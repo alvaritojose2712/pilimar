@@ -7,6 +7,7 @@ use App\Models\items_pedidos;
 use App\Models\pago_pedidos;
 use App\Models\clientes;
 use App\Models\movimientos_caja;
+use App\Models\sucursal;
 
 
 use Illuminate\Http\Request;
@@ -141,14 +142,40 @@ class PagoPedidosController extends Controller
         // if ($pedido_total[1] && $pedido_total[0]) {
         // $diferencia = ;
         // }
-        $pedido_total["diferencia"] = $pedido_total[0] - $pedido_total[1];
+        $pedido_total["diferencia"] = number_format($pedido_total[0] - $pedido_total[1],2);
         return [
             "pedido" => $pedidos,
             "pedido_total" => $pedido_total,
         ]; 
 
     }
+    public function verCreditos(Request $req)
+    {
+        $sucursal = sucursal::all()->first();
 
+        $busqueda = $req->qDeudores;
+        $data = clientes::with(["pedidos"=>function($q){
+            $q->with(["pagos"]);
+            $q->orderBy("created_at","desc");
+        }])
+        ->where("id","<>",1)->where(function($q) use ($busqueda){
+            $q->orWhere("identificacion","LIKE","%".$busqueda."%")
+            ->orWhere("nombre","LIKE","%".$busqueda."%");
+        })
+        ->get()
+        ->map(function($q){
+
+            $q->totalVuelto = 0; 
+            $q->saldo = 0;
+            
+            $q->saldo = $q->pedidos->map(function($q){
+                return $q->pagos->where("cuenta",0)->sum("monto")-$q->pagos->where("tipo",4)->sum("monto");
+            })->sum();
+
+            return $q;
+        })->sortBy("saldo");
+        return view("reportes.creditos",["data" => $data,"sucursal" => $sucursal]);
+    }
     public function getDeudores(Request $req)
     {
         $busqueda = $req->qDeudores;
@@ -166,7 +193,7 @@ class PagoPedidosController extends Controller
 
             $q->totalVuelto = 0; 
             $q->saldo = 0;
-            if ($view==="clientes") {
+            if ($view==="vueltos") {
                 // code...
                 $q->totalVuelto = $q->pedidos->map(function($q){
 
@@ -180,9 +207,9 @@ class PagoPedidosController extends Controller
                     return $q->pagos->where("tipo",6)->sum("monto")-$sum_entregado;
                 })->sum();
             }else if($view==="credito"){
-                $q->saldo = $q->pedidos->map(function($q){
+                $q->saldo = number_format($q->pedidos->map(function($q){
                     return $q->pagos->where("cuenta",0)->sum("monto")-$q->pagos->where("tipo",4)->sum("monto");
-                })->sum();
+                })->sum(),2);
 
             }
 

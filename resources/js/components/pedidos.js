@@ -26,39 +26,37 @@ filterMetodoPagoToggle,
 	try{
 		return (
 			<div className="container">
-				<div className="row">
-
+        <div className="d-flex justify-content-center align-items-center">
 					<div className="input-group cell2">
-
 					  <div className="input-group-prepend">
-								<div className="radios d-flex mr-2">
-									<div className={" m-1 pointer "+(tipoestadopedido=="todos"?"select-fact bg-warning":"select-fact")} onClick={()=>setTipoestadopedido("todos")}>
-										Todos <i className="fa fa-clock-o"></i>
-									</div>
-									<div className={" m-1 pointer "+(tipoestadopedido==0?"select-fact bg-warning":"select-fact")} onClick={()=>setTipoestadopedido(0)}>
-										Pend. <i className="fa fa-clock-o"></i>
-									</div>
-									<div className={" m-1 pointer " + (tipoestadopedido==1?"select-fact bg-success":"select-fact")} onClick={()=>setTipoestadopedido(1)}>
-										Procs. <i className="fa fa-check"></i> 
-									</div>
+							<div className="radios d-flex mr-2">
+								<div className={" m-1 pointer "+(tipoestadopedido=="todos"?"select-fact bg-warning":"select-fact")} onClick={()=>setTipoestadopedido("todos")}>
+									Todos <i className="fa fa-clock-o"></i>
 								</div>
+								<div className={" m-1 pointer "+(tipoestadopedido==0?"select-fact bg-warning":"select-fact")} onClick={()=>setTipoestadopedido(0)}>
+									Pend. <i className="fa fa-clock-o"></i>
+								</div>
+								<div className={" m-1 pointer " + (tipoestadopedido==1?"select-fact bg-success":"select-fact")} onClick={()=>setTipoestadopedido(1)}>
+									Procs. <i className="fa fa-check"></i> 
+								</div>
+							</div>
 						</div>
 					</div>
 					<div className="input-group cell8">
 					  <div className="input-group-prepend">
-	            <div className="input-group-text">
-								<div className="radios d-flex mr-2">
-									<div className={" m-1 pointer "+(tipobusquedapedido=="fact"?"select-fact bg-arabito":"select-fact")} onClick={()=>setTipoBusqueda("fact")}>
-										Fact. <i className="fa fa-search"></i>
-									</div>
-									<div className={" m-1 pointer " + (tipobusquedapedido=="prod"?"select-fact bg-arabito":"select-fact")} onClick={()=>setTipoBusqueda("prod")}>
-										Prod. <i className="fa fa-search"></i> 
-									</div>
-									<div className={" m-1 pointer " + (tipobusquedapedido=="cliente"?"select-fact bg-arabito":"select-fact")} onClick={()=>setTipoBusqueda("cliente")}>
-										Clien. <i className="fa fa-user"></i> 
-									</div>
-								</div>
-							</div>
+              <div className="input-group-text">
+                <div className="radios d-flex mr-2">
+                  <div className={" m-1 pointer "+(tipobusquedapedido=="fact"?"select-fact bg-sinapsis":"select-fact")} onClick={()=>setTipoBusqueda("fact")}>
+                    Fact. <i className="fa fa-search"></i>
+                  </div>
+                  <div className={" m-1 pointer " + (tipobusquedapedido=="prod"?"select-fact bg-sinapsis":"select-fact")} onClick={()=>setTipoBusqueda("prod")}>
+                    Prod. <i className="fa fa-search"></i> 
+                  </div>
+                  <div className={" m-1 pointer " + (tipobusquedapedido=="cliente"?"select-fact bg-sinapsis":"select-fact")} onClick={()=>setTipoBusqueda("cliente")}>
+                    Clien. <i className="fa fa-user"></i> 
+                  </div>
+                </div>
+              </div>
 	          </div>
 
 	          <input className="form-control" placeholder="Buscar... #Factura, #Descripción, #Cliente" value={busquedaPedido} data-type="busquedaPedido" onChange={onChangePedidos} autoComplete="off" />
@@ -76,7 +74,7 @@ filterMetodoPagoToggle,
 									<div className="card-pedidos d-flex justify-content-between" key={e.id}>
 									  <div className="">
 										  <h1>
-										  	<span className="badge btn-arabito">
+										  	<span className="badge btn-sinapsis">
 										  		{e.cantidadtotal}
 										  	</span>
 										  </h1>
@@ -108,13 +106,11 @@ filterMetodoPagoToggle,
 					{tipobusquedapedido=="fact"||tipobusquedapedido=="cliente"?
 						<>
 									
-							<div className="card-pedidos-header">
+							<div className="p-0 card-pedidos-header d-flex justify-content-center align-items-center">
 									<div className="cell1">
-							    	<h1>
-								    	<span className="badge btn-arabito">
-								    	{pedidos["totalventas"]}
-								    	</span>
-							    	</h1>
+                    <span className="badge btn-sinapsis fs-2">
+                    {pedidos["totalventas"]}
+                    </span>
 									</div>
 									<div className="cell5">
 	    							<span className={(filterMetodoPagoToggle=="todos"?"btn-dark":"")+(" pointer btn")} data-type="todos" onClick={filterMetodoPago}>Todos</span>
@@ -130,7 +126,7 @@ filterMetodoPagoToggle,
 							</div>
 							{pedidos["fact"]?pedidos["fact"].map(e=>
 								e?
-									<div className={("card-pedidos ")+(e.estado?"":"bg-arabito-light")} key={e.id}>
+									<div className={("card-pedidos ")+(e.estado?"":"bg-sinapsis-light")} key={e.id}>
 											
 										<div className="cell1 pointer" data-id={e.pedido.id} onClick={onClickEditPedido}>
 											
@@ -160,7 +156,7 @@ filterMetodoPagoToggle,
 						    						:null}
 
 						    						{ee.monto!=0&&ee.tipo==4?
-						    							<span className="btn btn-arabito btn-sm">Cred. {ee.monto}</span>
+						    							<span className="btn btn-sinapsis btn-sm">Cred. {ee.monto}</span>
 						    						:null}
 
 						    						{ee.monto!=0&&ee.tipo==5?

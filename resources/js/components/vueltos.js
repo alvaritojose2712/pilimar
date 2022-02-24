@@ -1,6 +1,4 @@
 
-import Clientes from '../components/clientes';
-
 function Credito({
   onchangecaja,
 
@@ -14,34 +12,9 @@ function Credito({
   monto_pago_deudor,
   setPagoCredito,
   onClickEditPedido,
-  onCLickDelPedido,
   detallesDeudor,
   onlyVueltos,
   setOnlyVueltos,
-
-  vueltoSubview,
-  setvueltoSubview,
-  qBuscarCliente,
-  setqBuscarCliente,
-  clientesCrud,
-  setindexSelectCliente,
-  indexSelectCliente,
-  setClienteCrud,
-  delCliente,
-  clienteInpidentificacion,
-  setclienteInpidentificacion,
-  clienteInpnombre,
-  setclienteInpnombre,
-  clienteInpcorreo,
-  setclienteInpcorreo,
-  clienteInpdireccion,
-  setclienteInpdireccion,
-  clienteInptelefono,
-  setclienteInptelefono,
-  clienteInpestado,
-  setclienteInpestado,
-  clienteInpciudad,
-  setclienteInpciudad,
 
   sumPedidos,
   sumPedidosArr
@@ -52,17 +25,14 @@ function Credito({
     <div className="container"> 
       <div className="row">
         <div className="col">
-          <h3>Clientes</h3> 
-          <div className="btn-group">
-            <button className={("btn ")+(vueltoSubview=="vuelto"?"btn-dark":"btn-arabito")} onClick={()=>setvueltoSubview("vuelto")}>Vuelto</button>
-            <button className={("btn ")+(vueltoSubview=="clientes"?"btn-dark":"btn-arabito")} onClick={()=>setvueltoSubview("clientes")}>Editar Clientes</button>
-          </div>
+          <h3>Vueltos</h3> 
+          
         </div>
       </div> 
-      {vueltoSubview=="vuelto"?
+      {
         selectDeudor===null?
         <div>
-          <input type="text" className="form-control" value={qDeudores} name="qDeudores" onChange={onchangecaja}/>
+          <input type="text" className="form-control" placeholder="Buscar..." value={qDeudores} name="qDeudores" onChange={onchangecaja}/>
           <table className="table table-hoverable">
             <thead>
               <tr>
@@ -87,6 +57,7 @@ function Credito({
               )}
             </tbody>
           </table>
+            {!deudoresList.length ? <div className='h3 text-center text-dark mt-2'><i>¡Sin resultados!</i></div>:null}
         </div>:
         <div className="p-4">
           <h3 className="text-center"><i className="fa fa-times text-danger pointer" onClick={()=>{
@@ -106,12 +77,6 @@ function Credito({
                           <span className="">{deudoresList[selectDeudor].identificacion}</span>
                           <h1 className="">{deudoresList[selectDeudor].nombre}</h1>
                         </div>:null}
-                        {sumPedidosArr.map(e=><button key={e} className="btn btn-outline-success" data-id={e} data-tipo="del" onClick={sumPedidos}>{e}</button>)}
-                        {sumPedidosArr.length?
-                          <a className="" target="_blank" href={"/sumpedidos?id="+sumPedidosArr}>
-                            <button className="btn btn-success">Emitir Factura.</button>
-                          </a>
-                          :null}
                       </th>
                       {!onlyVueltos?
                         <>
@@ -166,12 +131,6 @@ function Credito({
                     detallesDeudor["pedido"].map(e=>
                       <tr key={e.id}>
                         <td className="d-flex justify-content-between">
-                          {!sumPedidosArr.filter(id_save=>id_save==e.id).length?
-                            <button className="btn btn-outline-success" data-id={e.id} data-tipo="add" onClick={sumPedidos}>Select</button>
-                            :
-                          
-                            <button className="btn btn-outline-danger" data-id={e.id} data-tipo="del" onClick={sumPedidos}>UnSelect</button>
-                          }
                           {/*<span title="Eliminar pedido">
                             Eliminar <i className="fa fa-times text-danger" data-type="getDeudor" onClick={onCLickDelPedido} data-id={e.id}></i> {e.created_at}
                           </span>*/}
@@ -210,32 +169,8 @@ function Credito({
             </table>
           </div>
         </div>
-      :null}
-      {vueltoSubview=="clientes"?
-        <Clientes
-          qBuscarCliente={qBuscarCliente}
-          setqBuscarCliente={setqBuscarCliente}
-          clientesCrud={clientesCrud}
-          setindexSelectCliente={setindexSelectCliente}
-          indexSelectCliente={indexSelectCliente}
-          setClienteCrud={setClienteCrud}
-          delCliente={delCliente}
-          clienteInpidentificacion={clienteInpidentificacion}
-          setclienteInpidentificacion={setclienteInpidentificacion}
-          clienteInpnombre={clienteInpnombre}
-          setclienteInpnombre={setclienteInpnombre}
-          clienteInpcorreo={clienteInpcorreo}
-          setclienteInpcorreo={setclienteInpcorreo}
-          clienteInpdireccion={clienteInpdireccion}
-          setclienteInpdireccion={setclienteInpdireccion}
-          clienteInptelefono={clienteInptelefono}
-          setclienteInptelefono={setclienteInptelefono}
-          clienteInpestado={clienteInpestado}
-          setclienteInpestado={setclienteInpestado}
-          clienteInpciudad={clienteInpciudad}
-          setclienteInpciudad={setclienteInpciudad}
-        />
-      :null}
+      }
+      
     </div>
   )
 }

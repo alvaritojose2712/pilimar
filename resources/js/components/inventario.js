@@ -5,9 +5,15 @@ import Facturas from '../components/facturas';
 import Fallas from '../components/fallas';
 import PedidosCentralComponent from '../components/pedidosCentral';
 
+import InventarioForzado from '../components/inventarioForzado';
+
+
 
 
 function Inventario({
+  setporcenganancia,
+  changeInventario,
+  
   showaddpedidocentral,
   setshowaddpedidocentral,
   valheaderpedidocentral,
@@ -75,10 +81,6 @@ function Inventario({
   setinpInvid_marca,
   inpInvid_deposito,
   setinpInvid_deposito,
-
-  depositosList,
-  marcasList,
-
   setshowModalFacturas,
   showModalFacturas,
   facturas,
@@ -143,9 +145,23 @@ function Inventario({
   moneda,
   
   verDetallesFactura,
+  setNewProducto,
+  modViewInventario,
+  setmodViewInventario,
+  inpInvLotes,
+
+  addNewLote,
+  changeModLote,
+  reporteInventario,
+
+  guardarNuevoProductoLote,
+  refsInpInvList,
   
 }) {
 
+  const type = type => {
+    return !type || type === "delete" ? true : false
+  }
 
   return (
     <>
@@ -153,39 +169,24 @@ function Inventario({
         <div className="row">
         <div className="col">
           <div className="btn-group mb-2">              
-              {factSelectIndex!==null?<button className={("btn ")+(subViewInventario=="inventario"?"btn-dark":"btn-outline-success")} onClick={()=>setsubViewInventario("inventario")}>Inventario</button>
-              :null}
-              <button className={("btn ")+(subViewInventario=="fallas"?"btn-dark":"btn-outline-success")} onClick={()=>setsubViewInventario("fallas")}>Fallas</button>
+              <button className={("btn ")+(subViewInventario=="inventario"?"btn-dark":"btn-outline-success")} onClick={()=>setsubViewInventario("inventario")}>Inventario</button>
+              
               <button className={("btn ")+(subViewInventario=="proveedores"?"btn-dark":"btn-outline-success")} onClick={()=>setsubViewInventario("proveedores")}>Proveedores</button>
+              <button className={("btn ") + (subViewInventario=="fallas"?"btn-dark":"btn-outline-success")} onClick={()=>setsubViewInventario("fallas")}>Fallas</button>
           </div>
         </div>
-          <div className="col text-right d-flex align-items-center justify-content-between">
-            <button className={("btn ")+(subViewInventario=="pedidosCentral"?"btn-dark":"btn-outline-success")} onClick={()=>setsubViewInventario("pedidosCentral")}>Pedidos Central</button>
+          {subViewInventario == "inventario" ?<div className="col text-right d-flex align-items-center justify-content-between">
+            {/* <button className={("btn ")+(subViewInventario=="pedidosCentral"?"btn-dark":"btn-outline-success")} onClick={()=>setsubViewInventario("pedidosCentral")}>Pedidos Central</button> */}
             <div className="btn-group mb-2">
-              <button className="btn btn-arabito" onClick={()=>setshowModalFacturas(!showModalFacturas)}>Seleccionar Factura</button>
+              <button className="btn btn-sinapsis" onClick={()=>setshowModalFacturas(!showModalFacturas)}>Seleccionar Factura</button>
             </div>
           </div>
+          :null}
           
         </div>
       </div>
       <hr/>
-      <div className="container">
-        
-        <div className="d-flex justify-content-end">
-          {factSelectIndex==null?null
-          : 
-          <div className="input-group w-25">
-            <span className="input-group-text" >{facturas[factSelectIndex]?facturas[factSelectIndex].proveedor.descripcion:null}</span>
-
-            <button className="btn btn-outline-secondary">{facturas[factSelectIndex]?facturas[factSelectIndex].numfact:null}</button>
-            <button className="btn btn-outline-danger" onClick={()=>setfactSelectIndex(null)}>
-              <i className="fa fa-times"></i>
-            </button>
-          </div>
-          }
-        </div>
-      </div>
-      <hr/>
+     
       <Facturas
         setshowModalFacturas={setshowModalFacturas}
         showModalFacturas={showModalFacturas}
@@ -224,82 +225,141 @@ function Inventario({
         delFactura={delFactura}
         delItemFact={delItemFact}
       />
-      {factSelectIndex!==null?
+      {
         subViewInventario=="inventario"?
-          <CargarProducto 
-            productosInventario={productosInventario}
-            qBuscarInventario={qBuscarInventario}
-            setQBuscarInventario={setQBuscarInventario}
+          <>
+            <div className="container">
+              <div className="d-flex justify-content-between align-items-center">
+                <div className="">
 
-            setIndexSelectInventario={setIndexSelectInventario}
-            indexSelectInventario={indexSelectInventario}
-            inputBuscarInventario={inputBuscarInventario}
+                  {subViewInventario == "inventario" && modViewInventario != "unique" ?
+                    <button className="btn btn-success text-light" onClick={() => changeInventario(null, null, null, "add")}>Nuevo (f2) <i className="fa fa-plus"></i></button>
+                    :
+                    <button className="btn btn-sinapsis mr-1" onClick={setNewProducto}>Nuevo <i className="fa fa-plus"></i></button>
+                  }
 
-            inpInvbarras={inpInvbarras}
-            setinpInvbarras={setinpInvbarras}
-            inpInvcantidad={inpInvcantidad}
-            setinpInvcantidad={setinpInvcantidad}
-            inpInvalterno={inpInvalterno}
-            setinpInvalterno={setinpInvalterno}
-            inpInvunidad={inpInvunidad}
-            setinpInvunidad={setinpInvunidad}
-            inpInvcategoria={inpInvcategoria}
-            setinpInvcategoria={setinpInvcategoria}
-            inpInvdescripcion={inpInvdescripcion}
-            setinpInvdescripcion={setinpInvdescripcion}
-            inpInvbase={inpInvbase}
-            setinpInvbase={setinpInvbase}
-            inpInvventa={inpInvventa}
-            setinpInvventa={setinpInvventa}
-            inpInviva={inpInviva}
-            setinpInviva={setinpInviva}
+                  <button className={(modViewInventario == "list" ? "btn-success text-light" : "") + (" ms-2 btn")} onClick={() => setmodViewInventario("list")}><i className="fa fa-list"></i></button>
+                  <button className={(modViewInventario == "unique" ? "btn-sinapsis" : "") + (" btn")} onClick={() => setmodViewInventario("unique")}><i className="fa fa-columns"></i></button>
+                  <button className="btn btn-warning ms-2" onClick={reporteInventario}><i className="fa fa-print"></i></button>
+                </div>
 
-            number={number}
+                {factSelectIndex == null ? null
+                  :
+                  <div className="input-group w-25">
+                    <span className="input-group-text" >{facturas[factSelectIndex] ? facturas[factSelectIndex].proveedor.descripcion : null}</span>
 
-            guardarNuevoProducto={guardarNuevoProducto}
+                    <button className="btn btn-outline-secondary"
+                      onClick={() => { setshowModalFacturas(true); setfactsubView("detalles") }}>{facturas[factSelectIndex] ? facturas[factSelectIndex].numfact : null}</button>
+                    <button className="btn btn-outline-danger" onClick={() => setfactSelectIndex(null)}>
+                      <i className="fa fa-times"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+              <hr/>
+            </div>
+            {modViewInventario=="unique"?
+            <CargarProducto
+              setporcenganancia={setporcenganancia}
+              type={type}
+              setNewProducto={setNewProducto}
+              productosInventario={productosInventario}
+              qBuscarInventario={qBuscarInventario}
+              setQBuscarInventario={setQBuscarInventario}
 
-            setProveedor={setProveedor}
-            proveedordescripcion={proveedordescripcion}
-            setproveedordescripcion={setproveedordescripcion}
-            proveedorrif={proveedorrif}
-            setproveedorrif={setproveedorrif}
-            proveedordireccion={proveedordireccion}
-            setproveedordireccion={setproveedordireccion}
-            proveedortelefono={proveedortelefono}
-            setproveedortelefono={setproveedortelefono}
+              setIndexSelectInventario={setIndexSelectInventario}
+              indexSelectInventario={indexSelectInventario}
+              inputBuscarInventario={inputBuscarInventario}
 
-            subViewInventario={subViewInventario}
-            setsubViewInventario={setsubViewInventario}
+              inpInvbarras={inpInvbarras}
+              setinpInvbarras={setinpInvbarras}
+              inpInvcantidad={inpInvcantidad}
+              setinpInvcantidad={setinpInvcantidad}
+              inpInvalterno={inpInvalterno}
+              setinpInvalterno={setinpInvalterno}
+              inpInvunidad={inpInvunidad}
+              setinpInvunidad={setinpInvunidad}
+              inpInvcategoria={inpInvcategoria}
+              setinpInvcategoria={setinpInvcategoria}
+              inpInvdescripcion={inpInvdescripcion}
+              setinpInvdescripcion={setinpInvdescripcion}
+              inpInvbase={inpInvbase}
+              setinpInvbase={setinpInvbase}
+              inpInvventa={inpInvventa}
+              setinpInvventa={setinpInvventa}
+              inpInviva={inpInviva}
+              setinpInviva={setinpInviva}
+              inpInvLotes={inpInvLotes}
 
-            setIndexSelectProveedores={setIndexSelectProveedores}
-            indexSelectProveedores={indexSelectProveedores}
-            qBuscarProveedor={qBuscarProveedor}
-            setQBuscarProveedor={setQBuscarProveedor}
-            proveedoresList={proveedoresList}
+              number={number}
 
-            delProveedor={delProveedor}
-            delProducto={delProducto}
+              guardarNuevoProducto={guardarNuevoProducto}
 
-            inpInvid_proveedor={inpInvid_proveedor}
-            setinpInvid_proveedor={setinpInvid_proveedor}
-            inpInvid_marca={inpInvid_marca}
-            setinpInvid_marca={setinpInvid_marca}
-            inpInvid_deposito={inpInvid_deposito}
-            setinpInvid_deposito={setinpInvid_deposito}
-            
-            depositosList={depositosList}
-            marcasList={marcasList}
+              setProveedor={setProveedor}
+              proveedordescripcion={proveedordescripcion}
+              setproveedordescripcion={setproveedordescripcion}
+              proveedorrif={proveedorrif}
+              setproveedorrif={setproveedorrif}
+              proveedordireccion={proveedordireccion}
+              setproveedordireccion={setproveedordireccion}
+              proveedortelefono={proveedortelefono}
+              setproveedortelefono={setproveedortelefono}
 
-            Invnum={Invnum}
-            setInvnum={setInvnum}
-            InvorderColumn={InvorderColumn}
-            setInvorderColumn={setInvorderColumn}
-            InvorderBy={InvorderBy}
-            setInvorderBy={setInvorderBy}
-          />
+              subViewInventario={subViewInventario}
+              setsubViewInventario={setsubViewInventario}
+
+              setIndexSelectProveedores={setIndexSelectProveedores}
+              indexSelectProveedores={indexSelectProveedores}
+              qBuscarProveedor={qBuscarProveedor}
+              setQBuscarProveedor={setQBuscarProveedor}
+              proveedoresList={proveedoresList}
+
+              delProveedor={delProveedor}
+              delProducto={delProducto}
+
+              inpInvid_proveedor={inpInvid_proveedor}
+              setinpInvid_proveedor={setinpInvid_proveedor}
+              inpInvid_marca={inpInvid_marca}
+              setinpInvid_marca={setinpInvid_marca}
+              inpInvid_deposito={inpInvid_deposito}
+              setinpInvid_deposito={setinpInvid_deposito}
+              
+              Invnum={Invnum}
+              setInvnum={setInvnum}
+              InvorderColumn={InvorderColumn}
+              setInvorderColumn={setInvorderColumn}
+              InvorderBy={InvorderBy}
+              setInvorderBy={setInvorderBy}
+
+              addNewLote={addNewLote}
+              changeModLote={changeModLote}
+              
+            />
+            : <InventarioForzado
+                setporcenganancia={setporcenganancia}
+
+                refsInpInvList={refsInpInvList}
+                proveedoresList={proveedoresList}
+                guardarNuevoProductoLote={guardarNuevoProductoLote}
+                inputBuscarInventario={inputBuscarInventario}
+                type={type}
+                number={number}
+                productosInventario={productosInventario}
+                qBuscarInventario={qBuscarInventario}
+                setQBuscarInventario={setQBuscarInventario}
+
+                changeInventario={changeInventario}
+
+                Invnum={Invnum}
+                setInvnum={setInvnum}
+                InvorderColumn={InvorderColumn}
+                setInvorderColumn={setInvorderColumn}
+                InvorderBy={InvorderBy}
+                setInvorderBy={setInvorderBy}
+              />}
+          </>
         :null
-
-      :null}
+      }
       {subViewInventario=="proveedores"?<Proveedores 
 
         number={number}
@@ -327,8 +387,6 @@ function Inventario({
         setinpInvid_marca={setinpInvid_marca}
         inpInvid_deposito={inpInvid_deposito}
         setinpInvid_deposito={setinpInvid_deposito}
-        depositosList={depositosList}
-        marcasList={marcasList}
       />:null}
 
       {subViewInventario=="fallas"?<Fallas 

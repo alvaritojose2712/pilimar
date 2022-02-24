@@ -1,3 +1,5 @@
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
+
 export default function VentasComponet({
 	ventasData,
 	getVentasClick,
@@ -5,7 +7,10 @@ export default function VentasComponet({
 	fechaventas,
 	moneda
 }) {
-		console.log(ventasData)
+	
+	let dataGrafica = ventasData.grafica ? ventasData.grafica:[]
+	
+
 	return (
 		<div className="container">
 			<div className="input-group mb-4">
@@ -20,9 +25,9 @@ export default function VentasComponet({
 						{ventasData?
 							<div className="btn-group">
 								<button className="btn btn-outline-success fs-1">Tot. {moneda(ventasData["total"])}</button>
-								<button className="btn btn-outline-arabito fs-4">Efec. {moneda(ventasData[3])}</button>
-								<button className="btn btn-outline-arabito fs-4">Deb. {moneda(ventasData[2])}</button>
-								<button className="btn btn-outline-arabito fs-4">Trans. {moneda(ventasData[1])}</button>
+								<button className="btn btn-outline-sinapsis fs-4">Efec. {moneda(ventasData[3])}</button>
+								<button className="btn btn-outline-sinapsis fs-4">Deb. {moneda(ventasData[2])}</button>
+								<button className="btn btn-outline-sinapsis fs-4">Trans. {moneda(ventasData[1])}</button>
 							</div>
 						:null}
 
@@ -38,6 +43,15 @@ export default function VentasComponet({
 						:null}						
 					</div>	
 				</div>
+			</div>
+			<div className='m-3 d-flex justify-content-center'>
+				<LineChart width={800} height={300} data={dataGrafica}>
+					<Line type="monotone" dataKey="monto" stroke="#8884d8" />
+					<CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
+					<XAxis dataKey="hora" />
+					<YAxis />
+					<Tooltip />
+				</LineChart>
 			</div>
 		</div>
 	)

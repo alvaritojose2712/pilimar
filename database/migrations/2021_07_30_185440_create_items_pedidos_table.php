@@ -17,6 +17,7 @@ class CreateItemsPedidosTable extends Migration
             $table->increments('id');
             
 
+            $table->integer("lote")->nullable()->default(null);
             $table->integer("id_producto")->unsigned()->nullable(true);
             $table->foreign('id_producto')->references('id')->on('inventarios');
             $table->integer("id_pedido")->unsigned();
@@ -30,7 +31,7 @@ class CreateItemsPedidosTable extends Migration
             $table->decimal("monto",8,2);
             $table->timestamps();
 
-            $table->unique(["id_producto","id_pedido"]);
+            $table->unique(["id_producto","id_pedido","lote"]);
         });
     }
 

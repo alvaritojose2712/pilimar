@@ -7,7 +7,7 @@ import axios from 'axios';
 
 
 const host = ""
-// const host = "http://localhost/arabitoapp"
+// const host = "http://localhost/sinapsisapp"
 
 const db = {
   // setCentralData: data=>axios.get(host+"setCentralData",{params:data}),
@@ -16,7 +16,9 @@ const db = {
   setCarrito: data=>axios.post(host+"setCarrito",data),
   getPedido: data=>axios.post(host+"getPedido",data),
   getPedidosList: ()=>axios.post(host+"getPedidosList"),
-  verificarLogin: ()=>axios.post(host+"verificarLogin"),
+  verificarLogin: () => axios.post(host + "verificarLogin"),
+  logout: ()=>axios.get(host+"logout"),
+  
   guardarCierre: data=>axios.post(host+"guardarCierre",data),
 
   setMoneda: data=>axios.post(host+"setMoneda",data),
@@ -66,7 +68,9 @@ const db = {
 
   
   setProveedor: data=>axios.post(host+"setProveedor",data),
-  guardarNuevoProducto: data=>axios.post(host+"guardarNuevoProducto",data),
+  guardarNuevoProducto: data => axios.post(host + "guardarNuevoProducto", data),
+  guardarNuevoProductoLote: data=>axios.post(host+"guardarNuevoProductoLote",data),
+  
   getProveedores: data=>axios.post(host+"getProveedores",data),
   
   delProveedor: data=>axios.post(host+"delProveedor",data),
@@ -100,9 +104,17 @@ const db = {
   checkPedidosCentral: data=>axios.post(host+"checkPedidosCentral",data),
 
   setUsuario: data=>axios.post(host+"setUsuario",data),
-  delUsuario: data=>axios.post(host+"delUsuario",data),
+  delUsuario: data => axios.post(host + "delUsuario", data),
   getUsuarios: data=>axios.get(host+"getUsuarios"),
-
+  
+  removeLote: data=>axios.post(host+"removeLote",data),
+  
+  openPrintCreditos: (param) => window.open(host + "verCreditos","targed=blank"),
+  openVerCierre: ({ type,fechaCierre }) => window.open(host + "verCierre?type=" + type + "&fecha=" + fechaCierre,"targed=blank"),
+  openNotaentregapedido: ({ id }) => window.open(host + "/notaentregapedido?id=" + id, "targed=blank"),
+  openVerFactura: ({ id }) => window.open(host + "verFactura?id=" + id, "targed=blank"),
+  openReporteInventario: () => window.open(host + "reporteInventario","targed=blank"),
+  
   
 
 

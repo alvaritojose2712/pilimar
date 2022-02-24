@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Faker\Generator as Faker;
 
 class CreateInventariosTable extends Migration
 {
@@ -13,11 +14,13 @@ class CreateInventariosTable extends Migration
      */
     public function up()
     {
+        $faker = new Faker;
+        
         Schema::create('inventarios', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->string("codigo_proveedor")->unique();
             $table->string("codigo_barras")->unique();
+            $table->string("codigo_proveedor")->nullable()->default(null);
 
             $table->integer("id_proveedor")->unsigned();
             $table->foreign('id_proveedor')->references('id')->on('proveedores');
@@ -26,31 +29,25 @@ class CreateInventariosTable extends Migration
             $table->integer("id_categoria")->unsigned();
             $table->foreign('id_categoria')->references('id')->on('categorias');
 
-            $table->integer("id_marca")->unsigned();
-            $table->foreign('id_marca')->references('id')->on('marcas');
+            $table->string("id_marca")->nullable()->default("GENÉRICO");
 
-            $table->string("unidad");
+            $table->string("unidad")->nullable()->default("UND");
 
-            $table->integer("id_deposito")->unsigned();
-            $table->foreign('id_deposito')->references('id')->on('depositos');
+            $table->string("id_deposito")->nullable()->default(1);
 
             
             
             $table->string("descripcion");
 
-            
+            $table->decimal("iva",5,2)->nullable()->default(0);
 
-            
+            $table->decimal("porcentaje_ganancia",3,2)->nullable()->default(0);
+            $table->decimal("precio_base",8,2)->default(0);
+            $table->decimal("precio",8,2)->default(0);
 
-            $table->decimal("iva",3,2)->default(0);
+            $table->decimal("cantidad",9,2)->default(0);
 
-            $table->decimal("porcentaje_ganancia",3,2);
-            $table->decimal("precio_base",8,2);
-            $table->decimal("precio",8,2);
-
-            $table->decimal("cantidad",7,2);
-
-            $table->boolean("push")->default(0);
+            $table->boolean("push")->nullable()->default(0);
 
 
 
@@ -3903,19 +3900,19 @@ class CreateInventariosTable extends Migration
             array_push($arr, 
                 [
                     // "id" => $value[0],
-                    "codigo_proveedor" => $value[0].$value[2],
-                    "codigo_barras" => "MAN".$value[0],
-                    "id_proveedor" => 1,
-                    "id_categoria" => 1,
-                    "id_marca" => 1,
+                    "codigo_proveedor" => $faker->isbn13(),
+                    "codigo_barras" => $faker->ean13(),
+                    "id_proveedor" => $faker->numberBetween(1,8),
+                    "id_categoria" => $faker->numberBetween(1,39),
+                    "id_marca" => "MARCA".$faker->numberBetween(1,100),
                     "unidad" => $value[5],
                     "id_deposito" => 1,
                     "descripcion" => $value[4],
                     "iva" => 0,
                     "porcentaje_ganancia" => 0,
-                    "precio_base" => 0,
-                    "precio" => $value[7],
-                    "cantidad" => $value[8],
+                    "precio_base" => $faker->numberBetween(1,1000),
+                    "precio" => $faker->numberBetween(1,1000),
+                    "cantidad" => $faker->numberBetween(5,4000),
                 ]
             );
         }

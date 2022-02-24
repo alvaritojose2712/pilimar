@@ -27,7 +27,25 @@ class PedidosController extends Controller
     {
         $fecha = $req->fecha1pedido;
 
-        return pedidos::whereBetween("created_at",["$fecha 00:00:01","$fecha 23:59:59"])->limit(7)->orderBy("id","desc")->get();
+        if(isset($req->vendedor)) {
+            // code...
+            $vendedor = $req->vendedor;
+        }else{
+
+            $vendedor = [];
+        }
+        
+        $ret = pedidos::whereBetween("created_at",["$fecha 00:00:01","$fecha 23:59:59"]);
+
+        if (count($vendedor)) {
+            $ret->whereIn("id_vendedor",$vendedor);
+        }
+
+        return $ret->limit(7)
+        ->orderBy("id","desc")
+        ->get();
+
+        
     }
     public function get_moneda()
     {
@@ -89,7 +107,10 @@ class PedidosController extends Controller
 
         // return $items;
 
+        $sucursal = sucursal::all()->first();
+
         return view("reportes.sumpedidos",[
+            "sucursal" => $sucursal,
             "pedido"=>$items,
             "cliente"=>$cliente,
 
@@ -107,14 +128,21 @@ class PedidosController extends Controller
     {
         $fechaventas = $req->fechaventas;
 
-        return $this->cerrarFun($fechaventas,0,0);
+        
+
+        return $this->cerrarFun($fechaventas,0,0,[],true);
     }
     public function getPedidos(Request $req)
     {   
         $fact = [];
         $prod = [];
 
+        if(isset($req->vendedor)){
+            $vendedor = $req->vendedor;
 
+        }else{
+            $vendedor = [];
+        }
         $tipobusquedapedido = $req->tipobusquedapedido;
         $busquedaPedido = $req->busquedaPedido;
         $fecha1pedido = $req->fecha1pedido;
@@ -160,12 +188,12 @@ class PedidosController extends Controller
                 ->orWhere("codigo_proveedor","LIKE","%$busquedaPedido%");
                 
             })
-            ->whereIn("id",function($q) use ($fecha1pedido,$fecha2pedido,$tipoestadopedido){
+            ->whereIn("id",function($q) use ($vendedor,$fecha1pedido,$fecha2pedido,$tipoestadopedido){
                 $q->from("items_pedidos")
-                ->whereIn("id_pedido",function($q) use ($fecha1pedido,$fecha2pedido,$tipoestadopedido){
+                ->whereIn("id_pedido",function($q) use ($vendedor,$fecha1pedido,$fecha2pedido,$tipoestadopedido){
                     $q->from("pedidos")
                     ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"])
-                    ->where(function($q) use ( $tipoestadopedido){
+                    ->where(function($q) use ($tipoestadopedido, $vendedor){
 
                         if (!$tipoestadopedido) {
                             $q->where("estado",false);
@@ -173,10 +201,8 @@ class PedidosController extends Controller
                         if($tipoestadopedido==1){
                             $q->where("estado",true);
                         }
-
-                        if($tipoestadopedido=="todos"){
-
-                            // $q->where("estado",true);
+                        if (count($vendedor)) {
+                            $q->whereIn("id_vendedor",$vendedor);
                         }
                     })
                     ->select("id");
@@ -185,8 +211,13 @@ class PedidosController extends Controller
 
             })
             ->get()
-            ->map(function($q)use ($fecha1pedido,$fecha2pedido){
-                $items = items_pedidos::whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"])->where("id_producto",$q->id);
+            ->map(function($q)use ($fecha1pedido,$fecha2pedido,$vendedor){
+                $items = items_pedidos::whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"])
+                ->where("id_producto",$q->id);
+                if (count($vendedor)) {
+                    $items->whereIn("id_pedido",pedidos::whereIn("id_vendedor",$vendedor)->select("id"));
+                }
+
                 $q->cantidadtotal = $items->sum("cantidad");
                 $q->items = $items->get();
 
@@ -211,8 +242,12 @@ class PedidosController extends Controller
                     // $q->where("estado",true);
                 }
             })
-            ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"])
-            ->orderBy("created_at","desc")
+            ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"]);
+            if (count($vendedor)) {
+                # code...
+                $fact->whereIn("id_vendedor",$vendedor);
+            }
+            $fact = $fact->orderBy("created_at","desc")
             ->limit($limit)
             ->get()
             ->map(function($q) use (&$subtotal, &$desctotal, &$totaltotal,&$porctotal,&$itemstotal,&$totalventas,$filterMetodoPagoToggle){
@@ -255,8 +290,12 @@ class PedidosController extends Controller
                     // $q->where("estado",true);
                 }
             })
-            ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"])
-            ->orderBy("created_at","desc")
+            ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"]);
+
+            if (count($vendedor)) {
+                $fact->whereIn("id_vendedor",$vendedor);
+            }
+            $fact = $fact->orderBy("created_at","desc")
             ->limit($limit)
             ->get()
             ->map(function($q) use (&$subtotal, &$desctotal, &$totaltotal,&$porctotal,&$itemstotal,&$totalventas,$filterMetodoPagoToggle){
@@ -367,7 +406,7 @@ class PedidosController extends Controller
         },"items"=>function($q)
         {
 
-            $q->with("producto");
+            $q->with(["producto","lotedata"]);
             $q->orderBy("id","asc");
 
         }])->where("id",$id_pedido)->first();
@@ -377,25 +416,46 @@ class PedidosController extends Controller
             $total_des_ped = 0;
             $subtotal_ped = 0;
             $total_ped = 0;            
-
-            $pedido->items->map(function($item) use (&$total_des_ped,&$subtotal_ped,&$total_ped)
+            $exento = 0;
+            $gravable = 0;
+            $ivas = "";
+            $monto_iva = 0;
+            $pedido->items->map(function($item) use (&$exento,&$gravable,&$ivas,&$monto_iva,&$total_des_ped,&$subtotal_ped,&$total_ped)
             {
-
+                
                 if (!$item->producto) {
                     $subtotal = $item->monto*$item->cantidad;
+                    $iva_val = "0";
+                    $iva_m = 0;
                 }else{
                     $subtotal = $item->producto["precio"]*$item->cantidad;
+                    $iva_val = $item->producto["iva"];
+                    $iva_m = $iva_val/100;
 
                 }
                 $total_des = ($item->descuento/100)*$subtotal;
 
                 $total_des_ped += $total_des;
                 $subtotal_ped += $subtotal;
-                $total_ped += ($subtotal-$total_des);
+
+                $subtotal_c_desc = $subtotal-$total_des;
+                
+                if (!$iva_m) {
+                    $exento += ($subtotal_c_desc);
+                }else{
+                    $gravable += ($subtotal_c_desc);
+                    $monto_iva += ($subtotal_c_desc)*$iva_m;
+                }
+                if (strpos($ivas,$iva_val)===false) {
+                    $ivas .= $iva_val."%,";
+                }
+                
+                $total_ped += ($subtotal_c_desc)+(($subtotal_c_desc)*$iva_m);
 
                 $item->total_des = number_format($total_des,2,".",",");
                 $item->subtotal = number_format($subtotal,2,".",",");
-                $item->total = number_format($subtotal-$total_des,2,".",",");
+                $item->total = number_format($subtotal_c_desc,2,".",",");
+
 
 
 
@@ -405,7 +465,11 @@ class PedidosController extends Controller
             $pedido->total_des = number_format($total_des_ped,2,".",",");
             $pedido->subtotal = number_format($subtotal_ped,2,".",",");
             $pedido->total = number_format(round( $total_ped,3),2,".",",");
-            $pedido->iva = round($total_ped,3)*.16;
+
+            $pedido->exento = number_format($exento,"2");
+            $pedido->gravable = number_format($gravable,"2");
+            $pedido->ivas = substr($ivas,0,-1);
+            $pedido->monto_iva = number_format($monto_iva,"2");
 
             $pedido->clean_total_des = $total_des_ped;
             $pedido->clean_subtotal = $subtotal_ped;
@@ -515,7 +579,7 @@ class PedidosController extends Controller
             "ultimo_cierre" =>$this->ultimoCierre($fecha)
         ];
     }
-    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$dejar=[])
+    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$dejar=[],$grafica=false)
     {   
         if (!$fecha) {
             return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);
@@ -542,7 +606,8 @@ class PedidosController extends Controller
             "fecha"=>$fecha,
             "caja_inicial"=>$caja_inicial,
 
-            "numventas"=>$pedido->get()->count(),
+            "numventas"=>0,
+            "grafica"=>[],
 
             "entregadomenospend"=>0,
             "entregado" => $entregado_fun["entregado"],
@@ -565,19 +630,30 @@ class PedidosController extends Controller
             5=>0,
             6=>0,
         ];
+        $numventas_arr = [];
         pago_pedidos::whereIn("id_pedido",$pedido->select("id"))
         ->where("monto","<>",0)
         ->get()
-        ->map(function($q) use (&$arr_pagos){
+        ->map(function($q) use (&$arr_pagos,&$numventas_arr){
             if (array_key_exists($q->tipo,$arr_pagos)) {
                 $arr_pagos[$q->tipo] += $q->monto;
             }else{
                 $arr_pagos[$q->tipo] = $q->monto;
             }
             if ($q->tipo!=4&&$q->tipo!=6) {
+                $hora = date("h:i",strtotime($q->updated_at));
+                if (!array_key_exists($q->id_pedido,$numventas_arr)) {
+                    $numventas_arr[$q->id_pedido] = ["hora"=>$hora,"monto"=>$q->monto];
+                }else {
+                    $numventas_arr[$q->id_pedido]["monto"] = $numventas_arr[$q->id_pedido]["monto"]+$q->monto;
+                }
                 $arr_pagos["total"] += $q->monto;
             }
         });
+        $arr_pagos["numventas"] = count($numventas_arr);
+        if ($grafica) {
+            $arr_pagos["grafica"] = array_values($numventas_arr);
+        }
         if (isset($arr_pagos[6])) {
             // Sumar vuelto a pendientes
             $arr_pagos["pendiente"] += $arr_pagos[6]; 
@@ -778,14 +854,10 @@ class PedidosController extends Controller
             //Enviar Cierre
 
             $from1 = $sucursal->correo;
-            $from = "Arabito ";
+            $from = "sinapsis ";
             $subject = $sucursal->sucursal." ".$req->fecha;
             $env_emails = str_replace("\n", "", env("SEND_MAIL"));
             $sends = [
-                "amerelhenaoui@gmail.com",
-                "omarelhenaoui@hotmail.com",
-                "yeisersalah2@gmail.com",
-                "yesers982@hotmail.com",
                 "alvaroospino79@gmail.com",
             ];
             try {
