@@ -141,7 +141,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('getPagoProveedor', [PagoFacturasController::class,"getPagoProveedor"]);
 		Route::post('delPagoProveedor', [PagoFacturasController::class,"delPagoProveedor"]);
 		
-		
+		Route::post('delMovCaja', [MovimientosCajaController::class,"delMovCaja"]);
+		Route::post('delMov', [MovimientosController::class,"delMov"]);
 
 
 	});
@@ -157,8 +158,7 @@ Route::group(['middleware' => ['login']], function () {
 	Route::post('setCantidad', [ItemsPedidosController::class,"setCantidad"]);
 	Route::post('setpersonacarrito', [PedidosController::class,"setpersonacarrito"]);
 
-	Route::post('delMovCaja', [MovimientosCajaController::class,"delMovCaja"]);
-	Route::post('delMov', [MovimientosController::class,"delMov"]);
+	
 	
 	
 	
