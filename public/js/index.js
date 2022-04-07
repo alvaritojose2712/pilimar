@@ -6926,7 +6926,12 @@ function Facturar(_ref) {
         type = e;
       }
 
-      var id = productos[selectItem].id;
+      var id = null;
+
+      if (productos[selectItem]) {
+        id = productos[selectItem].id;
+      }
+
       _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].setCarrito({
         id: id,
         type: type,

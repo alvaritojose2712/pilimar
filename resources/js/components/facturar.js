@@ -1414,7 +1414,11 @@ const addCarritoRequest = e =>{
     }else{
       type = e
     }
-    const id = productos[selectItem].id
+    let id = null
+    if (productos[selectItem]) {
+      id = productos[selectItem].id
+
+    }
 
     db.setCarrito({ id, type, cantidad, numero_factura, loteIdCarrito}).then(res=>{
       getPedidosList()
