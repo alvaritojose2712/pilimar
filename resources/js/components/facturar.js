@@ -1419,7 +1419,7 @@ const addCarritoRequest = e =>{
         break;
       }
       setCantidad("")
-      inputbusquedaProductosref.current.value = ""
+      
       setLoading(false)
     })
 

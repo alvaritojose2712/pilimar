@@ -6942,7 +6942,6 @@ function Facturar(_ref) {
         }
 
         setCantidad("");
-        inputbusquedaProductosref.current.value = "";
         setLoading(false);
       });
     } catch (err) {
