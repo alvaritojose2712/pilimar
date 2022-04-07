@@ -220,6 +220,7 @@ class tickera extends Controller
                 
                 $printer->text("\n");
                 $printer->text("*ESTE RECIBO NO TIENE NINGÚN");
+                $printer->text("\n");
                 $printer->text("VALOR FISCAL*");
                 $printer->text("\n");
                 $printer->text("\n");
