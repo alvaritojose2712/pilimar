@@ -190,7 +190,7 @@ export default function Facturar({user,notificar,setLoading}) {
 
   const [movCajadescripcion,setMovCajadescripcion] = useState("")
   const [movCajatipo,setMovCajatipo] = useState(null)
-  const [movCajacategoria,setMovCajacategoria] = useState(3)
+  const [movCajacategoria,setMovCajacategoria] = useState(5)
   const [movCajamonto,setMovCajamonto] = useState("")
   const [movCajaFecha,setMovCajaFecha] = useState("")
 
@@ -635,6 +635,20 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
     filterPreventDefault:false,
     enableOnTags:["INPUT", "SELECT","TEXTAREA"],
   }, [view, counterListProductos, selectItem, subViewInventario, modViewInventario]);
+
+  useHotkeys('ctrl+enter', event => {
+    if(view=="pagar"){
+      if (ModaladdproductocarritoToggle) {
+      }else if(toggleAddPersona){
+      }else{
+        facturar_e_imprimir()
+      }
+    } 
+  },{
+    filterPreventDefault:false,
+    enableOnTags:["INPUT", "SELECT","TEXTAREA"],
+  }, [view, counterListProductos, selectItem, subViewInventario, modViewInventario]);
+
 
   useEffect(()=>{
     getUsuarios()

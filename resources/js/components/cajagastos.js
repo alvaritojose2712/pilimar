@@ -28,7 +28,7 @@ function Cajagastos({
           <form onSubmit={setMovimientoCaja} >
             <table className="table table-sm">
               <thead> 
-                {movCajatipo!==null?
+                {movCajatipo!==<tr></tr>?
                 <>
                 	<tr>
                 		<td>

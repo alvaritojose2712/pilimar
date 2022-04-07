@@ -27,6 +27,18 @@ use Response;
 
 class PedidosController extends Controller
 {  
+    protected  $letras = [
+                1=>"L",
+                2=>"R",
+                3=>"E",
+                4=>"A",
+                5=>"S",
+                6=>"G",
+                7=>"F",
+                8=>"B",
+                9=>"P",
+                0=>"X",
+            ];
     public function getPedidosFast(Request $req)
     {
         $fecha = $req->fecha1pedido;
@@ -132,42 +144,31 @@ class PedidosController extends Controller
 
         $arr = $this->cerrarFun($fechaventas,0,0,[],true);
 
-        try {
-            $letras = [
-                1=>"L",
-                2=>"R",
-                3=>"E",
-                4=>"A",
-                5=>"S",
-                6=>"G",
-                7=>"F",
-                8=>"B",
-                9=>"P",
-                0=>"X",
-            ];
+        if ($fechaventas) {
+            // code...
+           
 
-            foreach ($letras as $key => $value) {
-                if ($arr["total"]) {
+            foreach ($this->letras as $key => $value) {
+                if (isset($arr["total"])) {
                     $arr["total"] = str_replace($key, $value, ($arr["total"]));
                     // code...
                 }
-                if ($arr["3"]) {
+                if (isset($arr["3"])) {
                     // code...
                     $arr["3"] = str_replace($key, $value, ($arr["3"]));
                 }
-                if ($arr["2"]) {
+                if (isset($arr["2"])) {
                     $arr["2"] = str_replace($key, $value, ($arr["2"]));
                     // code...
                 }
 
-                if ($arr["1"]) {
+                if (isset($arr["1"])) {
                     $arr["1"] = str_replace($key, $value, ($arr["1"]));
                     // code...
                 }
             }
-        } catch (\Exception $e) {
-            
         }
+        
 
         return $arr;
     }
@@ -589,9 +590,9 @@ class PedidosController extends Controller
             $vendedor = session("id_usuario");
 
             $check = pedidos::where("estado",0)->where("id_vendedor",$vendedor)->orderBy("id","desc")->first();
-            if (!$check) {
-                $check = pedidos::where("estado",1)->where("id_vendedor",$vendedor)->orderBy("id","desc")->first();
-            }
+            // if (!$check) {
+            //     $check = pedidos::where("estado",1)->where("id_vendedor",$vendedor)->orderBy("id","desc")->first();
+            // }
             
             if (!$check) {
                 return [];
@@ -935,20 +936,9 @@ class PedidosController extends Controller
             "movimientos"=>$movimientos,
         ];
 
-        $letras = [
-            1=>"L",
-            2=>"R",
-            3=>"E",
-            4=>"A",
-            5=>"S",
-            6=>"G",
-            7=>"F",
-            8=>"B",
-            9=>"P",
-            0=>"X",
-        ];
+        
 
-        foreach ($letras as $key => $value) {
+        foreach ($this->letras as $key => $value) {
             $arr_send["total_inventario_format"] = str_replace($key, $value, $arr_send["total_inventario_format"]); 
             $arr_send["vueltos_totales"] = str_replace($key, $value, $arr_send["vueltos_totales"]); 
             $arr_send["precio"] = str_replace($key, $value, $arr_send["precio"]); 

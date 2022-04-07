@@ -316,12 +316,12 @@ setshowinputaddCarritoFast,
                       {editable?
                         showinputaddCarritoFast?
                           <>
-                            <span className="btn btn-outline-danger btn-sm" onClick={()=>setshowinputaddCarritoFast(false)}>Agregar rápido</span>
+                            <span className="btn btn-outline-danger btn-sm" onClick={()=>setshowinputaddCarritoFast(false)}>Agregar por barras</span>
                             <input className="form-control form-control-sm" value={inputaddCarritoFast} 
                             placeholder="Agregar..." onChange={e=>setinputaddCarritoFast(e.target.value)}/>
                           </>
                         :<>
-                          <span className="btn btn-outline-success btn-sm" onClick={()=>setshowinputaddCarritoFast(true)}>Agragar rápido</span>
+                          <span className="btn btn-outline-success btn-sm" onClick={()=>setshowinputaddCarritoFast(true)}>Agragar por barras</span>
                         </>
 
                       :null}
@@ -523,8 +523,8 @@ setshowinputaddCarritoFast,
                     <>
                     <button className="btn btn-circle text-white btn-success btn-xl me-1" onClick={facturar_pedido}>ENTER <i className="fa fa-paper-plane"></i></button>
 
-                    <button className="btn btn-circle btn-warning btn-xl me-5" onClick={facturar_e_imprimir}> 
-                      <i className="fa fa-paper-plane"></i>
+                    <button className="btn btn-circle btn-primary text-white btn-xl me-5" onClick={facturar_e_imprimir}> 
+                      CL+ETR<i className="fa fa-paper-plane"></i>
                       <i className="fa fa-print"></i>
                     </button>
                     </>

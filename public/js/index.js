@@ -2749,7 +2749,7 @@ function Cajagastos(_ref) {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
             className: "table table-sm",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("thead", {
-              children: movCajatipo !== null ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+              children: movCajatipo !== /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {}) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
@@ -5418,7 +5418,7 @@ function Facturar(_ref) {
       movCajatipo = _useState190[0],
       setMovCajatipo = _useState190[1];
 
-  var _useState191 = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(3),
+  var _useState191 = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(5),
       _useState192 = _slicedToArray(_useState191, 2),
       movCajacategoria = _useState192[0],
       setMovCajacategoria = _useState192[1];
@@ -6102,6 +6102,16 @@ function Facturar(_ref) {
       }
     } else if (view == "inventario" && subViewInventario == "inventario" && modViewInventario == "list") {
       focusInputSibli(event.target, 1);
+    }
+  }, {
+    filterPreventDefault: false,
+    enableOnTags: ["INPUT", "SELECT", "TEXTAREA"]
+  }, [view, counterListProductos, selectItem, subViewInventario, modViewInventario]);
+  (0,react_hotkeys_hook__WEBPACK_IMPORTED_MODULE_1__.useHotkeys)('ctrl+enter', function (event) {
+    if (view == "pagar") {
+      if (ModaladdproductocarritoToggle) {} else if (toggleAddPersona) {} else {
+        facturar_e_imprimir();
+      }
     }
   }, {
     filterPreventDefault: false,
@@ -12234,7 +12244,7 @@ function Pagar(_ref) {
                         onClick: function onClick() {
                           return setshowinputaddCarritoFast(false);
                         },
-                        children: "Agregar r\xE1pido"
+                        children: "Agregar por barras"
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("input", {
                         className: "form-control form-control-sm",
                         value: inputaddCarritoFast,
@@ -12249,7 +12259,7 @@ function Pagar(_ref) {
                         onClick: function onClick() {
                           return setshowinputaddCarritoFast(true);
                         },
-                        children: "Agragar r\xE1pido"
+                        children: "Agragar por barras"
                       })
                     }) : null
                   })]
@@ -12585,9 +12595,9 @@ function Pagar(_ref) {
                       className: "fa fa-paper-plane"
                     })]
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("button", {
-                    className: "btn btn-circle btn-warning btn-xl me-5",
+                    className: "btn btn-circle btn-primary text-white btn-xl me-5",
                     onClick: facturar_e_imprimir,
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("i", {
+                    children: ["CL+ETR", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("i", {
                       className: "fa fa-paper-plane"
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("i", {
                       className: "fa fa-print"
@@ -14049,7 +14059,7 @@ function VentasComponet(_ref) {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("i", {
               className: "fa fa-user m-2"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
-              className: "btn btn-xl btn-outline-success btn-circle fs-3",
+              className: "btn btn-xl btn-outline-success btn-circle fs-4",
               children: ventasData["numventas"]
             })]
           }) : null
