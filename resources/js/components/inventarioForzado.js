@@ -19,86 +19,215 @@ export default function InventarioForzado({
     proveedoresList,
     number,
     refsInpInvList,
+    categorias,
+    
+    setSameGanancia,
+    setSameCat,
+    setSamePro,
+    busquedaAvanazadaInv,
+    setbusquedaAvanazadaInv,
+
+    busqAvanzInputsFun,
+    busqAvanzInputs,
+    buscarInvAvanz,
 }){
     return (
         <div className="container-fluid">
-            <div className="input-group">
-                <input type="text" ref={inputBuscarInventario} className="form-control" placeholder="Buscar...(esc)" onChange={e => setQBuscarInventario(e.target.value)} value={qBuscarInventario} />
+            <div className="d-flex justify-content-between">
+                <div className="cell9 d-flex justify-content-between">
+                    <div className="cell8">                    
+                        {busquedaAvanazadaInv?<>
+                            <div className="input-group">
+                                <span className="input-group-text cell1">
+                                    codigo_barras
+                                </span>
+                                <input type="text" className="form-control cell1" onChange={e => busqAvanzInputsFun(e, "codigo_barras")} value={busqAvanzInputs["codigo_barras"]} placeholder="codigo_barras" />
+                                <span className="input-group-text cell1">
+                                    codigo_proveedor
+                                </span>
+                                <input type="text" className="form-control cell1" onChange={e => busqAvanzInputsFun(e, "codigo_proveedor")} value={busqAvanzInputs["codigo_proveedor"]} placeholder="codigo_proveedor" />
 
-                <select value={Invnum} onChange={e => setInvnum(e.target.value)}>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="500">500</option>
-                    <option value="2000">2000</option>
-                </select>
-                <select value={InvorderBy} onChange={e => setInvorderBy(e.target.value)}>
-                    <option value="asc">Asc</option>
-                    <option value="desc">Desc</option>
-                </select>
-                <button className="btn btn-success text-light" onClick={guardarNuevoProductoLote}><i className="fa fa-send"></i> (f1)</button>
+                                <span className="input-group-text cell1">
+                                    id_proveedor
+                                </span>
+                                
+                                <select
+                                className="form-control cell1"
+                                onChange={e => busqAvanzInputsFun(e, "id_proveedor")} value={busqAvanzInputs["id_proveedor"]}
+                                >
+                                    <option value="">--Select--</option>
+                                    {proveedoresList.map(e => <option value={e.id} key={e.id}>{e.descripcion}</option>)}
+                                    
+                                </select>
+
+                                <span className="input-group-text cell1">
+                                    id_categoria
+                                </span>
+                                
+                                <select
+                                className="form-control cell1"
+                                onChange={e => busqAvanzInputsFun(e, "id_categoria")} value={busqAvanzInputs["id_categoria"]} 
+                                >
+                                    <option value="">--Select--</option>
+                                    {categorias.map(e => <option value={e.id} key={e.id}>{e.descripcion}</option>)}
+
+                                </select>
+
+                                <span className="input-group-text cell1">
+                                    unidad
+                                </span>
+                                <input type="text" className="form-control cell1" onChange={e => busqAvanzInputsFun(e, "unidad")} value={busqAvanzInputs["unidad"]} placeholder="unidad" />
+                                
+                            </div>
+                            <div className="input-group">
+                                <span className="input-group-text cell1">
+                                    descripcion
+                                </span>
+                                <input type="text" className="form-control cell1" onChange={e => busqAvanzInputsFun(e, "descripcion")} value={busqAvanzInputs["descripcion"]} placeholder="descripcion" />
+                                <span className="input-group-text cell1">
+                                    iva
+                                </span>
+                                <input type="text" className="form-control cell1" onChange={e => busqAvanzInputsFun(e, "iva")} value={busqAvanzInputs["iva"]} placeholder="iva" />
+                                <span className="input-group-text cell1">
+                                    precio_base
+                                </span>
+                                <input type="text" className="form-control cell1" onChange={e => busqAvanzInputsFun(e, "precio_base")} value={busqAvanzInputs["precio_base"]} placeholder="precio_base" />
+                                <span className="input-group-text cell1">
+                                    precio
+                                </span>
+                                <input type="text" className="form-control cell1" onChange={e => busqAvanzInputsFun(e, "precio")} value={busqAvanzInputs["precio"]} placeholder="precio" />
+                                <span className="input-group-text cell1">
+                                    cantidad
+                                </span>
+                                <input type="text" className="form-control cell1" onChange={e => busqAvanzInputsFun(e, "cantidad")} value={busqAvanzInputs["cantidad"]} placeholder="cantidad" />
+
+                               
+                            </div>
+                        </>:null}
+                        <div className="input-group">
+                            {busquedaAvanazadaInv?null:
+                                <input type="text" ref={inputBuscarInventario} className="form-control" placeholder="Buscar...(esc)" onChange={e => setQBuscarInventario(e.target.value)} value={qBuscarInventario} />
+                            }
+                        </div>
+                    </div>
+                    <div className="cell2 ps-5">
+                        <div className="input-group">
+                            <select value={Invnum} onChange={e => setInvnum(e.target.value)} className="form-control">
+                                <option value="25">Num.25</option>
+                                <option value="50">Num.50</option>
+                                <option value="100">Num.100</option>
+                                <option value="500">Num.500</option>
+                                <option value="2000">Num.2000</option>
+                                <option value="10000">Num.100000</option>
+                            </select>
+                            <select value={InvorderBy} onChange={e => setInvorderBy(e.target.value)} className="form-control">
+                                <option value="asc">Orden Asc</option>
+                                <option value="desc">Orden Desc</option>
+                            </select>
+                            {busquedaAvanazadaInv?
+                                <button className="btn btn-success" onClick={buscarInvAvanz}><i className="fa fa-search"></i></button>
+                            
+                            :null}
+                        </div>
+                    </div>
+                </div>
+                <div className="cell1 text-right">
+                    <button className="btn btn-success text-light" onClick={guardarNuevoProductoLote}><i className="fa fa-send"></i> (f1)</button>
+                </div>
             </div>
+            <a href="#" onClick={() => setbusquedaAvanazadaInv(!busquedaAvanazadaInv)}>Búsqueda {busquedaAvanazadaInv ? "sencilla" :"avanazada"}</a>
             
             <form ref={refsInpInvList} onSubmit={e=>e.preventDefault()}>
                 <table className="table">
                     <thead>
                         <tr>
-                            <th className="pointer" onClick={() => setInvorderColumn("id")}>ID</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("codigo_proveedor")}>C. Alterno</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("codigo_barras")}>C. Barras</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("unidad")}>Unidad</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("descripcion")}>Descripción</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("cantidad")}>Ct.</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("precio_base")}>Base</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("precio")}>Venta</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("id_categoria")}>Categoría</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("id_proveedor")}>Preveedor</th>
-                            <th className="pointer" onClick={() => setInvorderColumn("iva")}>IVA</th>
+                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("id")}>ID</span></th>
+                            <th className="cell1 pointer"><span onClick={() => setInvorderColumn("codigo_proveedor")}>C. Alterno</span></th>
+                            <th className="cell1 pointer"><span onClick={() => setInvorderColumn("codigo_barras")}>C. Barras</span></th>
+                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("unidad")}>Unidad</span></th>
+                            <th className="cell2 pointer"><span onClick={() => setInvorderColumn("descripcion")}>Descripción</span></th>
+                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("cantidad")}>Ct.</span></th>
+                            <th className="cell1 pointer"><span onClick={() => setInvorderColumn("precio_base")}>Base</span></th>
+                            <th className="cell15 pointer">
+                                <span onClick={() => setInvorderColumn("precio")}>Venta </span>
+                                <span className="btn btn-outline-success mr-1 btn-sm" onClick={setSameGanancia}>% general <i className="fa fa-coin"></i></span>
+                            </th>
+                            <th className="cell15 pointer" >
+                                <span onClick={() => setInvorderColumn("id_categoria")}>
+                                    Categoría
+                                </span>
+                                <br />
+                                    <select
+                                        className=""
+                                        defaultValue={""}
+                                        onChange={e=>setSameCat(e.target.value)}
+                                    >
+                                        <option value="">--Select--</option>
+                                        {categorias.map(e => <option value={e.id} key={e.id}>{e.descripcion}</option>)}
+                                        
+                                    </select> 
+                                <br/>
+                                <span onClick={() => setInvorderColumn("id_proveedor")}>
+                                    Preveedor
+                                </span>
+                                <br />
+                                    <select
+                                        className=""
+                                        defaultValue={""}
+                                        onChange={e => setSamePro(e.target.value)}
+                                    >
+                                        <option value="">--Select--</option>
+                                        {proveedoresList.map(e => <option value={e.id} key={e.id}>{e.descripcion}</option>)}
+
+                                    </select> 
+                            </th>
+                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("iva")}>IVA</span></th>
+                            <th className="cell1"></th>
+
                         </tr>
                     </thead>
                     <tbody>
                         {productosInventario.length?productosInventario.map((e,i)=>
                             <tr key={i} className="pointer" onDoubleClick={() => changeInventario(null, i, e.id, "update")}>
-                                <td>
+                                <td className="cell05">
                                     {e.id}
                                 </td>
                                 {type(e.type)?
                                 <>
-                                    <td>{e.codigo_proveedor}</td>
-                                    <td>{e.codigo_barras}</td>
-                                    <td>{e.unidad}</td>
-                                    <td>{e.descripcion}</td>
-                                    <th>{e.cantidad}</th>
-                                    <td>{e.precio_base}</td>
-                                    <td>{e.precio}</td>
-                                    <td>{e.id_categoria}</td>
-                                    <td>{e.id_proveedor}</td>
-                                    <td>{e.iva}</td>
+                                    <td className="cell1">{e.codigo_proveedor}</td>
+                                    <td className="cell1">{e.codigo_barras}</td>
+                                    <td className="cell05">{e.unidad}</td>
+                                    <td className="cell2">{e.descripcion}</td>
+                                    <th className="cell05">{e.cantidad}</th>
+                                    <td className="cell1">{e.precio_base}</td>
+                                    <td className="cell15 text-success">{e.precio}</td>
+                                        <td className="cell15">{e.categoria.descripcion} <br /> {e.proveedor.descripcion}</td>
+                                    <td className="cell05">{e.iva}</td>
                                 </>
 
                                 :
                                 <>
-                                    <td>
+                                    <td className="cell1">
                                         <input type="text"
                                             disabled={type(e.type)} className="form-control form-control-sm"
-                                            value={e.codigo_proveedor}
+                                            value={!e.codigo_proveedor?"":e.codigo_proveedor}
                                             onChange={e => changeInventario((e.target.value), i, e.id, "changeInput", "codigo_proveedor")}
                                             placeholder="codigo_proveedor..." />
 
                                     </td>
-                                    <td>
+                                    <td className="cell1">
                                         <input type="text"
                                             disabled={type(e.type)} className="form-control form-control-sm"
-                                            value={e.codigo_barras}
+                                            value={!e.codigo_barras?"":e.codigo_barras}
                                             onChange={e => changeInventario((e.target.value), i, e.id, "changeInput", "codigo_barras")}
                                             placeholder="codigo_barras..." />
 
                                     </td>
-                                    <td>
+                                    <td className="cell05">
                                         <select
                                             disabled={type(e.type)}
                                             className="form-control form-control-sm"
-                                            value={e.unidad}
+                                            value={!e.unidad?"":e.unidad}
                                             onChange={e => changeInventario((e.target.value), i, e.id, "changeInput", "unidad")}
                                         >
                                             <option value="">--Select--</option>
@@ -113,99 +242,63 @@ export default function InventarioForzado({
                                             <option value="ML">ML</option>
                                         </select>
                                     </td>
-                                    <td>
-                                        <input type="text"
+                                    <td className="cell2">
+                                        <textarea type="text"
                                             disabled={type(e.type)} className="form-control form-control-sm"
-                                            value={e.descripcion}
-                                            onChange={e => changeInventario((e.target.value), i, e.id, "changeInput", "descripcion")}
-                                            placeholder="descripcion..." />
+                                            value={!e.descripcion?"":e.descripcion}
+                                            onChange={e => changeInventario((e.target.value.replace("\n","")), i, e.id, "changeInput", "descripcion")}
+                                            placeholder="descripcion..."></textarea>
 
                                     </td>
-                                    <td>
+                                    <td className="cell05">
                                         <input type="text"
                                             disabled={type(e.type)} className="form-control form-control-sm"
-                                            value={e.cantidad}
+                                            value={!e.cantidad?"":e.cantidad}
                                             onChange={e => changeInventario(number(e.target.value), i, e.id, "changeInput", "cantidad")}
                                             placeholder="cantidad..." />
 
                                     </td>
-                                    <td>
+                                    <td className="cell1">
                                         <input type="text"
                                             disabled={type(e.type)} className="form-control form-control-sm"
-                                            value={e.precio_base}
+                                            value={!e.precio_base?"":e.precio_base}
                                             onChange={e => changeInventario(number(e.target.value), i, e.id, "changeInput", "precio_base")}
-                                            placeholder="precio_base..." />
+                                            placeholder="Costo..." />
+
+
 
                                     </td>
-                                    <td>
+                                    <td className="cell15">
                                         <div className="input-group">
-                                            <span className="btn" onClick={()=>setporcenganancia("list",e.precio_base,(precio)=>{
-                                                    changeInventario(precio, i, e.id, "changeInput", "precio")
-                                                })}>%</span>
                                             <input type="text"
                                                 disabled={type(e.type)} className="form-control form-control-sm"
-                                                value={e.precio}
+                                                value={!e.precio?"":e.precio}
                                                 onChange={e => changeInventario(number(e.target.value), i, e.id, "changeInput", "precio")}
-                                                placeholder="Precio... % DoubeClick" />
+                                                placeholder="Final..." />
+                                            <span className="btn btn-sm" onClick={()=>setporcenganancia("list",e.precio_base,(precio)=>{
+                                                    changeInventario(precio, i, e.id, "changeInput", "precio")
+                                                })}>%</span>
                                         </div>
 
                                     </td>
-                                    <td>
+                                    <td className="cell15">
                                         <select
+                                            required={true}
                                             disabled={type(e.type)} 
                                             className="form-control form-control-sm"
-                                            value={e.id_categoria}
+                                            value={!e.id_categoria?"":e.id_categoria}
                                             onChange={e => changeInventario((e.target.value), i, e.id, "changeInput", "id_categoria")}
                                         >
                                             <option value="">--Select--</option>
-                                            <option value="1">VETERINARIA</option>
-                                            <option value="2">TORNILLERIA</option>
-                                            <option value="3">TERMOS</option>
-                                            <option value="4">TELEFONIA</option>
-                                            <option value="5">TECNOLOGIA</option>
-                                            <option value="6">REPUESTOS</option>
-                                            <option value="7">REFRIGERACION</option>
-                                            <option value="8">QUINCALLERIA</option>
-                                            <option value="9">PLOMERIA</option>
-                                            <option value="10">PLANTAS</option>
-                                            <option value="11">PINTURA</option>
-                                            <option value="12">PESCA</option>
-                                            <option value="13">PEGAS</option>
-                                            <option value="14">NAILOS</option>
-                                            <option value="15">MOTOS</option>
-                                            <option value="16">MECANICA</option>
-                                            <option value="17">MALLAS</option>
-                                            <option value="18">LENTES</option>
-                                            <option value="19">JARDINERIA</option>
-                                            <option value="20">INTERNET</option>
-                                            <option value="21">ILUMINACIÓN</option>
-                                            <option value="22">HOGAR</option>
-                                            <option value="23">HERRERIA</option>
-                                            <option value="24">HERRAMIENTAS</option>
-                                            <option value="25">GRIFERIA</option>
-                                            <option value="26">GAS</option>
-                                            <option value="27">FONTANERIA</option>
-                                            <option value="28">ELECTRONICA</option>
-                                            <option value="29">ELECTRODOMESTICO</option>
-                                            <option value="30">ELECTRICIDAD</option>
-                                            <option value="31">DISCO</option>
-                                            <option value="32">CORDONES</option>
-                                            <option value="33">CONSTRUCCION</option>
-                                            <option value="34">CERRADURA</option>
-                                            <option value="35">CERAMICA</option>
-                                            <option value="36">BATERIA</option>
-                                            <option value="37">ALAMBRE</option>
-                                            <option value="38">AGRICOLA</option>
-                                            <option value="39">ACEITES</option>
-                                            <option value="40">COSMETICOS</option>
+                                            {categorias.map(e => <option value={e.id} key={e.id}>{e.descripcion}</option>)}
+                                            
                                         </select>
-                                    </td>
-                                    <td>
+                                        <br/>
                                         <select
                                             required={true}
                                             disabled={type(e.type)}
                                             className="form-control form-control-sm"
-                                            value={e.id_proveedor}
+                                            value={!e.id_proveedor?"":e.id_proveedor}
                                             onChange={e => changeInventario((e.target.value), i, e.id, "changeInput", "id_proveedor")}
                                         >
                                             <option value="">--Select--</option>
@@ -213,40 +306,39 @@ export default function InventarioForzado({
 
                                         </select>
                                     </td>
-                                    
-                                    <td>
+                                    <td className="cell05">
                                         <input type="text"
                                             disabled={type(e.type)} className="form-control form-control-sm"
-                                            value={e.iva}
+                                            value={!e.iva?"":e.iva}
                                             onChange={e => changeInventario(number(e.target.value,2), i, e.id, "changeInput", "iva")}
                                             placeholder="iva..." />
 
                                     </td>
                                 </>
                                 }
-                                    <td>
+                                    <td className="cell1">
                                         <div className='d-flex justify-content-between'>
                                             {!e.type ?
                                                 <>
-                                                    <span className="btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delMode")}><i className="fa fa-trash"></i></span>
-                                                    <span className="btn btn-warning" onClick={() => changeInventario(null, i, e.id, "update")}><i className="fa fa-pencil"></i></span>
+                                                    <span className="btn-sm btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delMode")}><i className="fa fa-trash"></i></span>
+                                                    <span className="btn-sm btn btn-warning" onClick={() => changeInventario(null, i, e.id, "update")}><i className="fa fa-pencil"></i></span>
                                                 </>
                                                 : null}
                                             {e.type === "new" ?
-                                                <span className="btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delNew")}><i className="fa fa-times"></i></span>
+                                                <span className="btn-sm btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delNew")}><i className="fa fa-times"></i></span>
                                                 : null}
                                             {e.type === "update" ?
-                                                <span className="btn btn-warning" onClick={() => changeInventario(null, i, e.id, "delModeUpdateDelete")}><i className="fa fa-times"></i></span>
+                                                <span className="btn-sm btn btn-warning" onClick={() => changeInventario(null, i, e.id, "delModeUpdateDelete")}><i className="fa fa-times"></i></span>
                                                 : null}
                                             {e.type === "delete" ?
-                                                <span className="btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delModeUpdateDelete")}><i className="fa fa-arrow-left"></i></span>
+                                                <span className="btn-sm btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delModeUpdateDelete")}><i className="fa fa-arrow-left"></i></span>
                                                 : null}
                                         </div>
                                     </td>
                                 
                             </tr>
                         ):<tr>
-                            <td>Sin resultados</td>
+                            <td colSpan={7}>Sin resultados</td>
                         </tr>}
                     </tbody>
                 </table>

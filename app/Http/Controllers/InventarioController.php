@@ -16,6 +16,12 @@ use App\Models\sucursal;
 use App\Models\categorias;
 use App\Models\clientes;
 
+use App\Models\movimientos;
+use App\Models\items_movimiento;
+
+
+
+
             
 
 
@@ -24,6 +30,58 @@ use Response;
 
 class InventarioController extends Controller
 {
+    public function getEstaInventario(Request $req)
+    {
+        $fechaQEstaInve = $req->fechaQEstaInve;
+
+        $fecha1pedido = $req->fechaFromEstaInve;
+        $fecha2pedido = $req->fechaToEstaInve;
+        
+        $orderByEstaInv = $req->orderByEstaInv;
+        $orderByColumEstaInv = $req->orderByColumEstaInv;
+        
+        $tipoestadopedido = 1;
+
+        
+        return inventario::with([
+            "proveedor",
+            "categoria",
+            "marca",
+            "deposito",
+        ])
+        ->whereIn("id",function($q) use ($fecha1pedido,$fecha2pedido,$tipoestadopedido){
+            $q->from("items_pedidos")
+            ->whereIn("id_pedido",function($q) use ($fecha1pedido,$fecha2pedido,$tipoestadopedido){
+                $q->from("pedidos")
+                ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"])
+                
+                ->select("id");
+            })
+            ->select("id_producto");
+
+        })
+         ->where(function($q) use ($fechaQEstaInve)
+        {
+            $q->orWhere("descripcion","LIKE","%$fechaQEstaInve%")
+            ->orWhere("codigo_proveedor","LIKE","%$fechaQEstaInve%");
+            
+        })
+        ->selectRaw("*,@cantidadtotal := (SELECT sum(cantidad) FROM items_pedidos WHERE id_producto=inventarios.id AND created_at BETWEEN '$fecha1pedido 00:00:01' AND '$fecha2pedido 23:59:59') as cantidadtotal,(@cantidadtotal*inventarios.precio) as totalventa")
+        ->orderByRaw(" $orderByColumEstaInv"." ".$orderByEstaInv)
+        ->get();
+        // ->map(function($q)use ($fecha1pedido,$fecha2pedido){
+        //     $items = items_pedidos::whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"])
+        //     ->where("id_producto",$q->id)->sum("cantidad");
+
+        //     $q->cantidadtotal = $items
+        //     // $q->items = $items->get();
+
+        //     return $q;
+        // })->sortBy("cantidadtotal");
+
+
+
+    }
     public function hacer_pedido($id,$id_pedido,$cantidad,$type,$lote=null)
     {   
         try {
@@ -293,7 +351,28 @@ class InventarioController extends Controller
             return Response::json(["msj"=>"Error. ".$e->getMessage(),"estado"=>false]);
         }
     }
+    public function reporteFalla(Request $req)
+    {
+        $id_proveedor = $req->id;
 
+        $sucursal = sucursal::all()->first();
+        $proveedor = proveedores::find($id_proveedor);
+
+        if ($proveedor&&$id_proveedor) {
+            $fallas = fallas::With("producto")->whereIn("id_producto",function($q) use ($id_proveedor)
+            {
+                $q->from("inventarios")->where("id_proveedor",$id_proveedor)->select("id");
+            })->get();
+
+            return view("reportes.fallas",[
+                "fallas"=>$fallas, 
+                "sucursal"=>$sucursal,
+                "proveedor"=>$proveedor,
+            ]);
+        }
+
+
+    }
     public function index(Request $req)
     {
         $exacto = false;
@@ -319,62 +398,120 @@ class InventarioController extends Controller
         $orderColumn = $req->orderColumn;
         $orderBy = $req->orderBy;
 
-        if ($q=="") {
-            $data = inventario::with([
-                "proveedor",
-                "categoria",
-                "marca",
-                "deposito",
-                "lotes"=>function($q){
-                    $q->orderBy("vence","asc");
-                },
-            ])->where(function($e) use($itemCero){
-                if (!$itemCero) {
-                    $e->where("cantidad",">",0);
-                    // code...
-                }
+        
 
-            })
-            ->limit(20)
-            ->orderBy($orderColumn,$orderBy)
-            ->get();
+
+        if ($req->busquedaAvanazadaInv) {
+            $busqAvanzInputs = $req->busqAvanzInputs;
+            $data = inventario::with([
+                    "proveedor",
+                    "categoria",
+                    "marca",
+                    "deposito",
+                    "lotes"=>function($q){
+                        $q->orderBy("vence","asc");
+                    },
+                ])
+                ->where(function($e) use($busqAvanzInputs){
+    
+                    
+                    if ($busqAvanzInputs["codigo_barras"]!="") {
+                        $e->where("codigo_barras","LIKE",$busqAvanzInputs["codigo_barras"]."%");
+                    }
+                    if ($busqAvanzInputs["codigo_proveedor"]!="") {
+                        $e->where("codigo_proveedor","LIKE",$busqAvanzInputs["codigo_proveedor"]."%");
+                    }
+                    if ($busqAvanzInputs["id_proveedor"]!="") {
+                        $e->where("id_proveedor","LIKE",$busqAvanzInputs["id_proveedor"]);
+                    }
+                    if ($busqAvanzInputs["id_categoria"]!="") {
+                        $e->where("id_categoria","LIKE",$busqAvanzInputs["id_categoria"]);
+                    }
+                    if ($busqAvanzInputs["unidad"]!="") {
+                        $e->where("unidad","LIKE",$busqAvanzInputs["unidad"]."%");
+                    }
+                    if ($busqAvanzInputs["descripcion"]!="") {
+                        $e->where("descripcion","LIKE",$busqAvanzInputs["descripcion"]."%");
+                    }
+                    if ($busqAvanzInputs["iva"]!="") {
+                        $e->where("iva","LIKE",$busqAvanzInputs["iva"]."%");
+                    }
+                    if ($busqAvanzInputs["precio_base"]!="") {
+                        $e->where("precio_base","LIKE",$busqAvanzInputs["precio_base"]."%");
+                    }
+                    if ($busqAvanzInputs["precio"]!="") {
+                        $e->where("precio","LIKE",$busqAvanzInputs["precio"]."%");
+                    }
+                    if ($busqAvanzInputs["cantidad"]!="") {
+                        $e->where("cantidad","LIKE",$busqAvanzInputs["cantidad"]."%");
+                    }
+    
+                })
+                ->limit($num)
+                ->orderBy($orderColumn,$orderBy)
+                ->get();
+                
+
         }else{
-            $data = inventario::with([
-                "proveedor",
-                "categoria",
-                "marca",
-                "deposito",
-                "lotes"=>function($q){
-                    $q->orderBy("vence","asc");
-                },
-            ])
-            ->where(function($e) use($itemCero){
-                if (!$itemCero) {
-                    $e->where("cantidad",">",0);
-                    // code...
-                }
+            if ($q=="") {
+                $data = inventario::with([
+                    "proveedor",
+                    "categoria",
+                    "marca",
+                    "deposito",
+                    "lotes"=>function($q){
+                        $q->orderBy("vence","asc");
+                    },
+                ])->where(function($e) use($itemCero){
+                    if (!$itemCero) {
+                        $e->where("cantidad",">",0);
+                        // code...
+                    }
+    
+                })
+                ->limit($num)
+                ->orderBy($orderColumn,$orderBy)
+                ->get();
+            }else{
+                $data = inventario::with([
+                    "proveedor",
+                    "categoria",
+                    "marca",
+                    "deposito",
+                    "lotes"=>function($q){
+                        $q->orderBy("vence","asc");
+                    },
+                ])
+                ->where(function($e) use($itemCero){
+                    if (!$itemCero) {
+                        $e->where("cantidad",">",0);
+                        // code...
+                    }
+    
+                })
+                ->where(function($e) use($itemCero,$q,$exacto){
+    
+                    if ($exacto=="si") {
+                        $e->orWhere("codigo_barras","LIKE","$q")
+                        ->orWhere("codigo_proveedor","LIKE","$q");
+                    }elseif($exacto=="id_only"){
+    
+                        $e->where("id","$q");
+                    }else{
+                        $e->orWhere("descripcion","LIKE","%$q%")
+                        ->orWhere("codigo_proveedor","LIKE","%$q%")
+                        ->orWhere("codigo_barras","LIKE","%$q%");
+    
+                    }
+    
+                })
+                ->limit($num)
+                ->orderBy($orderColumn,$orderBy)
+                ->get();
+            }
 
-            })
-            ->where(function($e) use($itemCero,$q,$exacto){
-
-                if ($exacto=="si") {
-                    $e->orWhere("codigo_barras","LIKE","$q")
-                    ->orWhere("codigo_proveedor","LIKE","$q");
-                }elseif($exacto=="id_only"){
-
-                    $e->where("id","$q");
-                }else{
-                    $e->orWhere("descripcion","LIKE","%$q%")
-                    ->orWhere("codigo_proveedor","LIKE","%$q%")
-                    ->orWhere("codigo_barras","LIKE","%$q%");
-
-                }
-
-            })
-            ->limit($num)
-            ->orderBy($orderColumn,$orderBy)
-            ->get();
         }
+
         $data->map(function($q) use ($bs,$cop)
         {
             $q->bs = number_format($q->precio*$bs["valor"],2,".",",");
@@ -465,10 +602,33 @@ class InventarioController extends Controller
         }
         
     }
+    public function setMovimientoNotCliente($id_pro,$des,$ct,$precio,$cat)
+    {   
+        $mov = new movimientos;
+            
+            if ($mov->save()) {
+               $items_mov = new items_movimiento;
+               $items_mov->descripcion = $des;
+               $items_mov->id_producto = $id_pro;
+
+               $items_mov->cantidad = $ct;
+               $items_mov->precio = $precio;
+               $items_mov->tipo = 2;
+               $items_mov->categoria = $cat;
+               $items_mov->id_movimiento = $mov->id;
+               $items_mov->save();
+            }
+    }
     public function delProductoFun($id)
     {
         try {
-            inventario::find($id)->delete();
+
+            $i = inventario::find($id);
+            
+            $this->setMovimientoNotCliente(null,$i->descripcion,$i->cantidad,$i->precio,"Eliminación de Producto");
+
+            
+            $i->delete();
             return true;   
         } catch (\Exception $e) {
             throw new \Exception("Error al eliminar. ".$e->getMessage(), 1);
@@ -637,6 +797,7 @@ class InventarioController extends Controller
             }
 
             $this->checkFalla($req_id,$ctInsert);
+            $this->setMovimientoNotCliente($insertOrUpdateInv->id,"",$ctNew,"",$tipo);
             $this->insertItemFact($id_factura,$insertOrUpdateInv,$ctInsert,$beforecantidad,$ctNew,$tipo);
             
 

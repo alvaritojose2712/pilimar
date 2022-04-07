@@ -1,6 +1,4 @@
-import "../../css/login.css"
 import logo from "../../images/logo.png"
-import tools from "../../images/tools.png"
 
 import React, {Component} from 'react';
 import Cargando from './cargando';
@@ -87,7 +85,7 @@ class Login extends Component{
 				</div>
 				<span className="text-muted mt-4 text-center">
 					Ao Systems<br/>
-					<img src={logo} alt="logo ao" height="50px"/>
+					<img src={logo} alt="logo ao" height="150px"/>
 				</span>
 			</div>
 		);

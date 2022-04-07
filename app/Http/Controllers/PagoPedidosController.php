@@ -59,7 +59,7 @@ class PagoPedidosController extends Controller
             return Response::json(["msj"=>"Error: En caso de vuelto, debe registrar los datos del cliente","estado"=>false]);
         }
 
-        if ($total_real==$total_ins) {
+        if (round($total_real,1)==round($total_ins,1)) {
                // 1 Transferencia
                // 2 Debito 
                // 3 Efectivo 
@@ -85,8 +85,11 @@ class PagoPedidosController extends Controller
                 pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>6],["cuenta"=>$cuenta,"monto"=>floatval($req->vuelto)]);
 
                 $pedido = pedidos::find($req->id);
-                $pedido->estado = 1;
-                $pedido->save();
+
+                if ($pedido->estado==0) {
+                    $pedido->estado = 1;
+                    $pedido->save();
+                }
 
                 return Response::json(["msj"=>"Éxito","estado"=>true]);
             } catch (\Exception $e) {
@@ -95,7 +98,7 @@ class PagoPedidosController extends Controller
             }
 
         }else{
-            return Response::json(["msj"=>"Error. Montos no coinciden. Real: ".$total_real." | Ins: ".$total_ins,"estado"=>false]);
+            return Response::json(["msj"=>"Error. Montos no coinciden. Real: ".round($total_real,1)." | Ins: ".round($total_ins,1),"estado"=>false]);
             
         }
     }

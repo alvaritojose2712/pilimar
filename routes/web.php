@@ -12,6 +12,8 @@ use App\Http\Controllers\MovimientosCajaController;
 use App\Http\Controllers\PagoPedidosController;
 use App\Http\Controllers\MovimientosController;
 use App\Http\Controllers\ProveedoresController;
+use App\Http\Controllers\CategoriasController;
+
 
 use App\Http\Controllers\MarcasController;
 use App\Http\Controllers\DepositosController;
@@ -22,6 +24,8 @@ use App\Http\Controllers\tickera;
 use App\Http\Controllers\sendCentral;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\LotesController;
+use App\Http\Controllers\PagoFacturasController;
+
 
 
 
@@ -81,6 +85,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('guardarCierre', [PedidosController::class,"guardarCierre"]);
 		Route::get('verCierre', [PedidosController::class,"verCierre"]);
 		Route::post('cerrar', [PedidosController::class,"cerrar"]);
+		Route::get('getCierres', [PedidosController::class,"getCierres"]);
+
 		
 	});
 	Route::group(['middleware' => ['vendedor']], function () {
@@ -92,14 +98,15 @@ Route::group(['middleware' => ['login']], function () {
 	Route::group(['middleware' => ['admin']], function () {
 		Route::post('getVentas', [PedidosController::class,"getVentas"]);
 		
-		Route::post('delMovCaja', [MovimientosCajaController::class,"delMovCaja"]);
-		Route::post('delMov', [MovimientosController::class,"delMov"]);
+		
 		
 		Route::post('setProveedor', [ProveedoresController::class,"setProveedor"]);
 		Route::post('guardarNuevoProducto', [InventarioController::class,"guardarNuevoProducto"]);
 		Route::post('guardarNuevoProductoLote', [InventarioController::class,"guardarNuevoProductoLote"]);
 		
 		Route::post('getProveedores', [ProveedoresController::class,"getProveedores"]);
+		Route::get('getCategorias', [CategoriasController::class,"getCategorias"]);
+
 	
 		Route::post('delProveedor', [ProveedoresController::class,"delProveedor"]);
 		Route::post('delProducto', [InventarioController::class,"delProducto"]);
@@ -116,6 +123,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('getFallas', [InventarioController::class,"getFallas"]);
 		Route::post('setFalla', [InventarioController::class,"setFalla"]);
 		Route::post('delFalla', [InventarioController::class,"delFalla"]);
+		Route::get('reporteFalla', [InventarioController::class,"reporteFalla"]);
+		
 		
 		Route::post('removeLote', [LotesController::class,"removeLote"]);
 		
@@ -125,7 +134,19 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('getUsuarios', [UsuariosController::class,"getUsuarios"]);
 		Route::get('verCreditos', [PagoPedidosController::class,"verCreditos"]);
 		Route::get('reporteInventario', [InventarioController::class,"reporteInventario"]);
+		Route::post('getEstaInventario', [InventarioController::class,"getEstaInventario"]);
+
+		Route::post('saveMontoFactura', [FacturaController::class,"saveMontoFactura"]);
+		Route::post('setPagoProveedor', [PagoFacturasController::class,"setPagoProveedor"]);
+		Route::post('getPagoProveedor', [PagoFacturasController::class,"getPagoProveedor"]);
+		Route::post('delPagoProveedor', [PagoFacturasController::class,"delPagoProveedor"]);
+		
+		
+
+
 	});
+
+
 	Route::post('getMoneda', [MonedaController::class,"getMoneda"]);
 	Route::post('today', [PedidosController::class,"today"]);
 	
@@ -135,6 +156,9 @@ Route::group(['middleware' => ['login']], function () {
 	Route::post('delpedido', [PedidosController::class,"delpedido"]);
 	Route::post('setCantidad', [ItemsPedidosController::class,"setCantidad"]);
 	Route::post('setpersonacarrito', [PedidosController::class,"setpersonacarrito"]);
+
+	Route::post('delMovCaja', [MovimientosCajaController::class,"delMovCaja"]);
+	Route::post('delMov', [MovimientosController::class,"delMov"]);
 	
 	
 	

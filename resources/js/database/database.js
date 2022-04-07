@@ -95,25 +95,40 @@ const db = {
   imprimirTicked: data=>axios.post(host+"imprimirTicked",data),
   sendCierre: data=>axios.get(host+"verCierre",{params:data}),
 
+  saveMontoFactura: data=>axios.post(host+"saveMontoFactura",data),
 
   getPedidosCentral: data=>axios.post(host+"getPedidosCentral",data),
 
   getSucursal: data=>axios.get(host+"getSucursal",{params:data}),
+  getCategorias: data=>axios.get(host+"getCategorias",{params:data}),
+
+
 
   getProductosSerial: data=>axios.get(host+"getProductosSerial",{params:data}),
   checkPedidosCentral: data=>axios.post(host+"checkPedidosCentral",data),
 
   setUsuario: data=>axios.post(host+"setUsuario",data),
   delUsuario: data => axios.post(host + "delUsuario", data),
-  getUsuarios: data=>axios.get(host+"getUsuarios"),
+  getUsuarios: data => axios.get(host + "getUsuarios", { params: data }),
+  getCierres: data=>axios.get(host+"getCierres",{params:data}),
+  
   
   removeLote: data=>axios.post(host+"removeLote",data),
+  getEstaInventario: data => axios.post(host + "getEstaInventario", data),
+  setPagoProveedor: data => axios.post(host + "setPagoProveedor", data),
+  getPagoProveedor: data => axios.post(host + "getPagoProveedor", data),
+  delPagoProveedor: data=>axios.post(host+"delPagoProveedor",data),
+  
+  
+  
+  
   
   openPrintCreditos: (param) => window.open(host + "verCreditos","targed=blank"),
   openVerCierre: ({ type,fechaCierre }) => window.open(host + "verCierre?type=" + type + "&fecha=" + fechaCierre,"targed=blank"),
   openNotaentregapedido: ({ id }) => window.open(host + "/notaentregapedido?id=" + id, "targed=blank"),
   openVerFactura: ({ id }) => window.open(host + "verFactura?id=" + id, "targed=blank"),
-  openReporteInventario: () => window.open(host + "reporteInventario","targed=blank"),
+  openReporteInventario: () => window.open(host + "reporteInventario", "targed=blank"),
+  openReporteFalla: (id) => window.open(host + "reporteFalla?id=" + id, "targed=blank"),
   
   
 

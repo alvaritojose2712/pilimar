@@ -34,23 +34,56 @@ class FacturaController extends Controller
         $factOrderBy = $req->factOrderBy;
         $factOrderDescAsc = $req->factOrderDescAsc;
 
+        $fa = [];
         if ($factqBuscarDate=="") {
-            return factura::with(["proveedor","items"=>function($q){
+            $fa = factura::with(["proveedor","items"=>function($q){
                 $q->with("producto");
             }])
             ->where("descripcion","LIKE","$factqBuscar%")
             ->orWhere("numfact","LIKE","$factqBuscar%")
                 ->orderBy($factOrderBy,$factOrderDescAsc)
+                ->limit(20)
                 ->get();
         }else{
-            return factura::with(["proveedor","items"=>function($q){
+            $fa = factura::with(["proveedor","items"=>function($q){
                 $q->with("producto");
             }])->where("descripcion","LIKE","$factqBuscar%")->where("created_at","LIKE","$factqBuscarDate%")
                 ->orderBy($factOrderBy,$factOrderDescAsc)
+                ->limit(20)
                 ->get();
         }
-    }
 
+        return $fa->map(function($q){
+            $sub = $q->items->map(function($q)
+            {   
+                $base = $q->producto->precio_base*$q->cantidad;
+                $venta = $q->producto->precio*$q->cantidad;
+                // $q->subtotal = number_format($venta,2);
+                // $q->subtotal_base = number_format($base,2);
+
+                $q->subtotal_clean = $venta;
+                $q->subtotal_base_clean = $base;
+                return $q;
+            });
+            
+            $venta = $sub->sum("subtotal_clean");
+            $base = $sub->sum("subtotal_base_clean");
+
+            // $q->summonto = number_format($venta,2); 
+            $q->summonto_clean = $venta; 
+
+
+            // $q->summonto_base = number_format($base,2); 
+            $q->summonto_base_clean = $base; 
+            return $q;
+        });
+    }
+    public function saveMontoFactura(Request $req)
+    {
+        $fact = factura::find($req->id);
+        $fact->monto = $req->monto;
+        $fact->save();
+    }
     public function setFactura(Request $req)
     {
         try {

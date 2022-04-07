@@ -31,28 +31,32 @@ class tickera extends Controller
 
             return $string;
         }
-
-        $pedido = (new PedidosController)->getPedido($req);
-        $sucursal = sucursal::all()->first();
-        $get_moneda = (new PedidosController)->get_moneda();
         
-        $show_dolares = "no";
-        if ($show_dolares=="si") {
+        $get_moneda = (new PedidosController)->get_moneda();
+        $moneda_req = $req->moneda;
+        //$
+        //bs
+        //cop
+        if ($moneda_req=="$") {
           $dolar = 1;
+        }else if($moneda_req=="bs"){
+          $dolar = $get_moneda["bs"];
+        }else if($moneda_req=="cop"){
+          $dolar = $get_moneda["cop"];
         }else{
-
           $dolar = $get_moneda["bs"];
         }
 
+        $pedido = (new PedidosController)->getPedido($req,floatval($dolar));
+        $sucursal = sucursal::all()->first();
         $fecha_emision = date("Y-m-d H:i:s");
 
         try {
             
             $connector = new WindowsPrintConnector($sucursal->tickera);
-            
-
-            /* Print a "Hello world" receipt" */
+            //smb://computer/printer
             $printer = new Printer($connector);
+            $printer->setEmphasis(true);
 
             $nombres = "";
             $identificacion = "";
@@ -78,11 +82,17 @@ class tickera extends Controller
                         ];
                     }
                 }
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
                
                 foreach ($items as $item) {
 
                     //Current item ROW 1
 
+                    $printer->setEmphasis(true);
+                    $printer->text($sucursal->nombre_registro);
+
+                    $printer->setEmphasis(false);
+                    $printer->text("\n");
                     $printer->text($item['codigo_barras']);
                    $printer->text("\n");
                    $printer->text($item['descripcion']);
@@ -90,16 +100,21 @@ class tickera extends Controller
 
                     $printer->setEmphasis(true);
 
-                   $printer->text(addSpaces("",6).$item['pu']);
-                $printer->setEmphasis(false);
+                   $printer->text($item['pu']);
+                   $printer->setEmphasis(false);
                    
-                   $printer->text("\n");
                    $printer->text("\n");
 
                     $printer->feed();
                 }
             }else{
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
+
+                
+
+                $tux = EscposImage::load(resource_path() . "/images/logo-small.jpg", false);
+                $printer -> bitImage($tux);
+
+               $printer->setJustification(Printer::JUSTIFY_CENTER);
 
                 $printer -> setTextSize(1,1);
 
@@ -205,6 +220,7 @@ class tickera extends Controller
                 $printer -> text("\n");
                 $printer -> text($sucursal->telefono1." | ".$sucursal->telefono2);
                 $printer -> text("\n");
+
 
             }
 

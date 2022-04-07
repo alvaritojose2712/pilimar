@@ -41,7 +41,8 @@ import ViewPedidoVendedor from '../components/viewPedidoVendedor';
 
 export default function Facturar({user,notificar,setLoading}) {
   
-  const [num,setNum] = useState(50)
+  const [num, setNum] = useState(50)
+  const [showOptionQMain, setshowOptionQMain] = useState(false)
   const [itemCero,setItemCero] = useState(true)
   const [qProductosMain,setQProductosMain] = useState("")
 
@@ -67,6 +68,8 @@ export default function Facturar({user,notificar,setLoading}) {
 
   
   const [productos,setProductos] = useState([])
+  const [categorias,setcategorias] = useState([])
+
   const [productosInventario,setProductosInventario] = useState([])
 
   const [qBuscarInventario,setQBuscarInventario] = useState("")
@@ -167,6 +170,8 @@ export default function Facturar({user,notificar,setLoading}) {
 
   const [qDeudores,setQDeudores] = useState("")
   const [deudoresList,setDeudoresList] = useState([])
+  const [cierres,setCierres] = useState([])
+
 
   const [selectDeudor,setSelectDeudor] = useState(null)
 
@@ -285,6 +290,24 @@ export default function Facturar({user,notificar,setLoading}) {
   const [billete100,setbillete100] = useState("")
 
   const [usuariosData, setusuariosData] = useState([])
+  const [usuarioNombre, setusuarioNombre] = useState("")
+  const [usuarioUsuario, setusuarioUsuario] = useState("")
+  const [usuarioRole, setusuarioRole] = useState("")
+  const [usuarioClave, setusuarioClave] = useState("")
+  
+  const [qBuscarUsuario, setQBuscarUsuario] = useState("")
+  const [indexSelectUsuarios, setIndexSelectUsuarios] = useState(null)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   const [toggleClientesBtn, settoggleClientesBtn] = useState(false)
 
@@ -297,13 +320,49 @@ export default function Facturar({user,notificar,setLoading}) {
   const [valheaderpedidocentral, setvalheaderpedidocentral] = useState("12340005ARAMCAL")
   const [valbodypedidocentral, setvalbodypedidocentral] = useState("12341238123456123456123451234123712345612345612345123412361234561234561234512341235123456123456123451234123412345612345612345")
 
+  const [fechaGetCierre, setfechaGetCierre] = useState("")
+  
+  const [modFact, setmodFact] = useState("factura")
+  
+  
+  
 // 1234123812345612345612345
 // 1234123712345612345612345
 // 1234123612345612345612345
 // 1234123512345612345612345
 // 1234123412345612345612345
 // 12341234ARAMCAL
+
+
+const [fechaQEstaInve, setfechaQEstaInve] = useState("")
+const [fechaFromEstaInve, setfechaFromEstaInve] = useState("")
+const [fechaToEstaInve, setfechaToEstaInve] = useState("")
+const [orderByEstaInv, setorderByEstaInv] = useState("desc")
+const [orderByColumEstaInv, setorderByColumEstaInv] = useState("cantidadtotal")
+const [dataEstaInven, setdataEstaInven] = useState([])
+
+const [tipopagoproveedor, settipopagoproveedor] = useState("");
+const [montopagoproveedor, setmontopagoproveedor] = useState("");
+const [pagosproveedor, setpagosproveedor] = useState([]);
   
+const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
+
+  const [busqAvanzInputs, setbusqAvanzInputs] = useState({
+  codigo_barras:"",
+  codigo_proveedor:"",
+  id_proveedor:"",
+  id_categoria:"",
+  unidad:"",
+  descripcion:"",
+  iva:"",
+  precio_base:"",
+  precio:"",
+  cantidad:"",
+});
+  
+  
+  
+
 
   useHotkeys('f1', () => {
     if(selectItem!==null&&view=="seleccionar"){
@@ -477,7 +536,7 @@ export default function Facturar({user,notificar,setLoading}) {
       }
 
     } else if (view == "inventario" && subViewInventario == "inventario" && modViewInventario == "list") {
-      focusInputSibli(event.target, 1)
+      // focusInputSibli(event.target, 1)
     }
   },{
     enableOnTags:["INPUT", "SELECT"],
@@ -522,7 +581,7 @@ export default function Facturar({user,notificar,setLoading}) {
 
       }
     }else if (view == "inventario" && subViewInventario == "inventario" && modViewInventario == "list") {
-      focusInputSibli(event.target, -1)
+      // focusInputSibli(event.target, -1)
     }
   },{
     enableOnTags:["INPUT", "SELECT"],
@@ -574,9 +633,18 @@ export default function Facturar({user,notificar,setLoading}) {
     }
   },{
     filterPreventDefault:false,
-    enableOnTags:["INPUT", "SELECT"],
+    enableOnTags:["INPUT", "SELECT","TEXTAREA"],
   }, [view, counterListProductos, selectItem, subViewInventario, modViewInventario]);
 
+  useEffect(()=>{
+    getUsuarios()
+    
+  }, [qBuscarUsuario])
+
+  useEffect(() => {
+    setInputsUsuarios()
+  }, [indexSelectUsuarios])
+  
 
   useEffect(()=>{
     // let isMounted = true;  
@@ -605,7 +673,7 @@ export default function Facturar({user,notificar,setLoading}) {
     focusCtMain()
   },[selectItem])
   useEffect(()=>{
-    getFacturas()
+    getFacturas(false)
   },[
   factqBuscar,
   factqBuscarDate,
@@ -633,6 +701,7 @@ export default function Facturar({user,notificar,setLoading}) {
     Invnum,
     InvorderColumn,
     InvorderBy,
+    qBuscarInventario,
   ]);
 
   useEffect(()=>{
@@ -641,9 +710,7 @@ export default function Facturar({user,notificar,setLoading}) {
   useEffect(()=>{
     getMovimientos()
   },[showModalMovimientos,fechaMovimientos])
-  useEffect(()=>{
-    buscarInventario()
-  },[qBuscarInventario])
+  
 
   useEffect(()=>{
     getProveedores()
@@ -661,7 +728,7 @@ export default function Facturar({user,notificar,setLoading}) {
       }
 
     }
-  },[subViewInventario])  
+  },[view,subViewInventario])  
 
   useEffect(() => {
     if (view == "credito" || view =="vueltos") {
@@ -689,8 +756,14 @@ export default function Facturar({user,notificar,setLoading}) {
   },[fechaventas])
 
   useEffect(()=>{
-    setInputsProveedores()
-  },[indexSelectProveedores])
+    if (subViewInventario =="proveedores") {
+      setInputsProveedores()
+      
+    } else if (subViewInventario == "facturas"){
+      getPagoProveedor()
+    }
+
+  }, [subViewInventario,indexSelectProveedores])
 
   useEffect(()=>{
     setBilletes()
@@ -702,6 +775,14 @@ export default function Facturar({user,notificar,setLoading}) {
     billete50,
     billete100,
   ])
+  useEffect(()=>{
+    getEstaInventario()
+  },[
+fechaQEstaInve,
+fechaFromEstaInve,
+fechaToEstaInve,
+orderByEstaInv,
+orderByColumEstaInv])
 
 
   let total_caja_calc = ( parseFloat(caja_usd?caja_usd:0) + (parseFloat(caja_cop?caja_cop:0)/parseFloat(peso)) + (parseFloat(caja_bs?caja_bs:0)/parseFloat(dolar)) ).toFixed(2)
@@ -712,16 +793,50 @@ export default function Facturar({user,notificar,setLoading}) {
 
   let total_punto = dolar&&caja_punto?(caja_punto/dolar).toFixed(2):0
 
+const openReporteFalla = (id) => {
+  if (id) {
+    db.openReporteFalla(id)
+    
+  }
+} 
+const getEstaInventario = () => {
+
+  if (time!=0) {
+    clearTimeout(typingTimeout)
+  }
+
+  let time = window.setTimeout(()=>{
+    setLoading(true)
+    db.getEstaInventario({
+      fechaQEstaInve,
+      fechaFromEstaInve,
+      fechaToEstaInve,
+      orderByEstaInv,
+      orderByColumEstaInv})
+    .then(e=>{
+      setdataEstaInven(e.data)
+      setLoading(false)
+    })
+  },150)
+  setTypingTimeout(time)
+
+}
 const setporcenganancia = (tipo,base=0,fun=null) => {
   let insert = window.prompt("Porcentaje")
   if (insert) {
     if (number(insert)) {
       if (tipo=="unique") {
-        let re = Math.round(parseFloat(inpInvbase) + (parseFloat(inpInvbase)*(parseFloat(insert)/100)))
-        setinpInvventa(re)
+        let re = (parseFloat(inpInvbase) + (parseFloat(inpInvbase)*(parseFloat(insert)/100))).toFixed(2)
+        if (re) {
+          setinpInvventa(re)
+
+        }
       }else if("list"){
-        let re = Math.round(parseFloat(base) + (parseFloat(base)*(parseFloat(insert)/100)))
-        fun(re)
+        let re = (parseFloat(base) + (parseFloat(base)*(parseFloat(insert)/100))).toFixed(2)
+        if (re) {
+          fun(re)
+
+        }
       }
     }
 
@@ -755,6 +870,11 @@ const focusInputSibli = (tar, mov) => {
     }
   }
 }
+const getCierres = () => {
+  db.getCierres({fechaGetCierre}).then(res=>{
+    setCierres(res.data)
+  })
+}
 const cerrar_dia = (e) => {
   e.preventDefault()
   setLoading(true)
@@ -769,21 +889,23 @@ const cerrar_dia = (e) => {
     let cierreData = res.data
     if (res.data) {
       setguardar_usd(cierreData["efectivo_guardado"])
+      setguardar_cop("")
+      setguardar_bs("")
 
-      if (cierreData["match_cierre"]) {
-
-
-        setDejar_usd(cierreData["match_cierre"]["dejar_dolar"])
-        setDejar_cop(cierreData["match_cierre"]["dejar_peso"])
-        setDejar_bs(cierreData["match_cierre"]["dejar_bss"])
-        setNotaCierre(cierreData["match_cierre"]["nota"])
+      // if (cierreData["match_cierre"]) {
 
 
-        setguardar_usd(cierreData["match_cierre"]["efectivo_guardado"])
-        setguardar_cop(cierreData["match_cierre"]["efectivo_guardado_cop"])
-        setguardar_bs(cierreData["match_cierre"]["efectivo_guardado_bs"])
+      //   setDejar_usd(cierreData["match_cierre"]["dejar_dolar"])
+      //   setDejar_cop(cierreData["match_cierre"]["dejar_peso"])
+      //   setDejar_bs(cierreData["match_cierre"]["dejar_bss"])
+      //   setNotaCierre(cierreData["match_cierre"]["nota"])
+
+
+      //   setguardar_usd(cierreData["match_cierre"]["efectivo_guardado"])
+      //   setguardar_cop(cierreData["match_cierre"]["efectivo_guardado_cop"])
+      //   setguardar_bs(cierreData["match_cierre"]["efectivo_guardado_bs"])
         
-      }
+      // }
     }
     setCierre(cierreData)
 
@@ -798,16 +920,24 @@ const focusCtMain = () => {
 }
 function getBuscarDevolucion() {
   setLoading(true)
-  db.getBuscarDevolucion({
-    qProductosMain:buscarDevolucion,
-    num:25,
-    itemCero:true,
-    orderColumn:"descripcion",
-    orderBy:"asc"
-  }).then(res=>{
-    setProductosDevulucionSelect(res.data)
-    setLoading(false)
-  })
+
+  if (time!=0) {
+    clearTimeout(typingTimeout)
+  }
+
+  let time = window.setTimeout(()=>{
+    db.getBuscarDevolucion({
+      qProductosMain:buscarDevolucion,
+      num:10,
+      itemCero:true,
+      orderColumn:"descripcion",
+      orderBy:"asc"
+    }).then(res=>{
+      setProductosDevulucionSelect(res.data)
+      setLoading(false)
+    })
+  },150)
+  setTypingTimeout(time)
 }
 const setToggleAddPersonaFun = (prop,callback=null)=> {
   setToggleAddPersona(prop)
@@ -1018,16 +1148,20 @@ const toggleModalProductos = (prop,callback=null) => {
 }
 const toggleImprimirTicket = () => {
   if (pedidoData) {
-    let identificacion = window.prompt("Identificación",pedidoData.cliente.identificacion)
+    let moneda = window.prompt("Moneda: $ | bs | cop","bs")
+    let identificacion = window.prompt("Identificación", pedidoData.cliente.identificacion)
 
     if (identificacion) {
       let nombres = window.prompt("Nombre y Apellido",pedidoData.cliente.nombre)
       if (nombres) {
 
+        console.log("Imprimiendo...")
+
         db.imprimirTicked({
           id: pedidoData.id,
           identificacion,
-          nombres
+          nombres,
+          moneda,
         }).then(res=>{
           notificar(res)
         })
@@ -1090,13 +1224,22 @@ const getProductos = () => {
 }
 const getPersona = q => {
   setLoading(true)
-  db.getpersona({q}).then(res=>{
-    setPersona(res.data)
-    if (!res.data.length) {
-      setclienteInpidentificacion(q)
-    }
-    setLoading(false)
-  })
+  if (time!=0) {
+    clearTimeout(typingTimeout)
+  }
+
+  let time = window.setTimeout(()=>{
+    db.getpersona({q}).then(res=>{
+      setPersona(res.data)
+      if (!res.data.length) {
+        setclienteInpidentificacion(q)
+      }
+      setLoading(false)
+    })
+    
+  },150)
+  setTypingTimeout(time)
+
 }
 const setPersonaFast = e => {
   e.preventDefault()
@@ -1287,23 +1430,27 @@ const onCLickDelPedido = e => {
   if (confirm("¿Seguro de eliminar?")) {
     const current = e.currentTarget.attributes
     const id = current["data-id"].value
-    db.delpedido({id}).then(res=>{
-      notificar(res)
-      
-      
-      switch(current["data-type"].value){
-        case 'getDeudor':
-          getDeudor()
+    let motivo = window.prompt("¿Cuál es el Motivo de eliminación?")
+    if (motivo) {
+      db.delpedido({id,motivo}).then(res=>{
+        notificar(res)
+        
+        
+        switch(current["data-type"].value){
+          case 'getDeudor':
+            getDeudor()
 
-        break;
+          break;
 
-        case 'getPedidos':
-          getPedidos()
-          getPedidosList()
+          case 'getPedidos':
+            getPedidos()
+            getPedidosList()
 
-        break;
-      }
-    })
+          break;
+        }
+      })
+
+    }
   }
 }
 const delItemPedido = (e) => {
@@ -1411,6 +1558,10 @@ const setPersonas = (e) => {
 
     }
 }
+const facturar_e_imprimir = () => {
+  toggleImprimirTicket();
+  facturar_pedido();
+}
 const facturar_pedido = () => {
   if (refinputaddcarritofast.current !== document.activeElement) {
     setLoading(true)
@@ -1444,11 +1595,14 @@ const facturar_pedido = () => {
 const del_pedido = () =>{
   if (confirm("¿Seguro de eliminar?")) {
     if (pedidoData.id) {
-      db.delpedido({id:pedidoData.id}).then(res=>{
-        notificar(res)
-        getPedidosList()
-        setView("seleccionar")
-      })
+      let motivo = window.prompt("¿Cuál es el Motivo de eliminación?")
+      if (motivo) {
+        db.delpedido({id:pedidoData.id,motivo}).then(res=>{
+          notificar(res)
+          getPedidosList()
+          setView("seleccionar")
+        })
+      }
 
     }else{
       alert("No hay pedido seleccionado")
@@ -1487,7 +1641,7 @@ const guardar_cierre = (e,callback=null) => {
     
     if (res.data.estado) {
       if (type=="ver") {
-        db.openVerCierre({type,fechaCierre})
+        verCierreReq(fechaCierre,type)
       }else{
         setLoading(true)
         db.sendCierre({type,fecha:fechaCierre}).then(res=>{
@@ -1499,6 +1653,10 @@ const guardar_cierre = (e,callback=null) => {
     }     
 
   })
+}
+const verCierreReq = (fechaCierre,type="ver") => {
+  // console.log(fecha)
+  db.openVerCierre({fechaCierre,type})
 }
 const setPagoCredito = e =>{
   e.preventDefault()
@@ -1596,47 +1754,86 @@ const setDevolucion = e => {
   }
 }
 const buscarInventario = e => {
-  setLoading(true)
-  db.getinventario({
-    num:Invnum,
-    itemCero:true,
-    qProductosMain:qBuscarInventario,
-    orderColumn:InvorderColumn,
-    orderBy:InvorderBy
-  }).then(res=>{
-    setProductosInventario(res.data)
-    setLoading(false)
-    setIndexSelectInventario(null)
-    if (res.data.length===1) {
-      setIndexSelectInventario(0)
-    }else if(res.data.length==0){
-      setinpInvbarras(qBuscarInventario)
+
+  let checkempty = productosInventario.filter(e => e.type).filter(e=>
+    e.codigo_barras == ""||
+    e.descripcion == ""||
+    e.id_categoria == ""||
+    e.unidad == ""||
+    e.id_proveedor == ""||
+    e.cantidad == ""||
+    e.precio_base == ""||
+    e.precio == "")
+
+  if (!checkempty.length) {
+    setLoading(true)
+
+    if (time!=0) {
+      clearTimeout(typingTimeout)
     }
-  })
+
+    let time = window.setTimeout(()=>{
+      db.getinventario({
+        num:Invnum,
+        itemCero:true,
+        qProductosMain:qBuscarInventario,
+        orderColumn:InvorderColumn,
+        orderBy:InvorderBy,
+        busquedaAvanazadaInv,
+        busqAvanzInputs,
+        
+      }).then(res=>{
+        setProductosInventario(res.data)
+        setLoading(false)
+        setIndexSelectInventario(null)
+        if (res.data.length===1) {
+          setIndexSelectInventario(0)
+        }else if(res.data.length==0){
+          setinpInvbarras(qBuscarInventario)
+        }
+      })
+    },150)
+    setTypingTimeout(time)
+
+  }else{
+    alert("Hay productos pendientes en carga de Inventario List!")
+  }
+
+
+
 }
 const getProveedores = e => {
-  setLoading(true)
-  db.getProveedores({
-    q:qBuscarProveedor
-  }).then(res=>{
-    setProveedoresList(res.data)
-    setLoading(false)
-    if (res.data.length===1) {
-      setIndexSelectProveedores(0)
-    }
-  })
+  if (time != 0) {
+    clearTimeout(typingTimeout)
+  }
 
-  db.getMarcas({
-    q:qBuscarProveedor
-  }).then(res=>{
-    setmarcasList(res.data)
-  })
+  let time = window.setTimeout(() => {
+    setLoading(true)
+    db.getProveedores({
+      q:qBuscarProveedor
+    }).then(res=>{
+      setProveedoresList(res.data)
+      setLoading(false)
+      if (res.data.length===1) {
+        setIndexSelectProveedores(0)
+      }
+    })
+  }, 150)
+  setTypingTimeout(time)
 
-  db.getDepositos({
-    q:qBuscarProveedor
-  }).then(res=>{
-    setdepositosList(res.data)
-  })
+  if (!categorias.length) {
+    db.getCategorias({
+    }).then(res=>{
+      setcategorias(res.data)
+    })
+  }
+  if (!depositosList.length) {
+    db.getDepositos({
+      q:qBuscarProveedor
+    }).then(res=>{
+      setdepositosList(res.data)
+    })
+  }
 
 
 }
@@ -1740,7 +1937,7 @@ const guardarNuevoProducto = e => {
 
     if (res.data.estado) {
       buscarInventario()
-      getFacturas(null)
+      getFacturas(false)
 
       setinpInvbarras("")
       setinpInvcantidad("")
@@ -1762,6 +1959,61 @@ const getPedidosFast = () => {
     
   })
 }
+const setSameGanancia = () => {
+  let insert = window.prompt("Porcentaje")
+  if (insert) {
+    
+    let obj = cloneDeep(productosInventario)
+    obj.map(e=>{
+      if (e.type) {
+        let re = (parseFloat(e.precio_base) + (parseFloat(e.precio_base) * (parseFloat(insert) / 100))).toFixed(2)
+        if (re) {
+          e.precio = re
+        }
+      }
+      return e
+    })
+    setProductosInventario(obj)    
+  }
+}
+const setSameCat = (val) => {
+  if (confirm("¿Confirma Generalizar categoría?")) {
+    let obj = cloneDeep(productosInventario)
+    obj.map(e => {
+      if (e.type) {
+        e.id_categoria = val
+      }
+      return e
+    })
+    setProductosInventario(obj)
+  }
+
+}
+const setSamePro = (val) => {
+  if (confirm("¿Confirma Generalizar proveeedor?")) {
+    let obj = cloneDeep(productosInventario)
+    obj.map(e => {
+      if (e.type) {
+        e.id_proveedor = val
+      }
+      return e
+    })
+    setProductosInventario(obj)
+  }
+}
+
+const busqAvanzInputsFun = (e,key) => {
+  let obj = cloneDeep(busqAvanzInputs)
+  obj[key] = e.target.value
+  setbusqAvanzInputs(obj)
+ 
+}
+const buscarInvAvanz = () => {
+  buscarInventario(null)
+}
+  
+  
+  
 const setProveedor = e =>{
   setLoading(true)
   e.preventDefault()
@@ -1829,21 +2081,34 @@ const delProducto = e => {
   }
 }
 const getFacturas = (clean = true) =>{
-  setLoading(true)
-  db.getFacturas({
-    factqBuscar,
-    factqBuscarDate,
-    factOrderBy,
-    factOrderDescAsc
-  }).then(res=>{
-    setLoading(false)
-    setfacturas(res.data)
 
-    if (clean) {
-      setfactSelectIndex(null)
-
+  if (time!=0) {
+      clearTimeout(typingTimeout)
     }
-  })
+
+    let time = window.setTimeout(()=>{
+      setLoading(true)
+      db.getFacturas({
+        factqBuscar,
+        factqBuscarDate,
+        factOrderBy,
+        factOrderDescAsc
+      }).then(res=>{
+        setLoading(false)
+        setfacturas(res.data)
+
+        if (res.data.length === 1) {
+          setfactSelectIndex(0)
+        }
+
+        if (clean) {
+          setfactSelectIndex(null)
+        }
+      })
+
+    },100)
+    setTypingTimeout(time)
+
 }
 const setFactura = e => {
   e.preventDefault()
@@ -1895,6 +2160,16 @@ const delFactura = e => {
       }
     })
     
+  }
+}
+const saveFactura = () => {
+
+  if (facturas[factSelectIndex]) {
+    let id = facturas[factSelectIndex].id
+    let monto = facturas[factSelectIndex].summonto_base_clean
+    db.saveMontoFactura({id,monto}).then(e=>{
+      getFacturas(false)
+    })
   }
 }
 const delItemFact = e =>{
@@ -2270,40 +2545,53 @@ const setBilletes = () => {
   setCaja_usd(total)
 }
 const addNewUsuario = e => {
+  e.preventDefault()
 
   let id = null
-  let tipo = e.currentTarget.attributes["data-tipo"].value
-
-  let role = window.prompt("Role 1,2,3")
-  let nombres = window.prompt("Nombres")
-  let usuario = window.prompt("Usuario")
-  let clave = window.prompt("Clave")
-
-  if(tipo=="update"){
-    id = e.currentTarget.attributes["data-id"].value
+  if (indexSelectUsuarios) {
+    id = usuariosData[indexSelectUsuarios].id
   }
 
-  if (role&&nombres&&usuario&&clave) {
+  if (usuarioRole&&usuarioNombre&&usuarioUsuario) {
     setLoading(true)
-    db.setUsuario({id,role,nombres,usuario,clave}).then(res=>{
+    db.setUsuario({id,role:usuarioRole,nombres:usuarioNombre,usuario:usuarioUsuario,clave:usuarioClave})
+    .then(res=>{
       notificar(res)
       setLoading(false)
       getUsuarios()
     })
+  }else{
+    console.log("Err: addNewUsuario"+usuarioRole+" "+usuarioNombre+" "+usuarioUsuario)
+  }
+}
+const setInputsUsuarios = () => {
+  if (indexSelectUsuarios) {
+    let obj = usuariosData[indexSelectUsuarios]
+    if (obj) {
+      setusuarioNombre(obj.nombre)
+      setusuarioUsuario(obj.usuario)
+      setusuarioRole(obj.tipo_usuario)
+      setusuarioClave(obj.clave)
+    }
+    
   }
 }
 const getUsuarios = () => {
   setLoading(true)
-  db.getUsuarios({}).then(res=>{
+  db.getUsuarios({q:qBuscarUsuario}).then(res=>{
     setLoading(false)
     setusuariosData(res.data)
   })
 }
 const delUsuario = () => {
   setLoading(true)
-  let id = e.currentTarget.attributes["data-id"].value
+  let id = null
+  if (indexSelectUsuarios) {
+    id = usuariosData[indexSelectUsuarios].id
+  }
   db.delUsuario({id}).then(res=>{
     setLoading(false)
+    getUsuarios()
     notificar(res)
   })
 }
@@ -2359,7 +2647,6 @@ const reporteInventario = () => {
   db.openReporteInventario()
 }
 const guardarNuevoProductoLote = () => {
-  setLoading(true)
   let id_factura = null
 
   if (factSelectIndex != null) {
@@ -2369,8 +2656,20 @@ const guardarNuevoProductoLote = () => {
   }
   let lotesFil = productosInventario.filter(e => e.type)
 
-  if (lotesFil.length) {
+
+  let checkempty = lotesFil.filter(e=>
+    e.codigo_barras == ""||
+    e.descripcion == ""||
+    e.id_categoria == ""||
+    e.unidad == ""||
+    e.id_proveedor == ""||
+    e.cantidad == ""||
+    e.precio_base == ""||
+    e.precio == "")
+
+  if (lotesFil.length && !checkempty.length) {
     
+    setLoading(true)
     db.guardarNuevoProductoLote({ lotes: lotesFil, id_factura}).then(res=>{
       notificar(res)
       setLoading(false)
@@ -2384,7 +2683,43 @@ const guardarNuevoProductoLote = () => {
       }catch(err){}
     })
   }else{
-    alert("Sin Datos")
+    alert("¡Error con los campos! Algunos pueden estar vacíos"+JSON.stringify(checkempty))
+  }
+
+}
+const delPagoProveedor = e => {
+  let id = e.target.attributes["data-id"].value
+  if(confirm("¿Seguro de eliminar?")){
+    db.delPagoProveedor({id}).then(res=>{
+      getPagoProveedor()
+      notificar(res)
+    })
+  }
+}
+const getPagoProveedor = () => {
+  if (proveedoresList[indexSelectProveedores]) {
+    setLoading(true)
+    db.getPagoProveedor({
+      id_proveedor: proveedoresList[indexSelectProveedores].id,
+    }).then(res => {
+      setLoading(false)
+      setpagosproveedor(res.data)
+    })
+  }
+}
+const setPagoProveedor = e => {
+  e.preventDefault()
+  if (tipopagoproveedor&&montopagoproveedor){
+    if (proveedoresList[indexSelectProveedores]) {
+      db.setPagoProveedor({
+        tipo: tipopagoproveedor,
+        monto: montopagoproveedor,
+        id_proveedor: proveedoresList[indexSelectProveedores].id,
+      }).then(res=>{
+        getPagoProveedor()
+        notificar(res)
+      })
+    }
   }
 
 }
@@ -2417,7 +2752,7 @@ const changeInventario = (val, i, id, type, name = null) => {
         codigo_proveedor: "",
         codigo_barras: "",
         descripcion: "",
-        id_categoria: "40",
+        id_categoria: "",
         id_marca: "",
         unidad: "UND",
         id_proveedor: pro,
@@ -2530,13 +2865,16 @@ const auth = permiso => {
                 ref={inputbusquedaProductosref}
                 placeholder="Buscar... Presiona (ESC)" 
                 onChange={onchangeinputmain}/>
-              <div className="input-group-append">
-                <span className="input-group-text pointer" onClick={()=>{
-                  let num = window.prompt("Número de resultados a mostrar")
-                  if (num) {setNum(num)}
-                }}>Num.({num})</span>
-              </div>
-              <span className="input-group-text pointer" onClick={()=>setItemCero(!itemCero)}>En cero: {itemCero?"Sí":"No"}</span>
+              
+                {showOptionQMain?<>
+                <span className="input-group-text pointer" onClick={() => setshowOptionQMain(false)}><i className="fa fa-arrow-right"></i></span>
+                  <span className="input-group-text pointer" onClick={()=>{
+                    let num = window.prompt("Número de resultados a mostrar")
+                    if (num) {setNum(num)}
+                  }}>Num.({num})</span>
+                  <span className="input-group-text pointer" onClick={()=>setItemCero(!itemCero)}>En cero: {itemCero?"Sí":"No"}</span>
+              </> : <span className="input-group-text pointer" onClick={() => setshowOptionQMain(true)}><i className="fa fa-arrow-left"></i></span>}
+              
             </div>
             <ProductosList 
               auth={auth}
@@ -2590,6 +2928,7 @@ const auth = permiso => {
           setfechaventas={setfechaventas}
           fechaventas={fechaventas}
           moneda={moneda}
+          onClickEditPedido={onClickEditPedido}
         />:null}
 
         {view == "vueltos" ? <Vueltos
@@ -2658,6 +2997,11 @@ const auth = permiso => {
         :null}
 
         {view=="cierres"?<Cierres
+          verCierreReq={verCierreReq}
+          fechaGetCierre={fechaGetCierre}
+          setfechaGetCierre={setfechaGetCierre}
+          getCierres={getCierres}
+          cierres={cierres}
           number={number}
           guardar_usd={guardar_usd}
           setguardar_usd={setguardar_usd}
@@ -2708,6 +3052,9 @@ const auth = permiso => {
           setbillete50={setbillete50}
           billete100={billete100}
           setbillete100={setbillete100}
+
+          dolar={dolar}
+          peso={peso} 
         />:null}
         {view=="pedidos"?<Pedidos
           tipobusquedapedido={tipobusquedapedido}
@@ -2731,12 +3078,51 @@ const auth = permiso => {
         />:null}
 
         {view=="usuarios"?<Usuarios
-          usuariosData={usuariosData}
+          
           addNewUsuario={addNewUsuario}
+          
+
+          usuarioNombre={usuarioNombre}
+          setusuarioNombre={setusuarioNombre}
+          usuarioUsuario={usuarioUsuario}
+          setusuarioUsuario={setusuarioUsuario}
+          usuarioRole={usuarioRole}
+          setusuarioRole={setusuarioRole}
+          usuarioClave={usuarioClave}
+          setusuarioClave={setusuarioClave}
+          indexSelectUsuarios={indexSelectUsuarios}
+          setIndexSelectUsuarios={setIndexSelectUsuarios}
+          qBuscarUsuario={qBuscarUsuario}
+          setQBuscarUsuario={setQBuscarUsuario}
           delUsuario={delUsuario}
-          getUsuarios={getUsuarios}
+          usuariosData={usuariosData}
         />:null}
         {view=="inventario"?<Inventario
+          delPagoProveedor={delPagoProveedor}
+          busqAvanzInputsFun={busqAvanzInputsFun}
+          busqAvanzInputs={busqAvanzInputs}
+          buscarInvAvanz={buscarInvAvanz}
+
+          busquedaAvanazadaInv={busquedaAvanazadaInv}
+          setbusquedaAvanazadaInv={setbusquedaAvanazadaInv}
+
+          setSameGanancia={setSameGanancia}
+          setSameCat={setSameCat}
+          setSamePro={setSamePro}
+
+          openReporteFalla={openReporteFalla}
+          getPagoProveedor={getPagoProveedor}
+          setPagoProveedor={setPagoProveedor}
+          pagosproveedor={pagosproveedor}
+          
+          tipopagoproveedor={tipopagoproveedor}
+          settipopagoproveedor={settipopagoproveedor}
+          montopagoproveedor={montopagoproveedor}
+          setmontopagoproveedor={setmontopagoproveedor}
+          setmodFact={setmodFact}
+          modFact={modFact}
+          saveFactura={saveFactura}
+          categorias={categorias}
           setporcenganancia={setporcenganancia}
           refsInpInvList={refsInpInvList}
           guardarNuevoProductoLote={guardarNuevoProductoLote}
@@ -2881,11 +3267,29 @@ const auth = permiso => {
           setIndexPedidoCentral={setIndexPedidoCentral}
           indexPedidoCentral={indexPedidoCentral}
 
+          fechaQEstaInve={fechaQEstaInve}
+          setfechaQEstaInve={setfechaQEstaInve}
+          fechaFromEstaInve={fechaFromEstaInve}
+          setfechaFromEstaInve={setfechaFromEstaInve}
+          fechaToEstaInve={fechaToEstaInve}
+          setfechaToEstaInve={setfechaToEstaInve}
+          orderByEstaInv={orderByEstaInv}
+          setorderByEstaInv={setorderByEstaInv}
+          orderByColumEstaInv={orderByColumEstaInv}
+          setorderByColumEstaInv={setorderByColumEstaInv}
+
+          dataEstaInven={dataEstaInven}
+
         />:null}
         {view =="ViewPedidoVendedor"?<ViewPedidoVendedor
         
         />:null}
         {view=="pagar"?<Pagar 
+
+          dolar={dolar}
+          peso={peso}
+          moneda={moneda}
+          facturar_e_imprimir={facturar_e_imprimir}
           pedidosFast={pedidosFast}
           onClickEditPedido={onClickEditPedido}
           tipobusquedapedido={tipobusquedapedido}
