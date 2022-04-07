@@ -6871,6 +6871,7 @@ function Facturar(_ref) {
 
   var addCarrito = function addCarrito(e) {
     var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    getPedidosList();
     var index, loteid;
 
     if (e.currentTarget) {

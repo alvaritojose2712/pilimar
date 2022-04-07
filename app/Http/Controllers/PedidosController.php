@@ -146,10 +146,23 @@ class PedidosController extends Controller
         ];
 
         foreach ($letras as $key => $value) {
-            $arr["total"] = str_replace($key, $value, ($arr["total"]));
-            $arr["3"] = str_replace($key, $value, ($arr["3"]));
-            $arr["2"] = str_replace($key, $value, ($arr["2"]));
-            $arr["1"] = str_replace($key, $value, ($arr["1"]));
+            if ($arr["total"]) {
+                $arr["total"] = str_replace($key, $value, ($arr["total"]));
+                // code...
+            }
+            if ($arr["3"]) {
+                // code...
+                $arr["3"] = str_replace($key, $value, ($arr["3"]));
+            }
+            if ($arr["2"]) {
+                $arr["2"] = str_replace($key, $value, ($arr["2"]));
+                // code...
+            }
+
+            if ($arr["1"]) {
+                $arr["1"] = str_replace($key, $value, ($arr["1"]));
+                // code...
+            }
         }
 
         return $arr;

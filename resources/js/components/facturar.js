@@ -1360,6 +1360,7 @@ const getPedido = (id,callback=null) => {
   })
 }
 const addCarrito = (e,callback=null) => {
+  getPedidosList()
   let index, loteid;
   if (e.currentTarget) {
     let attr = e.currentTarget.attributes 
