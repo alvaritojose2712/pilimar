@@ -96,7 +96,6 @@ Route::group(['middleware' => ['login']], function () {
 	});
 	
 	Route::group(['middleware' => ['admin']], function () {
-		Route::post('getVentas', [PedidosController::class,"getVentas"]);
 		
 		
 		
@@ -147,6 +146,7 @@ Route::group(['middleware' => ['login']], function () {
 
 	});
 
+	Route::post('getVentas', [PedidosController::class,"getVentas"]);
 
 	Route::post('getMoneda', [MonedaController::class,"getMoneda"]);
 	Route::post('today', [PedidosController::class,"today"]);

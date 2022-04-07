@@ -9316,7 +9316,7 @@ function Header(_ref) {
         className: "row",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
           className: "col d-flex justify-content-end",
-          children: [auth(1) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+          children: [auth(3) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
             className: (view == "ventas" ? "btn btn-dark" : null) + " p-3 pointer",
             onClick: function onClick() {
               setView("ventas");

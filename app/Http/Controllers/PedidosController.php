@@ -132,37 +132,41 @@ class PedidosController extends Controller
 
         $arr = $this->cerrarFun($fechaventas,0,0,[],true);
 
-        $letras = [
-            1=>"L",
-            2=>"R",
-            3=>"E",
-            4=>"A",
-            5=>"S",
-            6=>"G",
-            7=>"F",
-            8=>"B",
-            9=>"P",
-            0=>"X",
-        ];
+        try {
+            $letras = [
+                1=>"L",
+                2=>"R",
+                3=>"E",
+                4=>"A",
+                5=>"S",
+                6=>"G",
+                7=>"F",
+                8=>"B",
+                9=>"P",
+                0=>"X",
+            ];
 
-        foreach ($letras as $key => $value) {
-            if ($arr["total"]) {
-                $arr["total"] = str_replace($key, $value, ($arr["total"]));
-                // code...
-            }
-            if ($arr["3"]) {
-                // code...
-                $arr["3"] = str_replace($key, $value, ($arr["3"]));
-            }
-            if ($arr["2"]) {
-                $arr["2"] = str_replace($key, $value, ($arr["2"]));
-                // code...
-            }
+            foreach ($letras as $key => $value) {
+                if ($arr["total"]) {
+                    $arr["total"] = str_replace($key, $value, ($arr["total"]));
+                    // code...
+                }
+                if ($arr["3"]) {
+                    // code...
+                    $arr["3"] = str_replace($key, $value, ($arr["3"]));
+                }
+                if ($arr["2"]) {
+                    $arr["2"] = str_replace($key, $value, ($arr["2"]));
+                    // code...
+                }
 
-            if ($arr["1"]) {
-                $arr["1"] = str_replace($key, $value, ($arr["1"]));
-                // code...
+                if ($arr["1"]) {
+                    $arr["1"] = str_replace($key, $value, ($arr["1"]));
+                    // code...
+                }
             }
+        } catch (\Exception $e) {
+            
         }
 
         return $arr;
