@@ -130,9 +130,29 @@ class PedidosController extends Controller
     {
         $fechaventas = $req->fechaventas;
 
-        
+        $arr = $this->cerrarFun($fechaventas,0,0,[],true);
 
-        return $this->cerrarFun($fechaventas,0,0,[],true);
+        $letras = [
+            1=>"L",
+            2=>"R",
+            3=>"E",
+            4=>"A",
+            5=>"S",
+            6=>"G",
+            7=>"F",
+            8=>"B",
+            9=>"P",
+            0=>"X",
+        ];
+
+        foreach ($letras as $key => $value) {
+            $arr["total"] = str_replace($key, $value, ($arr["total"]));
+            $arr["3"] = str_replace($key, $value, ($arr["3"]));
+            $arr["2"] = str_replace($key, $value, ($arr["2"]));
+            $arr["1"] = str_replace($key, $value, ($arr["1"]));
+        }
+
+        return $arr;
     }
     public function getPedidos(Request $req)
     {   
@@ -673,6 +693,7 @@ class PedidosController extends Controller
         $numventas_arr = [];
         pago_pedidos::whereIn("id_pedido",$pedido->select("id"))
         ->where("monto","<>",0)
+        ->orderBy("id","desc")
         ->get()
         ->map(function($q) use (&$arr_pagos,&$numventas_arr){
             if (array_key_exists($q->tipo,$arr_pagos)) {
@@ -877,9 +898,12 @@ class PedidosController extends Controller
         }])->where("created_at","LIKE",$req->fecha."%")->get();
         // return $vueltos_des;
         $sucursal = sucursal::all()->first();
+        $facturado = $this->cerrarFun($req->fecha,0,0);
         $arr_send = [
             "cierre" => $cierre,
+            "cierre_tot" => number_format($cierre->debito+$cierre->efectivo+$cierre->transferencia,2),
             "total_inventario" =>($total_inventario),
+            "total_inventario_format" =>number_format($total_inventario,2),
             "vueltos_totales" =>$vueltos_totales,
             "vueltos_des" =>$vueltos_des,
 
@@ -888,10 +912,73 @@ class PedidosController extends Controller
             "ganancia"=> round($ganancia,2),
             "porcentaje"=> $porcentaje,
             "desc_total"=> round($desc_total,2),
-            "facturado" =>$this->cerrarFun($req->fecha,0,0),
+            "facturado" => $facturado,
+            "facturado_tot" => $facturado[2]+$facturado[3]+$facturado[1],
             "sucursal"=>$sucursal,
             "movimientos"=>$movimientos,
         ];
+
+        $letras = [
+            1=>"L",
+            2=>"R",
+            3=>"E",
+            4=>"A",
+            5=>"S",
+            6=>"G",
+            7=>"F",
+            8=>"B",
+            9=>"P",
+            0=>"X",
+        ];
+
+        foreach ($letras as $key => $value) {
+            $arr_send["total_inventario_format"] = str_replace($key, $value, $arr_send["total_inventario_format"]); 
+            $arr_send["vueltos_totales"] = str_replace($key, $value, $arr_send["vueltos_totales"]); 
+            $arr_send["precio"] = str_replace($key, $value, $arr_send["precio"]); 
+            $arr_send["precio_base"] = str_replace($key, $value, $arr_send["precio_base"]); 
+            $arr_send["ganancia"] = str_replace($key, $value, $arr_send["ganancia"]); 
+            $arr_send["porcentaje"] = str_replace($key, $value, $arr_send["porcentaje"]); 
+            $arr_send["desc_total"] = str_replace($key, $value, $arr_send["desc_total"]); 
+            $arr_send["cierre_tot"] = str_replace($key, $value, $arr_send["cierre_tot"]); 
+            $arr_send["facturado_tot"] = str_replace($key, $value, $arr_send["facturado_tot"]); 
+
+
+
+            $arr_send["cierre"]["debito"] = str_replace($key, $value, $arr_send["cierre"]["debito"]); 
+            $arr_send["cierre"]["efectivo"] = str_replace($key, $value, $arr_send["cierre"]["efectivo"]); 
+            $arr_send["cierre"]["transferencia"] = str_replace($key, $value, $arr_send["cierre"]["transferencia"]); 
+
+            $arr_send["cierre"]["dejar_dolar"] = str_replace($key, $value, $arr_send["cierre"]["dejar_dolar"]);
+            $arr_send["cierre"]["dejar_peso"] = str_replace($key, $value, $arr_send["cierre"]["dejar_peso"]);
+            $arr_send["cierre"]["dejar_bss"] = str_replace($key, $value, $arr_send["cierre"]["dejar_bss"]);
+            $arr_send["cierre"]["tasa"] = str_replace($key, $value, $arr_send["cierre"]["tasa"]);
+
+            $arr_send["cierre"]["efectivo_guardado"] = str_replace($key, $value, $arr_send["cierre"]["efectivo_guardado"]);
+            $arr_send["cierre"]["efectivo_guardado_cop"] = str_replace($key, $value, $arr_send["cierre"]["efectivo_guardado_cop"]);
+            $arr_send["cierre"]["efectivo_guardado_bs"] = str_replace($key, $value, $arr_send["cierre"]["efectivo_guardado_bs"]);
+
+
+            $arr_send["facturado"]["total"] = str_replace($key, $value, $arr_send["facturado"]["total"]);
+            $arr_send["facturado"]["caja_inicial"] = str_replace($key, $value, $arr_send["facturado"]["caja_inicial"]);
+            $arr_send["facturado"]["numventas"] = str_replace($key, $value, $arr_send["facturado"]["numventas"]);
+            $arr_send["facturado"]["entregadomenospend"] = str_replace($key, $value, $arr_send["facturado"]["entregadomenospend"]);
+            $arr_send["facturado"]["entregado"] = str_replace($key, $value, $arr_send["facturado"]["entregado"]);
+            $arr_send["facturado"]["pendiente"] = str_replace($key, $value, $arr_send["facturado"]["pendiente"]);
+            $arr_send["facturado"]["total_caja"] = str_replace($key, $value, $arr_send["facturado"]["total_caja"]);
+            $arr_send["facturado"]["total_punto"] = str_replace($key, $value, $arr_send["facturado"]["total_punto"]);
+
+            $arr_send["facturado"]["total_punto"] = str_replace($key, $value, $arr_send["facturado"]["total_punto"]);
+            $arr_send["facturado"]["1"] = str_replace($key, $value, $arr_send["facturado"]["1"]);
+            $arr_send["facturado"]["2"] = str_replace($key, $value, $arr_send["facturado"]["2"]);
+            $arr_send["facturado"]["3"] = str_replace($key, $value, $arr_send["facturado"]["3"]);
+            $arr_send["facturado"]["4"] = str_replace($key, $value, $arr_send["facturado"]["4"]);
+            $arr_send["facturado"]["5"] = str_replace($key, $value, $arr_send["facturado"]["5"]);
+            $arr_send["facturado"]["6"] = str_replace($key, $value, $arr_send["facturado"]["6"]);
+        }
+
+
+
+        
 
 
 

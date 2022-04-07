@@ -110,21 +110,29 @@ class tickera extends Controller
             }else{
 
                 
+               $printer->setJustification(Printer::JUSTIFY_CENTER);
 
                 $tux = EscposImage::load(resource_path() . "/images/logo-small.jpg", false);
                 $printer -> bitImage($tux);
+                $printer->setEmphasis(true);
 
-               $printer->setJustification(Printer::JUSTIFY_CENTER);
+                // $printer->text("\n");
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+
+                $printer -> text("\n");
+                $printer -> text($sucursal->nombre_registro);
+                $printer -> text("\n");
+                $printer -> text($sucursal->rif);
+                $printer -> text("\n");
+                $printer -> text($sucursal->telefono1." | ".$sucursal->telefono2);
+                $printer -> text("\n");
 
                 $printer -> setTextSize(1,1);
 
                 $printer->setEmphasis(true);
 
                 
-                $printer->text("\n");
-                $printer->text("Creado: ".$pedido->created_at);
-                $printer->text("\n");
-                
+               
 
                 $printer->text("NOTA DE ENTREGA #".$pedido->id);
                 $printer->setEmphasis(false);
@@ -205,21 +213,21 @@ class tickera extends Controller
                 $printer->text("\n");
                 $printer->text("Total: ".$pedido->total);
                 $printer->text("\n");
+                $printer->text("\n");
+                    $printer->setJustification(Printer::JUSTIFY_CENTER);
+
+                $printer->text("Creado: ".$pedido->created_at);
+                
+                $printer->text("\n");
+                $printer->text("*ESTE RECIBO NO TIENE NINGÚN");
+                $printer->text("VALOR FISCAL*");
+                $printer->text("\n");
+                $printer->text("\n");
+                $printer->text("\n");
 
                
 
-                $printer->setEmphasis(true);
-
-                // $printer->text("\n");
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-
-                $printer -> text("\n");
-                $printer -> text($sucursal->nombre_registro);
-                $printer -> text("\n");
-                $printer -> text($sucursal->rif);
-                $printer -> text("\n");
-                $printer -> text($sucursal->telefono1." | ".$sucursal->telefono2);
-                $printer -> text("\n");
+                
 
 
             }

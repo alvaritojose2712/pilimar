@@ -65,7 +65,7 @@ export default function Facturar({user,notificar,setLoading}) {
 
   const [onlyVueltos,setOnlyVueltos] = useState(0)
 
-
+  const [showinputaddCarritoFast,setshowinputaddCarritoFast] = useState(false)
   
   const [productos,setProductos] = useState([])
   const [categorias,setcategorias] = useState([])
@@ -114,6 +114,8 @@ export default function Facturar({user,notificar,setLoading}) {
   const [proveedoresList,setProveedoresList] = useState([])
 
   const [pedidoList,setPedidoList] = useState([])
+  const [showMisPedido,setshowMisPedido] = useState(true)
+
 
   const [debito,setDebito] = useState("")
   const [efectivo,setEfectivo] = useState("")
@@ -133,9 +135,7 @@ export default function Facturar({user,notificar,setLoading}) {
 
   const [movimientosCaja,setMovimientosCaja] = useState([])
   const [movimientos,setMovimientos] = useState([])
-
   
-  const [vendedor, setVendedor] = useState([])
   const [tipobusquedapedido,setTipoBusqueda] = useState("fact")
 
   const [tipoestadopedido,setTipoestadopedido] = useState("todos")
@@ -441,8 +441,8 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
         setToggleAddPersona(false)
         toggleModalProductos(false)
         setViewCaja(false)
-        if (refinputaddcarritofast.current) {
-          refinputaddcarritofast.current.focus()
+        if (view!="seleccionar") {
+          setView("seleccionar")
 
         }
       }else if(view=="inventario"){
@@ -783,6 +783,12 @@ fechaFromEstaInve,
 fechaToEstaInve,
 orderByEstaInv,
 orderByColumEstaInv])
+
+  useEffect(()=>{
+    getPedidos()
+  },[showMisPedido])
+
+  
 
 
   let total_caja_calc = ( parseFloat(caja_usd?caja_usd:0) + (parseFloat(caja_cop?caja_cop:0)/parseFloat(peso)) + (parseFloat(caja_bs?caja_bs:0)/parseFloat(dolar)) ).toFixed(2)
@@ -1187,7 +1193,7 @@ const onChangePedidos = e =>{
 }
 const getPedidos = e => {
   setLoading(true)
-  db.getPedidos({busquedaPedido,fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle}).then(res=>{
+  db.getPedidos({vendedor:showMisPedido?[user.id_usuario]:[],busquedaPedido,fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle}).then(res=>{
     setPedidos(res.data)
     setLoading(false)
   })
@@ -1202,7 +1208,7 @@ const getProductos = () => {
   }
 
   let time = window.setTimeout(()=>{
-    db.getinventario({vendedor,num,itemCero,qProductosMain,orderColumn,orderBy}).then(res=>{
+    db.getinventario({vendedor:showMisPedido?[user.id_usuario]:[],num,itemCero,qProductosMain,orderColumn,orderBy}).then(res=>{
       if (res.data.length) {
         setProductos(res.data)
       }
@@ -1954,7 +1960,7 @@ const guardarNuevoProducto = e => {
 }
 const getPedidosFast = () => {
 
-  db.getPedidosFast({vendedor,fecha1pedido}).then(res=>{
+  db.getPedidosFast({vendedor:showMisPedido?[user.id_usuario]:[],fecha1pedido}).then(res=>{
     setpedidosFast(res.data)
     
   })
@@ -3057,6 +3063,8 @@ const auth = permiso => {
           peso={peso} 
         />:null}
         {view=="pedidos"?<Pedidos
+          setshowMisPedido={setshowMisPedido}
+          showMisPedido={showMisPedido}
           tipobusquedapedido={tipobusquedapedido}
           
           setTipoBusqueda={setTipoBusqueda}
@@ -3285,6 +3293,8 @@ const auth = permiso => {
         
         />:null}
         {view=="pagar"?<Pagar 
+          showinputaddCarritoFast={showinputaddCarritoFast}
+          setshowinputaddCarritoFast={setshowinputaddCarritoFast}
 
           dolar={dolar}
           peso={peso}

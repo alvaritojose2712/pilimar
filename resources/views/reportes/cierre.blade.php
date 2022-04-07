@@ -138,7 +138,7 @@
 					<th class="right">
 						INVENTARIO
 					</th>
-					<td class="">{{(number_format($total_inventario,2,",","."))}}</td>
+					<td class="">{{$total_inventario_format}}</td>
 					<td>
 						<b>VUELTOS TOTALES</b> <hr>
 						{{($vueltos_totales)}}
@@ -164,7 +164,7 @@
 				<tr>
 					<th colspan="3">
 						<h3>TOTAL FACTURADO:</h3>
-						<h1 class="text-success">{{($facturado[2]+$facturado[3]+$facturado[1])}}</h1>
+						<h1 class="text-success">{{($facturado_tot)}}</h1>
 					</th>
 					<th colspan="1" class="">
 
@@ -235,7 +235,7 @@
 				</tr>
 				<tr>
 					<th class="right sin-borde">TOTAL REAL</th>
-					<td class="sin-borde text-success"><h1>{{($cierre->debito+$cierre->efectivo+$cierre->transferencia)}}</h1></td>
+					<td class="sin-borde text-success"><h1>{{($cierre_tot)}}</h1></td>
 					
 					
 				</tr>

@@ -90,6 +90,9 @@ moneda,
 
 dolar,
 peso,
+
+showinputaddCarritoFast,
+setshowinputaddCarritoFast,
 }) {
 
   const debitoBs = (met) =>{
@@ -309,10 +312,18 @@ peso,
                   ):null}
                   <tr>
                     <td><button className="btn btn-outline-success fs-5">{items?items.length:null}</button></td>
-                    <td colSpan="5" className="align-middle">
+                    <td colSpan="5" className="align-middle text-center">
                       {editable?
-                      <input className="form-control form-control-sm" ref={refinputaddcarritofast} value={inputaddCarritoFast} 
-                      placeholder="Agregar...(esc)" onChange={e=>setinputaddCarritoFast(e.target.value)}/>
+                        showinputaddCarritoFast?
+                          <>
+                            <span className="btn btn-outline-danger btn-sm" onClick={()=>setshowinputaddCarritoFast(false)}>Agregar rápido</span>
+                            <input className="form-control form-control-sm" value={inputaddCarritoFast} 
+                            placeholder="Agregar..." onChange={e=>setinputaddCarritoFast(e.target.value)}/>
+                          </>
+                        :<>
+                          <span className="btn btn-outline-success btn-sm" onClick={()=>setshowinputaddCarritoFast(true)}>Agragar rápido</span>
+                        </>
+
                       :null}
                     </td>
 
@@ -495,8 +506,10 @@ peso,
                     </tr>
 
                     <tr className="text-muted">
-                      <th className="text-left">Ref. <span className='fs-4'> Bs {bs}</span></th>
-                      <th className="text-right">Ref. <span className='fs-4'>COP {cop}</span></th>
+                      <th className="text-right" colSpan="2">
+                        Ref. <span className='fs-4'> Bs {bs}</span><br/>
+                        Ref. <span className='fs-5'>COP {cop}</span>
+                      </th>
                     </tr>
                   </tbody>
                 </table>
