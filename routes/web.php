@@ -92,7 +92,6 @@ Route::group(['middleware' => ['login']], function () {
 	Route::group(['middleware' => ['vendedor']], function () {
 		Route::post('getinventario', [InventarioController::class,"index"]);
 		Route::post('setCarrito', [InventarioController::class,"setCarrito"]);
-		Route::post('getPedidosList', [PedidosController::class,"getPedidosUser"]);
 	});
 	
 	Route::group(['middleware' => ['admin']], function () {
@@ -145,6 +144,7 @@ Route::group(['middleware' => ['login']], function () {
 
 
 	});
+	Route::post('getPedidosList', [PedidosController::class,"getPedidosUser"]);
 
 	Route::post('getVentas', [PedidosController::class,"getVentas"]);
 

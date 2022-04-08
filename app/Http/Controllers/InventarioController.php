@@ -120,7 +120,8 @@ class InventarioController extends Controller
                 if ($checkIfExits) {
                     $old_ct = $checkIfExits["cantidad"];
 
-                    $setcantidad = $cantidad + $old_ct;
+                    // $setcantidad = $cantidad + $old_ct;
+                    $setcantidad = $cantidad;
                     $setprecio = $setcantidad*$precio;
                 }
 

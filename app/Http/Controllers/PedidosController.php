@@ -369,12 +369,10 @@ class PedidosController extends Controller
             "totalventas"=>$totalventas,
         ];
     }
-    public function getPedidosUser()
+    public function getPedidosUser(Request $req)
     {
-        if (session()->has("id_usuario")) {
-            $vendedor = session("id_usuario");
-            return pedidos::where("estado",0)->where("id_vendedor",$vendedor)->orderBy("id","desc")->get();
-        }
+        $vendedor = $req->vendedor;
+        return pedidos::where("estado",0)->where("id_vendedor",$vendedor)->orderBy("id","desc")->limit(4)->get();
     }
     public function pedidoAuth($id,$tipo="pedido")
     {

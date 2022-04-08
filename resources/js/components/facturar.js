@@ -396,7 +396,11 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
         setclienteInptelefono("")
         setclienteInpdireccion("")
 
-        inputmodaladdpersonacarritoref.current.focus()
+        if (inputmodaladdpersonacarritoref) {
+          if (inputmodaladdpersonacarritoref.current) {
+            inputmodaladdpersonacarritoref.current.focus()
+          }
+        }
       })
     } else if (view == "inventario" && subViewInventario == "inventario" && modViewInventario == "list") {
       changeInventario(null, null, null, "add")
@@ -441,9 +445,8 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
         setToggleAddPersona(false)
         toggleModalProductos(false)
         setViewCaja(false)
-        if (view!="seleccionar") {
+        if (!ModaladdproductocarritoToggle&&!toggleAddPersona&&view!="seleccionar") {
           setView("seleccionar")
-
         }
       }else if(view=="inventario"){
         inputBuscarInventario.current.value = ""
@@ -528,10 +531,18 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
       }else if(toggleAddPersona) {
 
         let index = countListPersoInter+1
-        if (tbodypersoInterref.current.rows[index]) {
-          setCountListPersoInter(index)
-          tbodypersoInterref.current.rows[index].focus()
-        } 
+        if (tbodypersoInterref) {
+          if (tbodypersoInterref.current) {
+            if (tbodypersoInterref.current.rows) {
+              if (tbodypersoInterref.current.rows[index]) {
+                setCountListPersoInter(index)
+                tbodypersoInterref.current.rows[index].focus()
+              } 
+
+            }
+          }
+
+        }
 
       }
 
@@ -571,9 +582,16 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
 
         if (countListPersoInter>0) {
           let index = countListPersoInter-1
-          if (tbodypersoInterref.current.rows[index]) {
-            tbodypersoInterref.current.rows[index].focus()
-            setCountListPersoInter(index)
+
+          if (tbodypersoInterref) {
+            if (tbodypersoInterref.current) {
+              if (tbodypersoInterref.current.rows) {
+                if (tbodypersoInterref.current.rows[index]) {
+                  tbodypersoInterref.current.rows[index].focus()
+                  setCountListPersoInter(index)
+                }
+              }
+            }
           }
         }
 
@@ -619,10 +637,14 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
           //wait
         }
       }else if(toggleAddPersona){
-        if (tbodypersoInterref.current.rows[countListPersoInter]) {
-          if (tbodypersoInterref.current.rows[countListPersoInter].attributes["data-index"]) {
-            setPersonas(tbodypersoInterref.current.rows[countListPersoInter].attributes["data-index"].value)
+        if (tbodypersoInterref) {
+          if (tbodypersoInterref.current) {
+            if (tbodypersoInterref.current.rows[countListPersoInter]) {
+              if (tbodypersoInterref.current.rows[countListPersoInter].attributes["data-index"]) {
+                setPersonas(tbodypersoInterref.current.rows[countListPersoInter].attributes["data-index"].value)
 
+              }
+            }
           }
         }
       }else{
@@ -1284,8 +1306,10 @@ const printCreditos = () => {
   db.openPrintCreditos("")
 }
 const getPedidosList = (callback=null)=>{
-  db.getPedidosList().then(res=>{
-    setPedidoList(res.data)
+  db.getPedidosList({vendedor:user.id_usuario?user.id_usuario:1}).then(res=>{
+    if (res.data) {
+      setPedidoList(res.data)
+    }
     if (res.data[0]) {
       setNumero_factura(res.data[0].id)
     }

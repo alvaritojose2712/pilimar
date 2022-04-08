@@ -5895,7 +5895,12 @@ function Facturar(_ref) {
         setclienteInpnombre("");
         setclienteInptelefono("");
         setclienteInpdireccion("");
-        inputmodaladdpersonacarritoref.current.focus();
+
+        if (inputmodaladdpersonacarritoref) {
+          if (inputmodaladdpersonacarritoref.current) {
+            inputmodaladdpersonacarritoref.current.focus();
+          }
+        }
       });
     } else if (view == "inventario" && subViewInventario == "inventario" && modViewInventario == "list") {
       changeInventario(null, null, null, "add");
@@ -5938,7 +5943,7 @@ function Facturar(_ref) {
         toggleModalProductos(false);
         setViewCaja(false);
 
-        if (view != "seleccionar") {
+        if (!ModaladdproductocarritoToggle && !toggleAddPersona && view != "seleccionar") {
           setView("seleccionar");
         }
       } else if (view == "inventario") {
@@ -6013,10 +6018,16 @@ function Facturar(_ref) {
       } else if (toggleAddPersona) {
         var _index2 = countListPersoInter + 1;
 
-        if (tbodypersoInterref.current.rows[_index2]) {
-          setCountListPersoInter(_index2);
+        if (tbodypersoInterref) {
+          if (tbodypersoInterref.current) {
+            if (tbodypersoInterref.current.rows) {
+              if (tbodypersoInterref.current.rows[_index2]) {
+                setCountListPersoInter(_index2);
 
-          tbodypersoInterref.current.rows[_index2].focus();
+                tbodypersoInterref.current.rows[_index2].focus();
+              }
+            }
+          }
         }
       }
     } else if (view == "inventario" && subViewInventario == "inventario" && modViewInventario == "list") {// focusInputSibli(event.target, 1)
@@ -6051,10 +6062,16 @@ function Facturar(_ref) {
         if (countListPersoInter > 0) {
           var _index4 = countListPersoInter - 1;
 
-          if (tbodypersoInterref.current.rows[_index4]) {
-            tbodypersoInterref.current.rows[_index4].focus();
+          if (tbodypersoInterref) {
+            if (tbodypersoInterref.current) {
+              if (tbodypersoInterref.current.rows) {
+                if (tbodypersoInterref.current.rows[_index4]) {
+                  tbodypersoInterref.current.rows[_index4].focus();
 
-            setCountListPersoInter(_index4);
+                  setCountListPersoInter(_index4);
+                }
+              }
+            }
           }
         }
       }
@@ -6092,9 +6109,13 @@ function Facturar(_ref) {
 
         }
       } else if (toggleAddPersona) {
-        if (tbodypersoInterref.current.rows[countListPersoInter]) {
-          if (tbodypersoInterref.current.rows[countListPersoInter].attributes["data-index"]) {
-            setPersonas(tbodypersoInterref.current.rows[countListPersoInter].attributes["data-index"].value);
+        if (tbodypersoInterref) {
+          if (tbodypersoInterref.current) {
+            if (tbodypersoInterref.current.rows[countListPersoInter]) {
+              if (tbodypersoInterref.current.rows[countListPersoInter].attributes["data-index"]) {
+                setPersonas(tbodypersoInterref.current.rows[countListPersoInter].attributes["data-index"].value);
+              }
+            }
           }
         }
       } else {
@@ -6757,8 +6778,12 @@ function Facturar(_ref) {
 
   var getPedidosList = function getPedidosList() {
     var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-    _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getPedidosList().then(function (res) {
-      setPedidoList(res.data);
+    _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getPedidosList({
+      vendedor: user.id_usuario ? user.id_usuario : 1
+    }).then(function (res) {
+      if (res.data) {
+        setPedidoList(res.data);
+      }
 
       if (res.data[0]) {
         setNumero_factura(res.data[0].id);
@@ -14441,8 +14466,8 @@ var db = {
   getPedido: function getPedido(data) {
     return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "getPedido", data);
   },
-  getPedidosList: function getPedidosList() {
-    return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "getPedidosList");
+  getPedidosList: function getPedidosList(data) {
+    return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "getPedidosList", data);
   },
   verificarLogin: function verificarLogin() {
     return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "verificarLogin");
