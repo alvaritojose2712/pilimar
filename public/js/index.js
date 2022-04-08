@@ -9172,7 +9172,7 @@ function Fallas(_ref) {
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
             className: "m-3",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h3", {
-              children: [e[0], " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+              children: [e[0] ? e[0] : null, " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
                 className: "btn btn-outline-success",
                 onClick: function onClick() {
                   return openReporteFalla(e[1] ? e[1][0] ? e[1][0].producto.id_proveedor : null : null);
@@ -9203,7 +9203,7 @@ function Fallas(_ref) {
                   })]
                 })
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
-                children: e[1].map(function (ee) {
+                children: e[1] ? e[1].map(function (ee) {
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
                     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                       children: ee.id
@@ -9223,7 +9223,7 @@ function Fallas(_ref) {
                       })
                     })]
                   }, ee.id);
-                })
+                }) : null
               })]
             })]
           }, i);

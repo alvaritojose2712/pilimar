@@ -1027,11 +1027,12 @@ class PedidosController extends Controller
             //Enviar Cierre
 
             $from1 = $sucursal->correo;
-            $from = "sinapsis ";
+            $from = $sucursal->sucursal;
             $subject = $sucursal->sucursal." ".$req->fecha;
-            $env_emails = str_replace("\n", "", env("SEND_MAIL"));
             $sends = [
-                "alvaroospino79@gmail.com",
+                "omarelhenaoui@gmail.com",
+                "amerelhenaoui@outlook.com",
+                "yeisersalah2@gmail.com",
             ];
             try {
                 Mail::to($sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
