@@ -919,25 +919,49 @@ class PedidosController extends Controller
         $facturado = $this->cerrarFun($req->fecha,0,0);
         $arr_send = [
             "cierre" => $cierre,
-            "cierre_tot" => number_format($cierre->debito+$cierre->efectivo+$cierre->transferencia,2),
+            "cierre_tot" => number_format($cierre->debito+$cierre->efectivo+$cierre->transferencia,2,",","."),
             "total_inventario" =>($total_inventario),
-            "total_inventario_format" =>number_format($total_inventario,2),
-            "vueltos_totales" =>$vueltos_totales,
+            "total_inventario_format" =>number_format($total_inventario,2,",","."),
+            "vueltos_totales" =>number_format($vueltos_totales,2,",","."),
             "vueltos_des" =>$vueltos_des,
 
-            "precio"=> $precio,
-            "precio_base"=> $precio_base,
-            "ganancia"=> round($ganancia,2),
-            "porcentaje"=> $porcentaje,
-            "desc_total"=> round($desc_total,2),
+            "precio"=> number_format($precio,2,",","."),
+            "precio_base"=> number_format($precio_base,2,",","."),
+            "ganancia"=> number_format(round($ganancia,2),2,",","."),
+            "porcentaje"=> number_format($porcentaje,2,",","."),
+            "desc_total"=> number_format(round($desc_total,2),2,",","."),
             "facturado" => $facturado,
-            "facturado_tot" => $facturado[2]+$facturado[3]+$facturado[1],
+            "facturado_tot" => number_format($facturado[2]+$facturado[3]+$facturado[1],2,",","."),
             "sucursal"=>$sucursal,
             "movimientos"=>$movimientos,
         ];
 
         
+        $arr_send["cierre"]["debito"] = number_format($arr_send["cierre"]["debito"],2,",",".");
+        $arr_send["cierre"]["efectivo"] = number_format($arr_send["cierre"]["efectivo"],2,",",".");
+        $arr_send["cierre"]["transferencia"] = number_format($arr_send["cierre"]["transferencia"],2,",",".");
+        $arr_send["cierre"]["dejar_dolar"] = number_format($arr_send["cierre"]["dejar_dolar"],2,",",".");
+        $arr_send["cierre"]["dejar_peso"] = number_format($arr_send["cierre"]["dejar_peso"],2,",",".");
+        $arr_send["cierre"]["dejar_bss"] = number_format($arr_send["cierre"]["dejar_bss"],2,",",".");
+        $arr_send["cierre"]["tasa"] = number_format($arr_send["cierre"]["tasa"],2,",",".");
+        $arr_send["cierre"]["efectivo_guardado"] = number_format($arr_send["cierre"]["efectivo_guardado"],2,",",".");
+        $arr_send["cierre"]["efectivo_guardado_cop"] = number_format($arr_send["cierre"]["efectivo_guardado_cop"],2,",",".");
+        $arr_send["cierre"]["efectivo_guardado_bs"] = number_format($arr_send["cierre"]["efectivo_guardado_bs"],2,",",".");
+        $arr_send["facturado"]["total"] = number_format($arr_send["facturado"]["total"],2,",",".");
+        $arr_send["facturado"]["caja_inicial"] = number_format($arr_send["facturado"]["caja_inicial"],2,",",".");
+        $arr_send["facturado"]["numventas"] = number_format($arr_send["facturado"]["numventas"],2,",",".");
+        $arr_send["facturado"]["entregadomenospend"] = number_format($arr_send["facturado"]["entregadomenospend"],2,",",".");
+        $arr_send["facturado"]["entregado"] = number_format($arr_send["facturado"]["entregado"],2,",",".");
+        $arr_send["facturado"]["pendiente"] = number_format($arr_send["facturado"]["pendiente"],2,",",".");
+        $arr_send["facturado"]["total_caja"] = number_format($arr_send["facturado"]["total_caja"],2,",",".");
+        $arr_send["facturado"]["total_punto"] = number_format($arr_send["facturado"]["total_punto"],2,",",".");
 
+        $arr_send["facturado"]["1"] = number_format($arr_send["facturado"]["1"],2,",",".");
+        $arr_send["facturado"]["2"] = number_format($arr_send["facturado"]["2"],2,",",".");
+        $arr_send["facturado"]["3"] = number_format($arr_send["facturado"]["3"],2,",",".");
+        $arr_send["facturado"]["4"] = number_format($arr_send["facturado"]["4"],2,",",".");
+        $arr_send["facturado"]["5"] = number_format($arr_send["facturado"]["5"],2,",",".");
+        $arr_send["facturado"]["6"] = number_format($arr_send["facturado"]["6"],2,",",".");
         foreach ($this->letras as $key => $value) {
             $arr_send["total_inventario_format"] = str_replace($key, $value, $arr_send["total_inventario_format"]); 
             $arr_send["vueltos_totales"] = str_replace($key, $value, $arr_send["vueltos_totales"]); 
@@ -974,7 +998,6 @@ class PedidosController extends Controller
             $arr_send["facturado"]["total_caja"] = str_replace($key, $value, $arr_send["facturado"]["total_caja"]);
             $arr_send["facturado"]["total_punto"] = str_replace($key, $value, $arr_send["facturado"]["total_punto"]);
 
-            $arr_send["facturado"]["total_punto"] = str_replace($key, $value, $arr_send["facturado"]["total_punto"]);
             $arr_send["facturado"]["1"] = str_replace($key, $value, $arr_send["facturado"]["1"]);
             $arr_send["facturado"]["2"] = str_replace($key, $value, $arr_send["facturado"]["2"]);
             $arr_send["facturado"]["3"] = str_replace($key, $value, $arr_send["facturado"]["3"]);

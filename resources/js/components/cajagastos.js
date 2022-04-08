@@ -26,7 +26,7 @@ function Cajagastos({
         <div className="modal-content">
           <h4>Movimientos de caja y Gastos</h4>
           <form onSubmit={setMovimientoCaja} >
-            <table className="table table-sm">
+            <table className="table table-sm table-hoverable">
               <thead> 
                 {movCajatipo!==<tr></tr>?
                 <>
@@ -60,7 +60,7 @@ function Cajagastos({
               <tbody>
                 <tr>
                   <td colSpan="2">
-                    <table className="table table-sm">
+                    <table className="table table-sm table-hoverable">
                       <tbody>
                         <tr>
                           <td colSpan="2">
@@ -92,7 +92,7 @@ function Cajagastos({
                     </table>
                   </td>
                   <td colSpan="3">
-                    <table className="table table-sm">
+                    <table className="table table-sm table-hoverable">
                       <tbody>
                         <tr>
                           <td colSpan="2"><h5 onClick={()=>setMovCajatipo(0)} className={movCajatipo==0?"text-primary":null+(" pointer")}>Pendiente {movCajatipo==0?null:"(Click)"}</h5></td>

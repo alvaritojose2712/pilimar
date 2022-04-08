@@ -42,11 +42,43 @@ class MovimientosCajaController extends Controller
 
    public function delMovCaja(Request $req)
    {
-        if ($mov = movimientos_caja::find($req->id)) {
+        $mov = movimientos_caja::find($req->id);
+        if ($mov) {
             try {
                 $fecha_str = strtotime($mov->created_at);
                 $fecha = date("Y-m-d",$fecha_str);
                 (new PedidosController)->checkPedidoAuth(null,$fecha);
+                $data = $mov;
+                $cat = $data->categoria;
+
+                switch ($data->categoria) {
+                    case '1': 
+
+                    $cat = "Vueltos";
+                    break;
+                    case '2': 
+
+                    $cat = "Nómina";
+                    break;
+                    case '3': 
+
+                    $cat = "Funcionamiento";
+                    break;
+                    case '4': 
+
+                    $cat = "Pago a proveedores";
+                    break;
+                    case '5': 
+
+                    $cat = "Otros";
+                    break;
+                    case '6': 
+
+                    $cat = "Devolución";
+                    break;
+                }
+                (new InventarioController)->setMovimientoNotCliente(null,$data->descripcion,$cat,$data->monto,"Eliminación de Movimiento de caja");
+
                 
                 $mov->delete();
                 return Response::json(["msj"=>"¡Éxito al eliminar movimiento!","estado"=>true]);

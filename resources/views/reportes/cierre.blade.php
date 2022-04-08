@@ -5,8 +5,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Reporte de Cierre</title>
 	<style type="text/css">
-
+		.bg-white{
+			background-color: white;
+		}
 		body{
+
 		}
 		.long-text{
 			width: 400px;
@@ -85,7 +88,7 @@
 	</style>
 </head>
 <body>
-	<div class="container">
+	<div class="container bg-white">
 		<table class="table">
 			<tbody>
 				<tr>
@@ -96,9 +99,9 @@
 				<tr>
 					<td>
 						@if (isset($message))
-							<img src="{{$message->embed('images/logo.png')}}" width="200px" class="img">
+							<img src="{{$message->embed('images/logo-small.jpg')}}" width="200px" >
 						@else
-							<img src="{{asset('images/logo.png')}}" width="200px" class="img">
+							<img src="{{asset('images/logo-small.jpg')}}" width="200px" >
 						@endif
 						
 
@@ -286,7 +289,7 @@
 		<table class="table">
 			<tbody>
 				<tr>
-					<th colspan="6">MOVIMIENTOS DE PRODUCTOS</th>
+					<th colspan="6">MOVIMIENTOS</th>
 				</tr>
 					@foreach($movimientos as $val)
 						@if ($val->motivo)
@@ -326,7 +329,7 @@
 
 									</td>
 									@if (!$e->producto)
-										<td><b>Producto</b><br/> {{$e->descripcion}}</td>
+										<td><b>Producto/Desc.</b><br/> {{$e->descripcion}}</td>
 										<td>P/U. {{$e->precio}}</td>
 									@else
 										<td><b>Producto</b><br/> {{$e->producto->descripcion}}</td>
