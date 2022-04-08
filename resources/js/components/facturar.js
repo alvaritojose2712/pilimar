@@ -189,7 +189,7 @@ export default function Facturar({user,notificar,setLoading}) {
   const [viewCaja,setViewCaja] = useState(false)
 
   const [movCajadescripcion,setMovCajadescripcion] = useState("")
-  const [movCajatipo,setMovCajatipo] = useState(null)
+  const [movCajatipo,setMovCajatipo] = useState(1)
   const [movCajacategoria,setMovCajacategoria] = useState(5)
   const [movCajamonto,setMovCajamonto] = useState("")
   const [movCajaFecha,setMovCajaFecha] = useState("")
@@ -990,13 +990,13 @@ const getMovimientos = () =>{
   db.getMovimientos({fechaMovimientos}).then(res=>{
     setMovimientos(res.data)
 
-    if (!res.data.length) {
+    // if (!res.data.length) {
       setIdMovSelect("nuevo")
-    }else{
-      if (res.data[0]) {
-        setIdMovSelect(res.data[0].id)
-      }
-    }
+    // }else{
+    //   if (res.data[0]) {
+    //     setIdMovSelect(res.data[0].id)
+    //   }
+    // }
     setLoading(false)
   })
 }
@@ -1084,8 +1084,6 @@ const setMovimientoCaja = e =>{
     getMovimientosCaja()
     notificar(res)
     setLoading(false)
-    setMovCajatipo(null)
-
     setMovCajadescripcion("")
     setMovCajamonto("")
 

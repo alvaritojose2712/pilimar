@@ -88,7 +88,8 @@ function ModalAddCarrito({
       <section className="modal-custom"> 
         <div className="text-danger" onClick={()=>setShowModalMovimientos(!showModalMovimientos)}><span className="closeModal">&#10006;</span></div>
         <div className="modal-content">
-        <h1>Movimientos del día  <input type="date" className="form-control" value={fechaMovimientos} onChange={e=>setFechaMovimientos(e.target.value)} /></h1>
+          <h4>Movimientos del día</h4>
+          <input type="date" value={fechaMovimientos} onChange={e=>setFechaMovimientos(e.target.value)} />
           <table className="table">
             <thead>
               <tr>
@@ -123,7 +124,7 @@ function ModalAddCarrito({
                         <option key={e.id} value={e.id}>{e.id}</option>
 
                       ):null}
-                      <option value="nuevo">nuevo</option>
+                      <option value="nuevo">Nuevo</option>
                     </select>
 
                   </div>

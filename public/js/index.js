@@ -2192,15 +2192,14 @@ function ModalAddCarrito(_ref) {
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
         className: "modal-content",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
-          children: ["Movimientos del d\xEDa  ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-            type: "date",
-            className: "form-control",
-            value: fechaMovimientos,
-            onChange: function onChange(e) {
-              return setFechaMovimientos(e.target.value);
-            }
-          })]
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h4", {
+          children: "Movimientos del d\xEDa"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+          type: "date",
+          value: fechaMovimientos,
+          onChange: function onChange(e) {
+            return setFechaMovimientos(e.target.value);
+          }
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
           className: "table",
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("thead", {
@@ -2256,7 +2255,7 @@ function ModalAddCarrito(_ref) {
                       }, e.id);
                     }) : null, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
                       value: "nuevo",
-                      children: "nuevo"
+                      children: "Nuevo"
                     })]
                   })]
                 })
@@ -2749,7 +2748,7 @@ function Cajagastos(_ref) {
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
             className: "table table-sm table-hoverable",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("thead", {
-              children: movCajatipo !== /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {}) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+              children: movCajatipo !== null ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
@@ -2760,6 +2759,17 @@ function Cajagastos(_ref) {
                       }
                     })
                   })
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                    children: "Descripci\xF3n"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                    children: "Monto"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                    colSpan: "2",
+                    children: "Categor\xEDa"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                    children: "Tipo"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {})]
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
@@ -2809,6 +2819,21 @@ function Cajagastos(_ref) {
                       })]
                     })
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", {
+                      className: "form-control",
+                      value: movCajatipo,
+                      onChange: function onChange(e) {
+                        return setMovCajatipo(e.target.value);
+                      },
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
+                        value: "1",
+                        children: "Entregado"
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
+                        value: "0",
+                        children: "Pendiente"
+                      })]
+                    })
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
                       className: "btn",
                       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("i", {
@@ -2817,26 +2842,15 @@ function Cajagastos(_ref) {
                     })
                   })]
                 })]
-              }) : null
+              }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {})
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                   colSpan: "2",
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("table", {
                     className: "table table-sm table-hoverable",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tbody", {
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
-                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                          colSpan: "2",
-                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h5", {
-                            onClick: function onClick() {
-                              return setMovCajatipo(1);
-                            },
-                            className: movCajatipo == 1 ? "text-primary" : null + " pointer",
-                            children: ["Entregado ", movCajatipo == 1 ? null : "(Click)"]
-                          })
-                        })
-                      }), movimientosCaja.filter(function (e) {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
+                      children: movimientosCaja.filter(function (e) {
                         return e.tipo == 1;
                       }).map(function (e) {
                         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
@@ -2853,26 +2867,15 @@ function Cajagastos(_ref) {
                             children: e.monto
                           })]
                         }, e.id);
-                      })]
+                      })
                     })
                   })
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                   colSpan: "3",
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("table", {
                     className: "table table-sm table-hoverable",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tbody", {
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
-                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                          colSpan: "2",
-                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h5", {
-                            onClick: function onClick() {
-                              return setMovCajatipo(0);
-                            },
-                            className: movCajatipo == 0 ? "text-primary" : null + " pointer",
-                            children: ["Pendiente ", movCajatipo == 0 ? null : "(Click)"]
-                          })
-                        })
-                      }), movimientosCaja.filter(function (e) {
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
+                      children: movimientosCaja.filter(function (e) {
                         return e.tipo == 0;
                       }).map(function (e) {
                         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
@@ -2889,7 +2892,7 @@ function Cajagastos(_ref) {
                             children: e.monto
                           })]
                         }, e.id);
-                      })]
+                      })
                     })
                   })
                 })]
@@ -5413,7 +5416,7 @@ function Facturar(_ref) {
       movCajadescripcion = _useState188[0],
       setMovCajadescripcion = _useState188[1];
 
-  var _useState189 = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(null),
+  var _useState189 = (0,react__WEBPACK_IMPORTED_MODULE_2__.useState)(1),
       _useState190 = _slicedToArray(_useState189, 2),
       movCajatipo = _useState190[0],
       setMovCajatipo = _useState190[1];
@@ -6407,15 +6410,13 @@ function Facturar(_ref) {
     _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getMovimientos({
       fechaMovimientos: fechaMovimientos
     }).then(function (res) {
-      setMovimientos(res.data);
+      setMovimientos(res.data); // if (!res.data.length) {
 
-      if (!res.data.length) {
-        setIdMovSelect("nuevo");
-      } else {
-        if (res.data[0]) {
-          setIdMovSelect(res.data[0].id);
-        }
-      }
+      setIdMovSelect("nuevo"); // }else{
+      //   if (res.data[0]) {
+      //     setIdMovSelect(res.data[0].id)
+      //   }
+      // }
 
       setLoading(false);
     });
@@ -6518,7 +6519,6 @@ function Facturar(_ref) {
       getMovimientosCaja();
       notificar(res);
       setLoading(false);
-      setMovCajatipo(null);
       setMovCajadescripcion("");
       setMovCajamonto("");
     });
