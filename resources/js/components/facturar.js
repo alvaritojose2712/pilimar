@@ -1288,8 +1288,8 @@ const getPedidosList = (callback=null)=>{
     setPedidoList(res.data)
     if (res.data[0]) {
       setNumero_factura(res.data[0].id)
-      if(callback){callback()}
     }
+    if(callback){callback()}
   })
 }
 const getPedido = (id,callback=null) => {

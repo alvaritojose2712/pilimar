@@ -6762,10 +6762,10 @@ function Facturar(_ref) {
 
       if (res.data[0]) {
         setNumero_factura(res.data[0].id);
+      }
 
-        if (callback) {
-          callback();
-        }
+      if (callback) {
+        callback();
       }
     });
   };
