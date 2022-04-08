@@ -785,3 +785,10 @@ body{
 .login100-form-btn:hover:before {
   opacity: 0;
 }
+
+
+
+.header-justify-content-end{
+  justify-content: flex-end !important;
+  
+}

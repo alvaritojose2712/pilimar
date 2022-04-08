@@ -748,6 +748,12 @@ body{
   opacity: 0;
 }
 
+
+
+.header-justify-content-end{
+  justify-content: flex-end !important;
+  
+}
 @charset "UTF-8";
 @font-face {
   font-family: "Nunito";

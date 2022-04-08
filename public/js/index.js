@@ -6756,11 +6756,16 @@ function Facturar(_ref) {
   };
 
   var getPedidosList = function getPedidosList() {
+    var callback = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getPedidosList().then(function (res) {
       setPedidoList(res.data);
 
       if (res.data[0]) {
         setNumero_factura(res.data[0].id);
+
+        if (callback) {
+          callback();
+        }
       }
     });
   };
@@ -6881,7 +6886,6 @@ function Facturar(_ref) {
 
   var addCarrito = function addCarrito(e) {
     var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-    getPedidosList();
     var index, loteid;
 
     if (e.currentTarget) {
@@ -6895,23 +6899,25 @@ function Facturar(_ref) {
       index = e;
     }
 
-    setLoteIdCarrito(loteid);
+    getPedidosList(function () {
+      setLoteIdCarrito(loteid);
 
-    if (index != counterListProductos && productos[index].lotes.length) {
-      setCounterListProductos(index);
-    } else {
-      if (pedidoList[0]) {
-        setNumero_factura(pedidoList[0].id);
+      if (index != counterListProductos && productos[index].lotes.length) {
+        setCounterListProductos(index);
       } else {
-        setNumero_factura("nuevo");
-      }
+        if (pedidoList[0]) {
+          setNumero_factura(pedidoList[0].id);
+        } else {
+          setNumero_factura("nuevo");
+        }
 
-      setSelectItem(index);
+        setSelectItem(index);
 
-      if (callback) {
-        callback();
+        if (callback) {
+          callback();
+        }
       }
-    }
+    });
   };
 
   var addCarritoRequest = function addCarritoRequest(e) {
@@ -9283,7 +9289,7 @@ function Header(_ref) {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
           className: "col",
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-            className: "d-flex justify-content-end flex-wrap align-items-center",
+            className: "d-flex header-justify-content-end flex-wrap align-items-center",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
               className: "p-3",
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("img", {
@@ -9306,7 +9312,7 @@ function Header(_ref) {
             })]
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-          className: "col-5 d-flex justify-content-end align-items-center",
+          className: "col-5 d-flex header-justify-content-end align-items-center",
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
               className: "fw-bold",
@@ -9329,7 +9335,7 @@ function Header(_ref) {
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
         className: "row",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-          className: "col d-flex justify-content-end",
+          className: "col d-flex header-justify-content-end",
           children: [auth(3) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
             className: (view == "ventas" ? "btn btn-dark" : null) + " p-3 pointer",
             onClick: function onClick() {
@@ -9409,7 +9415,7 @@ function Header(_ref) {
             })]
           }) : null]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
-          className: "col-4 d-flex justify-content-end",
+          className: "col-4 d-flex header-justify-content-end",
           children: [auth(2) ? view == "seleccionar" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
               className: (viewCaja ? "btn btn-sinapsis" : null) + " p-3 pointer",

@@ -1283,11 +1283,12 @@ const setPersonaFast = e => {
 const printCreditos = () => {
   db.openPrintCreditos("")
 }
-const getPedidosList = ()=>{
+const getPedidosList = (callback=null)=>{
   db.getPedidosList().then(res=>{
     setPedidoList(res.data)
     if (res.data[0]) {
       setNumero_factura(res.data[0].id)
+      if(callback){callback()}
     }
   })
 }
@@ -1374,7 +1375,6 @@ const getPedido = (id,callback=null) => {
   })
 }
 const addCarrito = (e,callback=null) => {
-  getPedidosList()
   let index, loteid;
   if (e.currentTarget) {
     let attr = e.currentTarget.attributes 
@@ -1387,22 +1387,24 @@ const addCarrito = (e,callback=null) => {
   }else{
     index = e
   }
+  getPedidosList(()=>{
+    setLoteIdCarrito(loteid)
 
-  setLoteIdCarrito(loteid)
-
-  
-  if (index != counterListProductos && productos[index].lotes.length) {
-    setCounterListProductos(index)
-  }else{
-    if (pedidoList[0]) {
-      setNumero_factura(pedidoList[0].id)
+    
+    if (index != counterListProductos && productos[index].lotes.length) {
+      setCounterListProductos(index)
     }else{
-      setNumero_factura("nuevo")
-    }
-    setSelectItem(index)
-    if (callback) {callback()}
+      if (pedidoList[0]) {
+        setNumero_factura(pedidoList[0].id)
+      }else{
+        setNumero_factura("nuevo")
+      }
+      setSelectItem(index)
+      if (callback) {callback()}
 
-  }
+    }
+  })
+
 }
 const addCarritoRequest = e =>{
   try{

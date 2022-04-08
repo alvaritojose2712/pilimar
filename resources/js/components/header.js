@@ -9,7 +9,7 @@ function Header({
       <div className="container-fluid">
         <div className="row">
           <div className="col">
-            <div className="d-flex justify-content-end flex-wrap align-items-center">
+            <div className="d-flex header-justify-content-end flex-wrap align-items-center">
               <div className="p-3">
                 <img src={logo} alt="sinapsis" className="logo" />
               </div>
@@ -24,7 +24,7 @@ function Header({
             </div>
 
           </div>
-          <div className="col-5 d-flex justify-content-end align-items-center">
+          <div className="col-5 d-flex header-justify-content-end align-items-center">
             <div>
               <span className="fw-bold">{user.nombre}</span><br/>
               <span className="fst-italic">{user.role}</span>
@@ -35,7 +35,7 @@ function Header({
       </div>
       <div className="bg-sinapsis container-fluid">
         <div className="row">
-          <div className="col d-flex justify-content-end">
+          <div className="col d-flex header-justify-content-end">
             
             {auth(3)?<span className={(view == "ventas" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => { setView("ventas"); getVentasClick()}}>Ventas</span>:null}
 
@@ -73,7 +73,8 @@ function Header({
             :null}
             
           </div>
-          <div className="col-4 d-flex justify-content-end">
+          <div className="col-4 d-flex header-justify-content-end">
+
             { 
               auth(2)?
                 view=="seleccionar"?
