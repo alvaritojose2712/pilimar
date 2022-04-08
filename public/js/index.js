@@ -2342,138 +2342,144 @@ function Modaladdproductocarrito(_ref) {
       setclienteInptelefono = _ref.setclienteInptelefono,
       clienteInpdireccion = _ref.clienteInpdireccion,
       setclienteInpdireccion = _ref.setclienteInpdireccion;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("section", {
-      className: "modal-custom",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-        className: "text-danger",
-        onClick: function onClick() {
-          return setToggleAddPersona(false);
-        },
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
-          className: "closeModal",
-          children: "\u2716"
-        })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-        className: "modal-content modal-cantidad",
+
+  try {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("section", {
+        className: "modal-custom",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-          className: "d-flex justify-content-between",
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h5", {
-              children: "Agregar Cliente"
-            })
+          className: "text-danger",
+          onClick: function onClick() {
+            return setToggleAddPersona(false);
+          },
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+            className: "closeModal",
+            children: "\u2716"
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-            type: "text",
-            className: "form-control",
-            ref: inputmodaladdpersonacarritoref,
-            placeholder: "Buscar...",
-            onChange: function onChange(val) {
-              return getPersona(val.target.value);
-            }
-          })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
-          className: "table table-bordered tabla_datos",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("thead", {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-                children: "C\xC9DULA"
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-                children: "NOMBRE Y APELLIDO"
-              })]
-            })
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tbody", {
-            ref: tbodypersoInterref,
-            children: [personas ? personas.map(function (e, i) {
-              return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
-                tabIndex: "-1",
-                className: (countListPersoInter == i ? "bg-select" : null) + ' tr-producto',
-                onClick: setPersonas,
-                "data-index": e.id,
-                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                  children: e.identificacion
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                  "data-index": i,
-                  children: e.nombre
-                })]
-              }, e.id);
-            }) : null, !personas.length ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                colSpan: "2",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("form", {
-                  onSubmit: setPersonaFast,
-                  className: "w-50 m-3",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                    className: "form-group",
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
-                      htmlFor: "",
-                      children: "C.I./RIF"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-                      type: "text",
-                      value: clienteInpidentificacion,
-                      onChange: function onChange(e) {
-                        return setclienteInpidentificacion(e.target.value);
-                      },
-                      className: "form-control"
-                    })]
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                    className: "form-group",
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
-                      htmlFor: "",
-                      children: "Nombres y Apellidos"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-                      type: "text",
-                      value: clienteInpnombre,
-                      onChange: function onChange(e) {
-                        return setclienteInpnombre(e.target.value);
-                      },
-                      className: "form-control"
-                    })]
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                    className: "form-group",
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
-                      htmlFor: "",
-                      children: "Tel\xE9fono"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-                      type: "text",
-                      value: clienteInptelefono,
-                      onChange: function onChange(e) {
-                        return setclienteInptelefono(e.target.value);
-                      },
-                      className: "form-control"
-                    })]
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                    className: "form-group",
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
-                      htmlFor: "",
-                      children: "Direcci\xF3n"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-                      type: "text",
-                      value: clienteInpdireccion,
-                      onChange: function onChange(e) {
-                        return setclienteInpdireccion(e.target.value);
-                      },
-                      className: "form-control"
-                    })]
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-                    className: "form-group",
-                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
-                      className: "btn btn-outline-success btn-block",
-                      type: "submit",
-                      children: "Guardar"
-                    })
-                  })]
-                })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+          className: "modal-content modal-cantidad",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+            className: "d-flex justify-content-between",
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h5", {
+                children: "Agregar Cliente"
               })
-            }) : null]
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+              type: "text",
+              className: "form-control",
+              ref: inputmodaladdpersonacarritoref,
+              placeholder: "Buscar...",
+              onChange: function onChange(val) {
+                return getPersona(val.target.value);
+              }
+            })
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
+            className: "table table-bordered tabla_datos",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("thead", {
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+                  children: "C\xC9DULA"
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+                  children: "NOMBRE Y APELLIDO"
+                })]
+              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tbody", {
+              ref: tbodypersoInterref,
+              children: [personas ? personas.map(function (e, i) {
+                return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
+                  tabIndex: "-1",
+                  className: (countListPersoInter == i ? "bg-select" : null) + ' tr-producto',
+                  onClick: setPersonas,
+                  "data-index": e.id,
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                    children: e.identificacion
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                    "data-index": i,
+                    children: e.nombre
+                  })]
+                }, e.id);
+              }) : null, !personas.length ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                  colSpan: "2",
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("form", {
+                    onSubmit: setPersonaFast,
+                    className: "w-50 m-3",
+                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                      className: "form-group",
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+                        htmlFor: "",
+                        children: "C.I./RIF"
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+                        type: "text",
+                        value: clienteInpidentificacion,
+                        onChange: function onChange(e) {
+                          return setclienteInpidentificacion(e.target.value);
+                        },
+                        className: "form-control"
+                      })]
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                      className: "form-group",
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+                        htmlFor: "",
+                        children: "Nombres y Apellidos"
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+                        type: "text",
+                        value: clienteInpnombre,
+                        onChange: function onChange(e) {
+                          return setclienteInpnombre(e.target.value);
+                        },
+                        className: "form-control"
+                      })]
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                      className: "form-group",
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+                        htmlFor: "",
+                        children: "Tel\xE9fono"
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+                        type: "text",
+                        value: clienteInptelefono,
+                        onChange: function onChange(e) {
+                          return setclienteInptelefono(e.target.value);
+                        },
+                        className: "form-control"
+                      })]
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                      className: "form-group",
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("label", {
+                        htmlFor: "",
+                        children: "Direcci\xF3n"
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+                        type: "text",
+                        value: clienteInpdireccion,
+                        onChange: function onChange(e) {
+                          return setclienteInpdireccion(e.target.value);
+                        },
+                        className: "form-control"
+                      })]
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+                      className: "form-group",
+                      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                        className: "btn btn-outline-success btn-block",
+                        type: "submit",
+                        children: "Guardar"
+                      })
+                    })]
+                  })
+                })
+              }) : null]
+            })]
           })]
         })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+        className: "overlay"
       })]
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-      className: "overlay"
-    })]
-  });
+    });
+  } catch (err) {
+    alert("Error: " + err);
+    return "Error: " + err;
+  }
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Modaladdproductocarrito);
@@ -5870,12 +5876,15 @@ function Facturar(_ref) {
       busqAvanzInputs = _useState358[0],
       setbusqAvanzInputs = _useState358[1];
 
-  (0,react_hotkeys_hook__WEBPACK_IMPORTED_MODULE_1__.useHotkeys)('f1', function () {
-    if (selectItem !== null && view == "seleccionar") {
+  (0,react_hotkeys_hook__WEBPACK_IMPORTED_MODULE_1__.useHotkeys)("tab", function () {
+    if (typeof selectItem == "number" && view == "seleccionar") {
       addCarritoRequest("agregar_procesar");
-    } else if (view == "pedidos") {
-      setView("seleccionar");
-    } else if (view == "pagar") {
+    }
+  }, {
+    enableOnTags: ["INPUT", "SELECT"]
+  }, [view, selectItem]);
+  (0,react_hotkeys_hook__WEBPACK_IMPORTED_MODULE_1__.useHotkeys)('f1', function () {
+    if (view == "pagar") {
       toggleModalProductos(true, function () {
         inputaddcarritointernoref.current.focus();
       });
@@ -5935,10 +5944,12 @@ function Facturar(_ref) {
   }, [view]);
   (0,react_hotkeys_hook__WEBPACK_IMPORTED_MODULE_1__.useHotkeys)('esc', function () {
     try {
-      if (view == "seleccionar" && selectItem !== null) {
+      if (view == "pedidos") {
+        setView("seleccionar");
+      } else if (view == "seleccionar" && typeof selectItem == "number") {
         setSelectItem(null);
         setViewCaja(false);
-      } else if (view == "seleccionar" && selectItem === null) {
+      } else if (view == "seleccionar" && typeof selectItem != "number") {
         inputbusquedaProductosref.current.value = "";
         inputbusquedaProductosref.current.focus();
       } else if (view == "pagar") {
@@ -6084,7 +6095,7 @@ function Facturar(_ref) {
     enableOnTags: ["INPUT", "SELECT"]
   }, [view, counterListProductos, countListInter, countListPersoInter, subViewInventario, modViewInventario]);
   (0,react_hotkeys_hook__WEBPACK_IMPORTED_MODULE_1__.useHotkeys)('enter', function (event) {
-    if (selectItem === null && view == "seleccionar") {
+    if (typeof selectItem != "number" && view == "seleccionar") {
       try {
         if (tbodyproductosref.current) {
           var tr = tbodyproductosref.current.rows[counterListProductos];
@@ -6101,7 +6112,7 @@ function Facturar(_ref) {
 
         }
       } catch (err) {}
-    } else if (selectItem !== null && view == "seleccionar") {
+    } else if (typeof selectItem == "number" && view == "seleccionar") {
       addCarritoRequest("agregar");
     } else if (view == "pagar") {
       if (ModaladdproductocarritoToggle) {
@@ -6924,25 +6935,23 @@ function Facturar(_ref) {
       index = e;
     }
 
-    getPedidosList(function () {
-      setLoteIdCarrito(loteid);
+    setLoteIdCarrito(loteid);
 
-      if (index != counterListProductos && productos[index].lotes.length) {
-        setCounterListProductos(index);
+    if (index != counterListProductos && productos[index].lotes.length) {
+      setCounterListProductos(index);
+    } else {
+      if (pedidoList[0]) {
+        setNumero_factura(pedidoList[0].id);
       } else {
-        if (pedidoList[0]) {
-          setNumero_factura(pedidoList[0].id);
-        } else {
-          setNumero_factura("nuevo");
-        }
-
-        setSelectItem(index);
-
-        if (callback) {
-          callback();
-        }
+        setNumero_factura("nuevo");
       }
-    });
+
+      setSelectItem(parseInt(index));
+
+      if (callback) {
+        callback();
+      }
+    }
   };
 
   var addCarritoRequest = function addCarritoRequest(e) {
@@ -8486,7 +8495,7 @@ function Facturar(_ref) {
       setView: setView
     }), view == "seleccionar" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)("div", {
       className: "container p-0",
-      children: [selectItem !== null ? productos[selectItem] ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_components_modaladdcarrito__WEBPACK_IMPORTED_MODULE_7__["default"], {
+      children: [typeof selectItem == "number" ? productos[selectItem] ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_components_modaladdcarrito__WEBPACK_IMPORTED_MODULE_7__["default"], {
         producto: productos[selectItem],
         setSelectItem: setSelectItem,
         cantidad: cantidad,
@@ -11861,7 +11870,7 @@ function ModalAddCarrito(_ref) {
               type: "button",
               onClick: addCarritoRequest,
               "data-type": "agregar_procesar",
-              children: "Procesar(f1)"
+              children: "Procesar(TAB)"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
               className: "btn btn-outline-secondary",
               type: "button",

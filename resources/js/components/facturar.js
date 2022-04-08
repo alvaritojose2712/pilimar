@@ -363,13 +363,15 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
   
   
 
-
-  useHotkeys('f1', () => {
-    if(selectItem!==null&&view=="seleccionar"){
+  useHotkeys("tab",()=>{
+    if(typeof(selectItem)=="number"&&view=="seleccionar"){
       addCarritoRequest("agregar_procesar")
-    }else if(view=="pedidos"){
-      setView("seleccionar")
-    }else if(view=="pagar"){
+    }
+  },{
+    enableOnTags:["INPUT", "SELECT"],
+  },[view,selectItem])
+  useHotkeys('f1', () => {
+    if(view=="pagar"){
       toggleModalProductos(true,()=>{
         inputaddcarritointernoref.current.focus()
 
@@ -435,10 +437,12 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
 
   useHotkeys('esc', () => {
     try{
-      if (view=="seleccionar"&&selectItem!==null) {
+      if(view=="pedidos"){
+        setView("seleccionar")
+      }else if (view=="seleccionar"&&typeof(selectItem)=="number") {
         setSelectItem(null) 
         setViewCaja(false) 
-      }else if(view=="seleccionar"&&selectItem===null){
+      }else if(view=="seleccionar"&&typeof(selectItem)!="number"){
         inputbusquedaProductosref.current.value = ""
         inputbusquedaProductosref.current.focus()
       }else if(view=="pagar"){
@@ -606,7 +610,7 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
 
   }, [view, counterListProductos, countListInter, countListPersoInter, subViewInventario, modViewInventario]);
   useHotkeys('enter', event => {
-    if(selectItem===null&&view=="seleccionar"){
+    if(typeof(selectItem)!="number"&&view=="seleccionar"){
       try{
         if (tbodyproductosref.current) {
           let tr = tbodyproductosref.current.rows[counterListProductos]
@@ -624,7 +628,7 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
 
       }catch(err){}
 
-    }else if(selectItem!==null&&view=="seleccionar"){
+    }else if(typeof(selectItem)=="number"&&view=="seleccionar"){
       addCarritoRequest("agregar")
     }else if(view=="pagar"){
       if (ModaladdproductocarritoToggle) {
@@ -1409,23 +1413,21 @@ const addCarrito = (e,callback=null) => {
   }else{
     index = e
   }
-  getPedidosList(()=>{
-    setLoteIdCarrito(loteid)
+  setLoteIdCarrito(loteid)
 
-    
-    if (index != counterListProductos && productos[index].lotes.length) {
-      setCounterListProductos(index)
+  if (index != counterListProductos && productos[index].lotes.length) {
+    setCounterListProductos(index)
+  }else{
+    if (pedidoList[0]) {
+      setNumero_factura(pedidoList[0].id)
     }else{
-      if (pedidoList[0]) {
-        setNumero_factura(pedidoList[0].id)
-      }else{
-        setNumero_factura("nuevo")
-      }
-      setSelectItem(index)
-      if (callback) {callback()}
-
+      setNumero_factura("nuevo")
     }
-  })
+    setSelectItem(parseInt(index))
+    if (callback) {callback()}
+
+  }
+  
 
 }
 const addCarritoRequest = e =>{
@@ -2873,7 +2875,7 @@ const auth = permiso => {
         view=="seleccionar"?
         <div className="container p-0">
           
-            {selectItem!==null?productos[selectItem]?<ModalAddCarrito 
+            {typeof(selectItem)=="number"?productos[selectItem]?<ModalAddCarrito 
               producto={productos[selectItem]} 
               setSelectItem={setSelectItem}
               cantidad={cantidad}
