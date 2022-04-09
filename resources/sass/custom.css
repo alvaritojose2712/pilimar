@@ -237,10 +237,10 @@ i{
     text-align: center;
 }
 .btn-circle.btn-xl {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     padding: 10px 16px;
-    border-radius: 35px;
+    border-radius: 40px;
     font-size: 12px;
     text-align: center;
 }
@@ -791,4 +791,9 @@ body{
 .header-justify-content-end{
   justify-content: flex-end !important;
   
+}
+
+.hover:hover{
+  background-color: #eaeaea !important;
+
 }

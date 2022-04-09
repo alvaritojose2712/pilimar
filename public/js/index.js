@@ -2080,14 +2080,13 @@ module.exports = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ ModalMovimientos)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
 
 
-
-function ModalAddCarrito(_ref) {
+function ModalMovimientos(_ref) {
   var setShowModalMovimientos = _ref.setShowModalMovimientos,
       showModalMovimientos = _ref.showModalMovimientos,
       setBuscarDevolucion = _ref.setBuscarDevolucion,
@@ -2107,7 +2106,7 @@ function ModalAddCarrito(_ref) {
       fechaMovimientos = _ref.fechaMovimientos;
 
   var retTipoMov = function retTipoMov() {
-    return movimientos.length ? movimientos.map(function (e) {
+    return movimientos.length ? movimientos.map(function (e, i) {
       return !e.items.length || e.items.filter(function (e) {
         return e.tipo == 2 || !e.id_producto;
       }).length ? null : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
@@ -2124,7 +2123,7 @@ function ModalAddCarrito(_ref) {
           children: retTipoSubMov(e.items, 0)
         })]
       }, e.id);
-    }) : "";
+    }) : null;
   };
 
   var retCat = function retCat(cat) {
@@ -2270,9 +2269,7 @@ function ModalAddCarrito(_ref) {
               })]
             })]
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
-            children: buscarDevolucion == "" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-              children: retTipoMov()
-            }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
+            children: buscarDevolucion == "" ? retTipoMov() : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("table", {
                   className: "table",
@@ -2304,8 +2301,6 @@ function ModalAddCarrito(_ref) {
     })]
   });
 }
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ModalAddCarrito);
 
 /***/ }),
 
@@ -5952,6 +5947,14 @@ function Facturar(_ref) {
       } else if (view == "seleccionar" && typeof selectItem != "number") {
         inputbusquedaProductosref.current.value = "";
         inputbusquedaProductosref.current.focus();
+
+        if (viewCaja) {
+          setViewCaja(false);
+        }
+
+        if (showModalMovimientos) {
+          setShowModalMovimientos(false);
+        }
       } else if (view == "pagar") {
         setToggleAddPersona(false);
         toggleModalProductos(false);
@@ -5968,7 +5971,7 @@ function Facturar(_ref) {
   }, {
     enableOnTags: ["INPUT", "SELECT"],
     filter: false
-  }, [view, selectItem]);
+  }, [view, selectItem, viewCaja, showModalMovimientos, ModaladdproductocarritoToggle, toggleAddPersona]);
   (0,react_hotkeys_hook__WEBPACK_IMPORTED_MODULE_1__.useHotkeys)('space', function () {
     if (view == "seleccionar" && selectItem !== null) {
       setNumero_factura("nuevo");
@@ -6199,10 +6202,14 @@ function Facturar(_ref) {
     buscarInventario();
   }, [Invnum, InvorderColumn, InvorderBy, qBuscarInventario]);
   (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
-    getMovimientosCaja();
+    if (viewCaja) {
+      getMovimientosCaja();
+    }
   }, [viewCaja, movCajaFecha]);
   (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
-    getMovimientos();
+    if (showModalMovimientos) {
+      getMovimientos();
+    }
   }, [showModalMovimientos, fechaMovimientos]);
   (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
     getProveedores();
@@ -6750,15 +6757,17 @@ function Facturar(_ref) {
       _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getpersona({
         q: q
       }).then(function (res) {
-        setPersona(res.data);
+        if (res.data) {
+          setPersona(res.data);
 
-        if (!res.data.length) {
-          setclienteInpidentificacion(q);
+          if (!res.data.length) {
+            setclienteInpidentificacion(q);
+          }
+
+          setLoading(false);
         }
-
-        setLoading(false);
       });
-    }, 150);
+    }, 100);
     setTypingTimeout(time);
   };
 
@@ -6773,9 +6782,11 @@ function Facturar(_ref) {
     }).then(function (res) {
       notificar(res);
 
-      if (res.data.estado) {
-        if (res.data.id) {
-          setPersonas(res.data.id);
+      if (res.data) {
+        if (res.data.estado) {
+          if (res.data.id) {
+            setPersonas(res.data.id);
+          }
         }
       }
 
@@ -6979,19 +6990,19 @@ function Facturar(_ref) {
         numero_factura: numero_factura,
         loteIdCarrito: loteIdCarrito
       }).then(function (res) {
-        getPedidosList();
-        getProductos();
-        notificar(res);
-
+        // getProductos()
         switch (res.data.type) {
           case "agregar":
             setSelectItem(null);
+            getPedidosList();
+            notificar(res);
             break;
 
           case "agregar_procesar":
             getPedido(res.data.num_pedido, function () {
               setView("pagar");
               setSelectItem(null);
+              getPedidosList();
             });
             break;
         }
@@ -7391,17 +7402,20 @@ function Facturar(_ref) {
           busquedaAvanazadaInv: busquedaAvanazadaInv,
           busqAvanzInputs: busqAvanzInputs
         }).then(function (res) {
-          setProductosInventario(res.data);
-          setLoading(false);
-          setIndexSelectInventario(null);
+          if (res.data) {
+            setProductosInventario(res.data);
+            setIndexSelectInventario(null);
 
-          if (res.data.length === 1) {
-            setIndexSelectInventario(0);
-          } else if (res.data.length == 0) {
-            setinpInvbarras(qBuscarInventario);
+            if (res.data.length === 1) {
+              setIndexSelectInventario(0);
+            } else if (res.data.length == 0) {
+              setinpInvbarras(qBuscarInventario);
+            }
           }
+
+          setLoading(false);
         });
-      }, 150);
+      }, 120);
       setTypingTimeout(time);
     } else {
       alert("Hay productos pendientes en carga de Inventario List!");
@@ -11764,10 +11778,9 @@ function ModalSelectFactura(_ref) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "default": () => (/* binding */ ModalAddCarrito)
 /* harmony export */ });
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-
 
 
 
@@ -11886,8 +11899,6 @@ function ModalAddCarrito(_ref) {
     })]
   });
 }
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ModalAddCarrito);
 
 /***/ }),
 
@@ -12607,7 +12618,7 @@ function Pagar(_ref) {
                       className: "",
                       children: "Total"
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
-                      className: "text-right",
+                      className: "text-right text-success fw-bold",
                       children: total
                     })]
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tr", {
@@ -12615,10 +12626,10 @@ function Pagar(_ref) {
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("th", {
                       className: "text-right",
                       colSpan: "2",
-                      children: ["Ref. ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
                         className: "fs-4",
                         children: [" Bs ", bs]
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("br", {}), "Ref. ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
                         className: "fs-5",
                         children: ["COP ", cop]
                       })]
@@ -12629,7 +12640,7 @@ function Pagar(_ref) {
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
               className: "d-flex justify-content-center"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
-              className: "d-flex justify-content-center",
+              className: "d-flex justify-content-center p-2",
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
                 className: "",
                 children: [editable ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
@@ -12649,7 +12660,7 @@ function Pagar(_ref) {
                     })]
                   })]
                 }) : null, editable ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("button", {
-                  className: "btn btn-circle text-white btn-sinapsis btn-xl me-4",
+                  className: "btn btn-circle text-white btn-sinapsis btn-xl me-1",
                   onClick: function onClick() {
                     return setToggleAddPersona(true);
                   },
@@ -12657,7 +12668,7 @@ function Pagar(_ref) {
                     className: "fa fa-user"
                   })]
                 }) : null, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("button", {
-                  className: "btn btn-circle text-white btn-sinapsis btn-xl me-1",
+                  className: "btn btn-circle text-white btn-sinapsis btn-xl me-4",
                   onClick: toggleImprimirTicket,
                   children: ["F3 ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("i", {
                     className: "fa fa-print"
@@ -13011,7 +13022,7 @@ function Pedidos(_ref) {
                         "data-id": e.pedido.id,
                         onClick: onClickEditPedido,
                         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("small", {
-                          children: ["Items. ", e.pedido.items.length]
+                          children: ["Items. ", e.pedido.tot_items]
                         })
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("td", {
                         className: "cell3",
@@ -13392,7 +13403,7 @@ function ProductosList(_ref) {
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("tr", {
             "data-index": i,
             tabIndex: "-1",
-            className: (counterListProductos == i ? "bg-sinapsis-light" : null) + ' tr-producto',
+            className: (counterListProductos == i ? "bg-sinapsis-light" : null) + ' tr-producto hover',
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("td", {
               "data-index": i,
               onClick: function onClick(event) {
@@ -13446,27 +13457,39 @@ function ProductosList(_ref) {
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("td", {
               className: "cell1",
               children: e.unidad
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("td", {
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("td", {
               className: "cell2",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
-                className: "btn-group w-100",
-                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
-                  type: "button",
-                  className: "m-0 btn-sm btn btn-success text-light w-50 fs-5",
-                  children: e.precio
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("button", {
-                  type: "button",
-                  className: "m-0 btn-sm btn btn-secondary w-50",
-                  children: ["Bs. ", e.bs, " "]
-                })]
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
-                className: "btn-group w-100",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("button", {
-                  type: "button",
-                  className: "m-0 btn-sm btn btn-secondary",
-                  children: ["Cop. ", e.cop]
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+                className: "container-fluid",
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+                  className: "row",
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+                    className: "col-5 m-0 p-0",
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+                      className: "btn-group w-100 h-100",
+                      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
+                        type: "button",
+                        className: "m-0 btn-sm btn btn-success text-light fs-4",
+                        children: e.precio
+                      })
+                    })
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+                    className: "col m-0 p-0",
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+                      className: "btn-group-vertical w-100 h-100",
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("button", {
+                        type: "button",
+                        className: "m-0 btn-sm btn btn-secondary fs-6",
+                        children: ["Bs. ", e.bs, " "]
+                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("button", {
+                        type: "button",
+                        className: "m-0 btn-sm btn btn-secondary",
+                        children: ["Cop. ", e.cop]
+                      })]
+                    })
+                  })]
                 })
-              })]
+              })
             })]
           }, e.id);
         }) : null

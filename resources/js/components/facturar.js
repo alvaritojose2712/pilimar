@@ -445,6 +445,12 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
       }else if(view=="seleccionar"&&typeof(selectItem)!="number"){
         inputbusquedaProductosref.current.value = ""
         inputbusquedaProductosref.current.focus()
+        if (viewCaja) {
+          setViewCaja(false)
+        }
+        if (showModalMovimientos) {
+          setShowModalMovimientos(false)
+        }
       }else if(view=="pagar"){
         setToggleAddPersona(false)
         toggleModalProductos(false)
@@ -463,7 +469,7 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
   },{
     enableOnTags:["INPUT", "SELECT"],
     filter:false,
-  },[view,selectItem]);
+  },[view,selectItem,viewCaja,showModalMovimientos,ModaladdproductocarritoToggle,toggleAddPersona]);
 
   useHotkeys('space', () => {
     if (view=="seleccionar"&&selectItem!==null) {
@@ -745,10 +751,15 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
   ]);
 
   useEffect(()=>{
-    getMovimientosCaja()
+    if (viewCaja) {
+      getMovimientosCaja()
+    }
   },[viewCaja,movCajaFecha])
   useEffect(()=>{
-    getMovimientos()
+    if (showModalMovimientos) {
+      getMovimientos()
+
+    }
   },[showModalMovimientos,fechaMovimientos])
   
 
@@ -1274,14 +1285,17 @@ const getPersona = q => {
 
   let time = window.setTimeout(()=>{
     db.getpersona({q}).then(res=>{
-      setPersona(res.data)
-      if (!res.data.length) {
-        setclienteInpidentificacion(q)
+      if (res.data) {
+        setPersona(res.data)
+        if (!res.data.length) {
+          setclienteInpidentificacion(q)
+        }
+        setLoading(false)
+
       }
-      setLoading(false)
     })
     
-  },150)
+  },100)
   setTypingTimeout(time)
 
 }
@@ -1295,11 +1309,14 @@ const setPersonaFast = e => {
     clienteInptelefono,
   }).then(res=>{
     notificar(res)
-    if (res.data.estado) {
-      if (res.data.id) {
-        setPersonas(res.data.id)
-      }
+    if (res.data) {
+      if (res.data.estado) {
+        if (res.data.id) {
+          setPersonas(res.data.id)
+        }
 
+      }
+      
     }
     setLoading(false)
   })
@@ -1447,18 +1464,20 @@ const addCarritoRequest = e =>{
     }
 
     db.setCarrito({ id, type, cantidad, numero_factura, loteIdCarrito}).then(res=>{
-      getPedidosList()
-      getProductos()
-      notificar(res)
+      // getProductos()
 
       switch(res.data.type){
         case "agregar":
           setSelectItem(null)
+          getPedidosList()
+          notificar(res)
+
         break;
         case "agregar_procesar":
           getPedido(res.data.num_pedido,()=>{
             setView("pagar")
             setSelectItem(null)
+            getPedidosList()
           })
         break;
       }
@@ -1834,16 +1853,19 @@ const buscarInventario = e => {
         busqAvanzInputs,
         
       }).then(res=>{
-        setProductosInventario(res.data)
-        setLoading(false)
-        setIndexSelectInventario(null)
-        if (res.data.length===1) {
-          setIndexSelectInventario(0)
-        }else if(res.data.length==0){
-          setinpInvbarras(qBuscarInventario)
+        if (res.data) {
+
+          setProductosInventario(res.data)
+          setIndexSelectInventario(null)
+          if (res.data.length===1) {
+            setIndexSelectInventario(0)
+          }else if(res.data.length==0){
+            setinpInvbarras(qBuscarInventario)
+          }
         }
+        setLoading(false)
       })
-    },150)
+    },120)
     setTypingTimeout(time)
 
   }else{

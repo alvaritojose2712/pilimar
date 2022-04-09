@@ -1,6 +1,4 @@
-
-
-function ModalAddCarrito({
+export default function ModalMovimientos({
   setShowModalMovimientos,
   showModalMovimientos,
 
@@ -29,7 +27,7 @@ function ModalAddCarrito({
 
   const retTipoMov = () => (
    
-    movimientos.length?movimientos.map(e=>
+    movimientos.length?movimientos.map((e,i)=>
       !e.items.length||e.items.filter(e=>e.tipo==2||!e.id_producto).length?null
       :<tr key={e.id}>
         <td className="align-middle">
@@ -42,7 +40,7 @@ function ModalAddCarrito({
         <td className="w-50">
           {retTipoSubMov(e.items,0)}
         </td>
-      </tr>):""
+      </tr>):null
     
          
   )
@@ -139,12 +137,7 @@ function ModalAddCarrito({
             <tbody>
 
               {buscarDevolucion==""?
-              <>
-                
-                {retTipoMov()}
-                    
-              </>
-
+                retTipoMov()
               :<tr>
                 <td>
                   <table className="table">
@@ -171,4 +164,3 @@ function ModalAddCarrito({
     
   )
 }
-export default ModalAddCarrito

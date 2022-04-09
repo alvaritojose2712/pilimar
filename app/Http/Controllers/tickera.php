@@ -133,11 +133,14 @@ class tickera extends Controller
 
                 
                
+                $printer -> text("\n");
 
                 $printer->text("NOTA DE ENTREGA #".$pedido->id);
                 $printer->setEmphasis(false);
 
                 $printer -> text("\n");
+                $printer -> text("\n");
+
                 if ($nombres!="") {
                     $printer->setJustification(Printer::JUSTIFY_LEFT);
                     $printer -> text("Nombre y Apellido: ".$nombres);
@@ -190,8 +193,10 @@ class tickera extends Controller
 
                    $printer->text(addSpaces("P/U. ",6).$item['pu']);
                    $printer->text("\n");
-
+                   
+                   $printer->setEmphasis(true);
                    $printer->text(addSpaces("Ct. ",6).$item['cantidad']);
+                   $printer->setEmphasis(false);
                    $printer->text("\n");
 
                    $printer->text(addSpaces("Tot. ",6).$item['totalprecio']);

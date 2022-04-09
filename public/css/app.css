@@ -238,10 +238,10 @@ i{
     text-align: center;
 }
 .btn-circle.btn-xl {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     padding: 10px 16px;
-    border-radius: 35px;
+    border-radius: 40px;
     font-size: 12px;
     text-align: center;
 }
@@ -754,11 +754,12 @@ body{
   justify-content: flex-end !important;
   
 }
-@charset "UTF-8";
-@font-face {
-  font-family: "Nunito";
-  src: url(/fonts/Nunito-Regular.ttf?f8c1d028eab80594702332e512d858ff) format("trueType");
+
+.hover:hover{
+  background-color: #eaeaea !important;
+
 }
+@charset "UTF-8";
 /*!
  * Bootstrap v5.1.0 (https://getbootstrap.com/)
  * Copyright 2011-2021 The Bootstrap Authors

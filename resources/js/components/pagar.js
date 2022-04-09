@@ -502,13 +502,13 @@ setshowinputaddCarritoFast,
                     </tr>
                     <tr className="hover h4">
                       <th className="">Total</th>
-                      <td className="text-right">{total}</td>
+                      <td className="text-right text-success fw-bold">{total}</td>
                     </tr>
 
                     <tr className="text-muted">
                       <th className="text-right" colSpan="2">
-                        Ref. <span className='fs-4'> Bs {bs}</span><br/>
-                        Ref. <span className='fs-5'>COP {cop}</span>
+                        <span className='fs-4'> Bs {bs}</span><br/>
+                        <span className='fs-5'>COP {cop}</span>
                       </th>
                     </tr>
                   </tbody>
@@ -516,7 +516,7 @@ setshowinputaddCarritoFast,
               </div>
               <div className="d-flex justify-content-center">
               </div>
-              <div className="d-flex justify-content-center">
+              <div className="d-flex justify-content-center p-2">
                 
                 <div className="">
                   {editable?
@@ -530,9 +530,9 @@ setshowinputaddCarritoFast,
                     </>
                   :null}
                   {editable?
-                  <button className="btn btn-circle text-white btn-sinapsis btn-xl me-4" onClick={()=>setToggleAddPersona(true)}>F2 <i className="fa fa-user"></i></button>
+                  <button className="btn btn-circle text-white btn-sinapsis btn-xl me-1" onClick={()=>setToggleAddPersona(true)}>F2 <i className="fa fa-user"></i></button>
                   :null}
-                  <button className="btn btn-circle text-white btn-sinapsis btn-xl me-1" onClick={toggleImprimirTicket}>F3 <i className="fa fa-print"></i></button>
+                  <button className="btn btn-circle text-white btn-sinapsis btn-xl me-4" onClick={toggleImprimirTicket}>F3 <i className="fa fa-print"></i></button>
                   <button className="btn btn-circle text-white btn-sinapsis btn-xl me-4" onClick={viewReportPedido}>F4 <i className="fa fa-eye"></i></button>
                   {editable?
                   <button className="btn btn-circle text-white btn-danger btn-sm" onClick={del_pedido}>F5 <i className="fa fa-times"></i></button>

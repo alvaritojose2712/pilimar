@@ -189,7 +189,7 @@ filterMetodoPagoToggle,
 								    			<tr>
 								    				<td className="cell6" data-id={e.pedido.id} onClick={onClickEditPedido}><b className="h3 text-success">{e.pedido.total}</b></td>
 											    	<td className="text-muted cell1" data-id={e.pedido.id} onClick={onClickEditPedido}>
-											    		<small>Items. {e.pedido.items.length}</small>
+											    		<small>Items. {e.pedido.tot_items}</small>
 											    	</td>
 											    	<td className="cell3">
 															<div className="btn-group-vertical btn-options">

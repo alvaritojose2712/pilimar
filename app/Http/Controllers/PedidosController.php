@@ -57,9 +57,9 @@ class PedidosController extends Controller
             $ret->whereIn("id_vendedor",$vendedor);
         }
 
-        return $ret->limit(7)
+        return $ret->limit(6)
         ->orderBy("id","desc")
-        ->get();
+        ->get(["id","estado"]);
     }
     public function get_moneda()
     {
@@ -293,7 +293,7 @@ class PedidosController extends Controller
             ->map(function($q) use (&$subtotal, &$desctotal, &$totaltotal,&$porctotal,&$itemstotal,&$totalventas,$filterMetodoPagoToggle){
                 // global ;
 
-                $fun = $this->getPedidoFun($q->id,$filterMetodoPagoToggle);
+                $fun = $this->getPedidoFun($q->id,$filterMetodoPagoToggle,1,1,1,true);
                 $q->pedido = $fun;
 
                 // $istrue = false; 
@@ -372,7 +372,7 @@ class PedidosController extends Controller
     public function getPedidosUser(Request $req)
     {
         $vendedor = $req->vendedor;
-        return pedidos::where("estado",0)->where("id_vendedor",$vendedor)->orderBy("id","desc")->limit(4)->get();
+        return pedidos::where("estado",0)->where("id_vendedor",$vendedor)->orderBy("id","desc")->limit(4)->get(["id","estado"]);
     }
     public function pedidoAuth($id,$tipo="pedido")
     {
@@ -465,18 +465,35 @@ class PedidosController extends Controller
             
         }
     }
-    public function getPedidoFun($id_pedido,$filterMetodoPagoToggle="todos",$cop=1,$bs=1,$factor=1)
+    public function getPedidoFun($id_pedido,$filterMetodoPagoToggle="todos",$cop=1,$bs=1,$factor=1,$clean=false)
     {
         
-        $pedido = pedidos::with(["vendedor","cliente","pagos"=>function($q) use ($filterMetodoPagoToggle) 
+        $pedido = pedidos::with(["vendedor"=>function($q){
+            $q->select(["id","usuario","tipo_usuario","nombre"]);
+        },"cliente"=>function($q){
+            $q->select(["id","identificacion","nombre"]);
+        },"pagos"=>function($q) use ($filterMetodoPagoToggle) 
         {
             // if ($filterMetodoPagoToggle!="todos") {
             //     $q->where("tipo",$filterMetodoPagoToggle);
             // }
+            $q->select(["id","tipo","monto","cuenta","id_pedido"]);
+
         },"items"=>function($q)
         {
-
-            $q->with(["producto","lotedata"]);
+            $q->select([
+                "id",
+                "lote",
+                "id_producto",
+                "id_pedido",
+                "abono",
+                "cantidad",
+                "descuento",
+                "monto",
+            ]);
+            $q->with(["producto"=>function($q){
+                $q->select(["id","codigo_barras","codigo_proveedor","descripcion","precio","precio_base","iva"]);
+            },"lotedata"]);
             $q->orderBy("id","asc");
 
         }])->where("id",$id_pedido)->first();
@@ -535,6 +552,7 @@ class PedidosController extends Controller
                 return $item;
                 
             });
+            $pedido->tot_items =count($pedido->items);
             $pedido->total_des = number_format($total_des_ped,2,".",",");
             $pedido->subtotal = number_format($subtotal_ped,2,".",",");
             $pedido->total = number_format(round( $total_ped,3),2,".",",");
@@ -576,7 +594,13 @@ class PedidosController extends Controller
 
         }
 
-        return $pedido;
+        if ($clean) {
+            // code...
+            return $pedido->makeHidden("items");
+            // return $pedido;
+        }else{
+            return $pedido;
+        }
     }
     public function getPedido(Request $req,$factor=1)
     {   
@@ -989,7 +1013,6 @@ class PedidosController extends Controller
 
             $arr_send["facturado"]["total"] = str_replace($key, $value, $arr_send["facturado"]["total"]);
             $arr_send["facturado"]["caja_inicial"] = str_replace($key, $value, $arr_send["facturado"]["caja_inicial"]);
-            $arr_send["facturado"]["numventas"] = str_replace($key, $value, $arr_send["facturado"]["numventas"]);
             $arr_send["facturado"]["entregadomenospend"] = str_replace($key, $value, $arr_send["facturado"]["entregadomenospend"]);
             $arr_send["facturado"]["entregado"] = str_replace($key, $value, $arr_send["facturado"]["entregado"]);
             $arr_send["facturado"]["pendiente"] = str_replace($key, $value, $arr_send["facturado"]["pendiente"]);
