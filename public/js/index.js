@@ -10188,6 +10188,25 @@ function InventarioForzado(_ref) {
       busqAvanzInputsFun = _ref.busqAvanzInputsFun,
       busqAvanzInputs = _ref.busqAvanzInputs,
       buscarInvAvanz = _ref.buscarInvAvanz;
+
+  var getPorGanacia = function getPorGanacia(precio, base) {
+    try {
+      var por = 0;
+      precio = parseFloat(precio);
+      base = parseFloat(base);
+      var dif = precio - base;
+      por = (dif * 100 / base).toFixed(2);
+
+      if (por) {
+        return (dif < 0 ? "" : "+") + por + "%";
+      } else {
+        return "";
+      }
+    } catch (err) {
+      return "";
+    }
+  };
+
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
     className: "container-fluid",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
@@ -10571,9 +10590,12 @@ function InventarioForzado(_ref) {
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                   className: "cell1",
                   children: e.precio_base
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
                   className: "cell15 text-success",
-                  children: e.precio
+                  children: [e.precio, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+                    className: "text-success",
+                    children: getPorGanacia(!e.precio ? 0 : e.precio, !e.precio_base ? 0 : e.precio_base)
+                  })]
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
                   className: "cell15",
                   children: [e.categoria.descripcion, " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("br", {}), " ", e.proveedor.descripcion]
@@ -10681,11 +10703,11 @@ function InventarioForzado(_ref) {
                     onChange: function onChange(e) {
                       return changeInventario(number(e.target.value), i, e.id, "changeInput", "precio_base");
                     },
-                    placeholder: "Costo..."
+                    placeholder: "Base..."
                   })
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
                   className: "cell15",
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
                     className: "input-group",
                     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
                       type: "text",
@@ -10695,7 +10717,7 @@ function InventarioForzado(_ref) {
                       onChange: function onChange(e) {
                         return changeInventario(number(e.target.value), i, e.id, "changeInput", "precio");
                       },
-                      placeholder: "Final..."
+                      placeholder: "Venta..."
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
                       className: "btn btn-sm",
                       onClick: function onClick() {
@@ -10705,7 +10727,10 @@ function InventarioForzado(_ref) {
                       },
                       children: "%"
                     })]
-                  })
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+                    className: "text-success",
+                    children: getPorGanacia(!e.precio ? 0 : e.precio, !e.precio_base ? 0 : e.precio_base)
+                  })]
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
                   className: "cell15",
                   children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", {
