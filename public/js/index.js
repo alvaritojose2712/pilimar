@@ -6855,6 +6855,8 @@ function Facturar(_ref) {
 
       if (res.data[0]) {
         setNumero_factura(res.data[0].id);
+      } else {
+        setNumero_factura('nuevo');
       }
 
       if (callback) {
@@ -12389,7 +12391,7 @@ function Pagar(_ref) {
                     })
                   }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("th", {
                     colSpan: "5",
-                    className: "p-2",
+                    className: "p-2 align-middle",
                     children: [cliente ? cliente.nombre : null, " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("b", {
                       children: cliente ? cliente.identificacion : null
                     })]

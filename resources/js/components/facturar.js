@@ -1364,6 +1364,9 @@ const getPedidosList = (callback=null)=>{
     }
     if (res.data[0]) {
       setNumero_factura(res.data[0].id)
+    }else{
+      setNumero_factura('nuevo')
+
     }
     if(callback){callback()}
   })
