@@ -2508,7 +2508,9 @@ function Modaladdproductocarrito(_ref) {
       clickSetOrderColumn = _ref.clickSetOrderColumn,
       orderColumn = _ref.orderColumn,
       orderBy = _ref.orderBy,
-      onchangeinputmain = _ref.onchangeinputmain;
+      onchangeinputmain = _ref.onchangeinputmain,
+      showinputaddCarritoFast = _ref.showinputaddCarritoFast,
+      setshowinputaddCarritoFast = _ref.setshowinputaddCarritoFast;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("section", {
       className: "modal-custom",
@@ -2531,12 +2533,24 @@ function Modaladdproductocarrito(_ref) {
             })
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-            type: "text",
-            className: "form-control",
-            placeholder: "Buscar...",
-            ref: inputaddcarritointernoref,
-            onChange: onchangeinputmain
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+            className: "input-group",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+              className: "",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                onClick: function onClick() {
+                  return setshowinputaddCarritoFast(!showinputaddCarritoFast);
+                },
+                className: "btn btn-outline-" + (showinputaddCarritoFast ? "success" : "danger"),
+                children: "Agg. r\xE1pido"
+              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+              type: "text",
+              className: "form-control",
+              placeholder: "Buscar...",
+              ref: inputaddcarritointernoref,
+              onChange: onchangeinputmain
+            })]
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
           className: "table table-bordered tabla_datos",
@@ -6156,6 +6170,21 @@ function Facturar(_ref) {
     enableOnTags: ["INPUT", "SELECT", "TEXTAREA"]
   }, [view, counterListProductos, selectItem, subViewInventario, modViewInventario]);
   (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
+    if (showinputaddCarritoFast) {
+      if (inputaddcarritointernoref) {
+        if (inputaddcarritointernoref.current) {
+          inputaddcarritointernoref.current.focus();
+        }
+      }
+
+      if (inputbusquedaProductosref) {
+        if (inputbusquedaProductosref.current) {
+          inputbusquedaProductosref.current.focus();
+        }
+      }
+    }
+  }, [showinputaddCarritoFast]);
+  (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
     getUsuarios();
   }, [qBuscarUsuario]);
   (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
@@ -6726,17 +6755,33 @@ function Facturar(_ref) {
         orderColumn: orderColumn,
         orderBy: orderBy
       }).then(function (res) {
-        if (res.data.length) {
-          setProductos(res.data);
-        }
+        if (res.data) {
+          var len = res.data.length;
 
-        if (!res.data.length) {
-          setProductos([]);
-        }
+          if (len) {
+            setProductos(res.data);
+          }
 
-        if (!res.data[counterListProductos]) {
-          setCounterListProductos(0);
-          setCountListInter(0);
+          if (!len) {
+            setProductos([]);
+          }
+
+          if (!res.data[counterListProductos]) {
+            setCounterListProductos(0);
+            setCountListInter(0);
+          }
+
+          if (showinputaddCarritoFast) {
+            if (len == 1) {
+              var id_pedido_fact = null;
+
+              if (ModaladdproductocarritoToggle && pedidoData.id) {
+                id_pedido_fact = pedidoData.id;
+              }
+
+              addCarritoRequest("agregar", res.data[0].id, id_pedido_fact);
+            }
+          }
         }
 
         setLoading(false);
@@ -6966,6 +7011,9 @@ function Facturar(_ref) {
   };
 
   var addCarritoRequest = function addCarritoRequest(e) {
+    var id_direct = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+    var id_pedido_direct = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
     try {
       setLoading(true);
       var type;
@@ -6983,11 +7031,15 @@ function Facturar(_ref) {
         id = productos[selectItem].id;
       }
 
+      if (id_direct) {
+        id = id_direct;
+      }
+
       _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].setCarrito({
         id: id,
         type: type,
         cantidad: cantidad,
-        numero_factura: numero_factura,
+        numero_factura: id_pedido_direct ? id_pedido_direct : numero_factura,
         loteIdCarrito: loteIdCarrito
       }).then(function (res) {
         // getProductos()
@@ -6996,6 +7048,11 @@ function Facturar(_ref) {
             setSelectItem(null);
             getPedidosList();
             notificar(res);
+
+            if (showinputaddCarritoFast && ModaladdproductocarritoToggle) {
+              getPedido(res.data.num_pedido);
+            }
+
             break;
 
           case "agregar_procesar":
@@ -7127,7 +7184,7 @@ function Facturar(_ref) {
   };
 
   var setProductoCarritoInterno = function setProductoCarritoInterno(e) {
-    var cantidad = window.prompt("Cantidad");
+    var cantidad = window.prompt("Cantidad", "1");
 
     if (cantidad && pedidoData.id) {
       setLoading(true);
@@ -7198,6 +7255,10 @@ function Facturar(_ref) {
           setLoading(false);
 
           if (res.data.estado) {
+            if (showinputaddCarritoFast) {
+              setshowinputaddCarritoFast(false);
+            }
+
             setView("seleccionar");
             getPedidos();
             getPedidosList();
@@ -8546,6 +8607,12 @@ function Facturar(_ref) {
           ref: inputbusquedaProductosref,
           placeholder: "Buscar... Presiona (ESC)",
           onChange: onchangeinputmain
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)("button", {
+          onClick: function onClick() {
+            return setshowinputaddCarritoFast(!showinputaddCarritoFast);
+          },
+          className: "btn btn-outline-" + (showinputaddCarritoFast ? "success" : "danger"),
+          children: "Agg. r\xE1pido"
         }), showOptionQMain ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.Fragment, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)("span", {
             className: "input-group-text pointer",
@@ -12202,6 +12269,8 @@ function Pagar(_ref) {
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
             className: "col",
             children: [ModaladdproductocarritoToggle && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_components_Modaladdproductocarrito__WEBPACK_IMPORTED_MODULE_1__["default"], {
+              showinputaddCarritoFast: showinputaddCarritoFast,
+              setshowinputaddCarritoFast: setshowinputaddCarritoFast,
               toggleModalProductos: toggleModalProductos,
               productos: productos,
               setProductoCarritoInterno: setProductoCarritoInterno,
@@ -12316,42 +12385,13 @@ function Pagar(_ref) {
                       className: "btn btn-outline-success fs-5",
                       children: items ? items.length : null
                     })
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("td", {
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("th", {
                     colSpan: "5",
-                    className: "align-middle text-center",
-                    children: editable ? showinputaddCarritoFast ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
-                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-                        className: "btn btn-outline-danger btn-sm",
-                        onClick: function onClick() {
-                          return setshowinputaddCarritoFast(false);
-                        },
-                        children: "Agregar por barras"
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("input", {
-                        className: "form-control form-control-sm",
-                        value: inputaddCarritoFast,
-                        placeholder: "Agregar...",
-                        onChange: function onChange(e) {
-                          return setinputaddCarritoFast(e.target.value);
-                        }
-                      })]
-                    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
-                      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-                        className: "btn btn-outline-success btn-sm",
-                        onClick: function onClick() {
-                          return setshowinputaddCarritoFast(true);
-                        },
-                        children: "Agragar por barras"
-                      })
-                    }) : null
-                  })]
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("tr", {
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("th", {
-                    colSpan: "6",
                     className: "p-2",
                     children: [cliente ? cliente.nombre : null, " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("b", {
                       children: cliente ? cliente.identificacion : null
                     })]
-                  })
+                  })]
                 })]
               })]
             })]

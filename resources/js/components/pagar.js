@@ -223,6 +223,9 @@ setshowinputaddCarritoFast,
             <div className="col">
               
               {ModaladdproductocarritoToggle&&<Modaladdproductocarrito 
+                showinputaddCarritoFast={showinputaddCarritoFast}
+                setshowinputaddCarritoFast={setshowinputaddCarritoFast}
+
                 toggleModalProductos={toggleModalProductos}
                 productos={productos}
                 setProductoCarritoInterno={setProductoCarritoInterno}
@@ -312,24 +315,7 @@ setshowinputaddCarritoFast,
                   ):null}
                   <tr>
                     <td><button className="btn btn-outline-success fs-5">{items?items.length:null}</button></td>
-                    <td colSpan="5" className="align-middle text-center">
-                      {editable?
-                        showinputaddCarritoFast?
-                          <>
-                            <span className="btn btn-outline-danger btn-sm" onClick={()=>setshowinputaddCarritoFast(false)}>Agregar por barras</span>
-                            <input className="form-control form-control-sm" value={inputaddCarritoFast} 
-                            placeholder="Agregar..." onChange={e=>setinputaddCarritoFast(e.target.value)}/>
-                          </>
-                        :<>
-                          <span className="btn btn-outline-success btn-sm" onClick={()=>setshowinputaddCarritoFast(true)}>Agragar por barras</span>
-                        </>
-
-                      :null}
-                    </td>
-
-                  </tr>
-                  <tr>
-                    <th colSpan="6" className="p-2">{cliente?cliente.nombre:null} <b>{cliente?cliente.identificacion:null}</b></th>
+                    <th colSpan="5" className="p-2">{cliente?cliente.nombre:null} <b>{cliente?cliente.identificacion:null}</b></th>
                   </tr>
                 </tbody>
               </table>

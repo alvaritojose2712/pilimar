@@ -682,6 +682,24 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
   }, [view, counterListProductos, selectItem, subViewInventario, modViewInventario]);
 
 
+
+  useEffect(()=>{
+    if (showinputaddCarritoFast) {
+      if (inputaddcarritointernoref) {
+        if (inputaddcarritointernoref.current) {
+          inputaddcarritointernoref.current.focus()
+        }
+      }
+
+      if (inputbusquedaProductosref) {
+        if (inputbusquedaProductosref.current) {
+          inputbusquedaProductosref.current.focus()
+        }
+      }
+    }
+    
+  }, [showinputaddCarritoFast])
+
   useEffect(()=>{
     getUsuarios()
     
@@ -1258,15 +1276,28 @@ const getProductos = () => {
 
   let time = window.setTimeout(()=>{
     db.getinventario({vendedor:showMisPedido?[user.id_usuario]:[],num,itemCero,qProductosMain,orderColumn,orderBy}).then(res=>{
-      if (res.data.length) {
-        setProductos(res.data)
-      }
-      if (!res.data.length) {
-        setProductos([])
-      }
-      if (!res.data[counterListProductos]) {
-        setCounterListProductos(0)
-        setCountListInter(0)
+      if (res.data) {
+        let len = res.data.length
+        if (len) {
+          setProductos(res.data)
+        }
+        if (!len) {
+          setProductos([])
+        }
+        if (!res.data[counterListProductos]) {
+          setCounterListProductos(0)
+          setCountListInter(0)
+        }
+
+        if (showinputaddCarritoFast) {
+          if (len==1) {
+            let id_pedido_fact = null
+            if (ModaladdproductocarritoToggle&&pedidoData.id) {
+              id_pedido_fact = pedidoData.id
+            }
+            addCarritoRequest("agregar",res.data[0].id,id_pedido_fact)
+          }
+        }
       }
       setLoading(false)
     })
@@ -1447,7 +1478,7 @@ const addCarrito = (e,callback=null) => {
   
 
 }
-const addCarritoRequest = e =>{
+const addCarritoRequest = (e,id_direct=null,id_pedido_direct=null) =>{
   try{
     setLoading(true)
     let type
@@ -1460,10 +1491,12 @@ const addCarritoRequest = e =>{
     let id = null
     if (productos[selectItem]) {
       id = productos[selectItem].id
-
+    }
+    if (id_direct) {
+      id = id_direct
     }
 
-    db.setCarrito({ id, type, cantidad, numero_factura, loteIdCarrito}).then(res=>{
+    db.setCarrito({ id, type, cantidad, numero_factura:id_pedido_direct?id_pedido_direct:numero_factura, loteIdCarrito}).then(res=>{
       // getProductos()
 
       switch(res.data.type){
@@ -1471,6 +1504,10 @@ const addCarritoRequest = e =>{
           setSelectItem(null)
           getPedidosList()
           notificar(res)
+
+          if (showinputaddCarritoFast&&ModaladdproductocarritoToggle) {
+            getPedido(res.data.num_pedido)
+          }
 
         break;
         case "agregar_procesar":
@@ -1588,7 +1625,7 @@ const setCantidadCarrito = (e) => {
   }
 } 
 const setProductoCarritoInterno = (e) => {
-  const cantidad = window.prompt("Cantidad")
+  let cantidad = window.prompt("Cantidad","1")
   if (cantidad&&pedidoData.id) {
     setLoading(true)
     let id;
@@ -1598,7 +1635,7 @@ const setProductoCarritoInterno = (e) => {
     }else{
       id = e
     }
-    const type = "agregar"
+    let type = "agregar"
     db.setCarrito({id,type,cantidad,numero_factura:pedidoData.id}).then(res=>{
       getPedido()
       setModaladdproductocarritoToggle(false)
@@ -1648,6 +1685,9 @@ const facturar_pedido = () => {
         setLoading(false)
         
         if (res.data.estado) {
+          if(showinputaddCarritoFast){
+            setshowinputaddCarritoFast(false)
+          }
           setView("seleccionar")
           getPedidos()
           getPedidosList()
@@ -2938,6 +2978,7 @@ const auth = permiso => {
                 ref={inputbusquedaProductosref}
                 placeholder="Buscar... Presiona (ESC)" 
                 onChange={onchangeinputmain}/>
+                <button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"danger")}>Agg. rápido</button>
               
                 {showOptionQMain?<>
                 <span className="input-group-text pointer" onClick={() => setshowOptionQMain(false)}><i className="fa fa-arrow-right"></i></span>

@@ -11,6 +11,9 @@ function Modaladdproductocarrito({
   orderColumn,
   orderBy,
   onchangeinputmain,
+
+  showinputaddCarritoFast,
+  setshowinputaddCarritoFast,
 }) {
 
   return (
@@ -24,7 +27,14 @@ function Modaladdproductocarrito({
           </div>
          </div>
          <div>
-           <input type="text" className="form-control" placeholder="Buscar..." ref={inputaddcarritointernoref} onChange={onchangeinputmain}/>
+         <div className="input-group">
+          <span className="">
+            <button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"danger")}>Agg. rápido</button>
+            
+            </span>
+            <input type="text" className="form-control" placeholder="Buscar..." ref={inputaddcarritointernoref} onChange={onchangeinputmain}/>
+           
+         </div>
          </div>
          <table className="table table-bordered tabla_datos">
             <thead>
