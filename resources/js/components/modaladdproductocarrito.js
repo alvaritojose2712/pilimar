@@ -29,10 +29,10 @@ function Modaladdproductocarrito({
          <div>
          <div className="input-group">
           <span className="">
-            <button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"danger")}>Agg. rápido</button>
+            <button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"sinapsis")}>Agg. rápido</button>
             
             </span>
-            <input type="text" className="form-control" placeholder="Buscar..." ref={inputaddcarritointernoref} onChange={onchangeinputmain}/>
+            <input type="text" className="form-control" placeholder="Buscar..." ref={inputaddcarritointernoref} value={qProductosMain} onChange={onchangeinputmain}/>
            
          </div>
          </div>

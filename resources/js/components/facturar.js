@@ -1291,12 +1291,12 @@ const getProductos = () => {
 
         if (showinputaddCarritoFast) {
           if (len==1) {
+            setQProductosMain("")
             let id_pedido_fact = null
             if (ModaladdproductocarritoToggle&&pedidoData.id) {
               id_pedido_fact = pedidoData.id
             }
             addCarritoRequest("agregar",res.data[0].id,id_pedido_fact)
-            setQProductosMain("")
 
           }
         }
@@ -2978,9 +2978,10 @@ const auth = permiso => {
                 <input type="text" 
                 className="form-control" 
                 ref={inputbusquedaProductosref}
-                placeholder="Buscar... Presiona (ESC)" 
+                placeholder="Buscar... Presiona (ESC)"
+                value={qProductosMain}
                 onChange={onchangeinputmain}/>
-                <button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"danger")}>Agg. rápido</button>
+                <button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"sinapsis")}>Agg. rápido</button>
               
                 {showOptionQMain?<>
                 <span className="input-group-text pointer" onClick={() => setshowOptionQMain(false)}><i className="fa fa-arrow-right"></i></span>

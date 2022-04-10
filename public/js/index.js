@@ -2541,7 +2541,7 @@ function Modaladdproductocarrito(_ref) {
                 onClick: function onClick() {
                   return setshowinputaddCarritoFast(!showinputaddCarritoFast);
                 },
-                className: "btn btn-outline-" + (showinputaddCarritoFast ? "success" : "danger"),
+                className: "btn btn-outline-" + (showinputaddCarritoFast ? "success" : "sinapsis"),
                 children: "Agg. r\xE1pido"
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
@@ -6773,6 +6773,7 @@ function Facturar(_ref) {
 
           if (showinputaddCarritoFast) {
             if (len == 1) {
+              setQProductosMain("");
               var id_pedido_fact = null;
 
               if (ModaladdproductocarritoToggle && pedidoData.id) {
@@ -6780,7 +6781,6 @@ function Facturar(_ref) {
               }
 
               addCarritoRequest("agregar", res.data[0].id, id_pedido_fact);
-              setQProductosMain("");
             }
           }
         }
@@ -8607,12 +8607,13 @@ function Facturar(_ref) {
           className: "form-control",
           ref: inputbusquedaProductosref,
           placeholder: "Buscar... Presiona (ESC)",
+          value: qProductosMain,
           onChange: onchangeinputmain
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)("button", {
           onClick: function onClick() {
             return setshowinputaddCarritoFast(!showinputaddCarritoFast);
           },
-          className: "btn btn-outline-" + (showinputaddCarritoFast ? "success" : "danger"),
+          className: "btn btn-outline-" + (showinputaddCarritoFast ? "success" : "sinapsis"),
           children: "Agg. r\xE1pido"
         }), showOptionQMain ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.Fragment, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)("span", {
