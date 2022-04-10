@@ -6780,6 +6780,7 @@ function Facturar(_ref) {
               }
 
               addCarritoRequest("agregar", res.data[0].id, id_pedido_fact);
+              setQProductosMain("");
             }
           }
         }

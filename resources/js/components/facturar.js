@@ -1296,6 +1296,8 @@ const getProductos = () => {
               id_pedido_fact = pedidoData.id
             }
             addCarritoRequest("agregar",res.data[0].id,id_pedido_fact)
+            setQProductosMain("")
+
           }
         }
       }
