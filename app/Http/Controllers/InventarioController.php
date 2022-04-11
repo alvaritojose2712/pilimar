@@ -544,21 +544,21 @@ class InventarioController extends Controller
                 $usuario = $req->usuario;
             }
 
-          $producto = inventario::find($id_producto);
+          // $producto = inventario::select(["descripcion"])->find($id_producto);
 
             
             if ($id=="nuevo") {
 
               //Crea Pedido
-                $check_cli = clientes::find(1);
+                // $check_cli = clientes::find(1);
 
-                if (!$check_cli) {
-                    $cli = new clientes;
-                    $cli->identificacion = "CF";
-                    $cli->nombre = "CF";
-                    $cli->direccion = "CF";
-                    $cli->save();
-                }
+                // if (!$check_cli) {
+                //     $cli = new clientes;
+                //     $cli->identificacion = "CF";
+                //     $cli->nombre = "CF";
+                //     $cli->direccion = "CF";
+                //     $cli->save();
+                // }
                 $new_pedido = new pedidos;
 
                 $new_pedido->estado = 0;
@@ -587,7 +587,7 @@ class InventarioController extends Controller
 
 
                 $this->hacer_pedido($id_producto,$nuevo_pedido_num,$cantidad,"ins",$loteIdCarrito);
-              return Response::json(["msj"=>"Agregado nuevo pedido #".$nuevo_pedido_num." || ".$producto["descripcion"]." || Cant. ".$cantidad,"estado"=>"ok","num_pedido"=>$nuevo_pedido_num,"type"=>$type]);
+              return Response::json(["msj"=>"Agregado nuevo pedido #".$nuevo_pedido_num." || Cant. ".$cantidad,"estado"=>"ok","num_pedido"=>$nuevo_pedido_num,"type"=>$type]);
                 
 
             }else{
@@ -595,7 +595,7 @@ class InventarioController extends Controller
                 
                 $this->hacer_pedido($id_producto,$id,$cantidad,"ins",$loteIdCarrito);
 
-                return Response::json(["msj"=>"Agregado al pedido #".$id." || ".$producto["descripcion"]." || Cant. ".$cantidad,"estado"=>"ok","num_pedido"=>$id,"type"=>$type]);
+                return Response::json(["msj"=>"Agregado al pedido #".$id." || Cant. ".$cantidad,"estado"=>"ok","num_pedido"=>$id,"type"=>$type]);
 
 
             }

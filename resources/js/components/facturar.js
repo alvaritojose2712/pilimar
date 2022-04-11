@@ -1320,7 +1320,12 @@ const getPersona = q => {
   let time = window.setTimeout(()=>{
     db.getpersona({q}).then(res=>{
       if (res.data) {
-        setPersona(res.data)
+        if(res.statusText=="OK"){
+          if (res.data.length) {
+            setPersona(res.data)
+
+          }
+        }
         if (!res.data.length) {
           setclienteInpidentificacion(q)
         }
@@ -1525,6 +1530,10 @@ const addCarritoRequest = (e,id_direct=null,id_pedido_direct=null) =>{
         break;
       }
       setCantidad("")
+      if (inputbusquedaProductosref) {
+        setQProductosMain("")
+        inputbusquedaProductosref.current.focus()
+      }
       
       setLoading(false)
     })
@@ -1794,7 +1803,13 @@ const setPagoCredito = e =>{
 const getDeudores = e =>{
   setLoading(true)
   db.getDeudores({qDeudores,view}).then(res=>{
-    setDeudoresList(res.data)
+    if (res.data) {
+      if (res.data.length) {
+        setDeudoresList(res.data)
+      }else{
+        setDeudoresList([])
+      }
+    }
     setLoading(false)
   })
 }

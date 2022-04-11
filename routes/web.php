@@ -26,14 +26,16 @@ use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\LotesController;
 use App\Http\Controllers\PagoFacturasController;
 
+Route::get('', [HomeController::class,"index"]);
+Route::get('setCarrito', [InventarioController::class,"setCarrito"]);
 
+Route::post('getinventario', [InventarioController::class,"index"]);
 
 
 Route::get('error', function (){
 	return view("layouts.error");
 })->name("error");
 
-Route::get('', [HomeController::class,"index"]);
 Route::post('login', [HomeController::class,"login"]);
 Route::get('logout', [HomeController::class,"logout"]);
 Route::post('verificarLogin', [HomeController::class,"verificarLogin"]);
@@ -90,8 +92,8 @@ Route::group(['middleware' => ['login']], function () {
 		
 	});
 	Route::group(['middleware' => ['vendedor']], function () {
-		Route::post('getinventario', [InventarioController::class,"index"]);
-		Route::post('setCarrito', [InventarioController::class,"setCarrito"]);
+		// Route::post('getinventario', [InventarioController::class,"index"]);
+		// Route::post('setCarrito', [InventarioController::class,"setCarrito"]);
 	});
 	
 	Route::group(['middleware' => ['admin']], function () {

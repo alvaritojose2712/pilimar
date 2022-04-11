@@ -70,7 +70,7 @@ function Modaladdproductocarrito({
             <tbody ref={tbodyproducInterref}>
 
 
-              {productos.map((e,i)=>
+              {productos.length?productos.map((e,i)=>
                 <tr tabIndex="-1" className={(countListInter==i?"bg-select":null)+(' tr-producto ')} key={e.id} onClick={setProductoCarritoInterno} data-index={e.id}>
                   <td className="cell2">{e.codigo_barras}</td>
                   <td className='text-left pl-5 cell4'>{e.descripcion}</td>
@@ -88,7 +88,7 @@ function Modaladdproductocarrito({
                     </div>
                   </td>
                 </tr>
-                )}
+                ):null}
             </tbody>
           </table>
 

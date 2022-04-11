@@ -2382,7 +2382,7 @@ function Modaladdproductocarrito(_ref) {
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tbody", {
               ref: tbodypersoInterref,
-              children: [personas ? personas.map(function (e, i) {
+              children: [personas.length ? personas.map(function (e, i) {
                 return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
                   tabIndex: "-1",
                   className: (countListPersoInter == i ? "bg-select" : null) + ' tr-producto',
@@ -4503,7 +4503,7 @@ function Credito(_ref) {
             })]
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("tbody", {
-          children: deudoresList.map(function (e, i) {
+          children: deudoresList.length ? deudoresList.map(function (e, i) {
             return e ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("tr", {
               className: "text-center pointer",
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("td", {
@@ -4521,7 +4521,7 @@ function Credito(_ref) {
                 children: [e.id, " - ", e.nombre, " - ", e.identificacion]
               })]
             }, e.id) : null;
-          })
+          }) : null
         })]
       }), !deudoresList.length ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
         className: "h3 text-center text-dark mt-2",
@@ -6807,7 +6807,11 @@ function Facturar(_ref) {
         q: q
       }).then(function (res) {
         if (res.data) {
-          setPersona(res.data);
+          if (res.statusText == "OK") {
+            if (res.data.length) {
+              setPersona(res.data);
+            }
+          }
 
           if (!res.data.length) {
             setclienteInpidentificacion(q);
@@ -7071,6 +7075,12 @@ function Facturar(_ref) {
         }
 
         setCantidad("");
+
+        if (inputbusquedaProductosref) {
+          setQProductosMain("");
+          inputbusquedaProductosref.current.focus();
+        }
+
         setLoading(false);
       });
     } catch (err) {
@@ -7371,7 +7381,14 @@ function Facturar(_ref) {
       qDeudores: qDeudores,
       view: view
     }).then(function (res) {
-      setDeudoresList(res.data);
+      if (res.data) {
+        if (res.data.length) {
+          setDeudoresList(res.data);
+        } else {
+          setDeudoresList([]);
+        }
+      }
+
       setLoading(false);
     });
   };
@@ -14568,7 +14585,9 @@ var db = {
     return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "getinventario", data);
   },
   setCarrito: function setCarrito(data) {
-    return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "setCarrito", data);
+    return axios__WEBPACK_IMPORTED_MODULE_1___default().get(host + "setCarrito", {
+      params: data
+    });
   },
   getPedido: function getPedido(data) {
     return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "getPedido", data);
