@@ -179,7 +179,7 @@ class InventarioController extends Controller
             }else if($type=="del"){
                 (new PedidosController)->checkPedidoAuth($id,"item");
                 
-                    $item = items_pedidos::select(["cantidad","id_producto","lote"])->find($id);
+                    $item = items_pedidos::find($id);
                     $old_ct = $item->cantidad;
                     $id_producto = $item->id_producto;
                     $lote = $item->lote;
