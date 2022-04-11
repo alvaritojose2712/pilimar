@@ -1694,7 +1694,7 @@ const facturar_pedido = () => {
             setshowinputaddCarritoFast(false)
           }
           setView("seleccionar")
-          getPedidos()
+          // getPedidos()
           getPedidosList()
           getProductos()
 
@@ -3407,6 +3407,7 @@ const auth = permiso => {
         
         />:null}
         {view=="pagar"?<Pagar 
+          qProductosMain={qProductosMain}
           showinputaddCarritoFast={showinputaddCarritoFast}
           setshowinputaddCarritoFast={setshowinputaddCarritoFast}
 

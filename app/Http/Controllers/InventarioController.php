@@ -97,19 +97,19 @@ class InventarioController extends Controller
             // $old_cant = $old_cant_query["cantidad"];
             if ($type=="ins") {
 
-                $producto = inventario::find($id);
+                $producto = inventario::select(["cantidad","precio"])->find($id);
                 $precio = $producto->precio;
                 
                 $setcantidad = $cantidad;
                 $setprecio = $precio;
                 if ($lote) {
-                    $checkIfExits = items_pedidos::where("id_producto",$id)
+                    $checkIfExits = items_pedidos::select(["cantidad"])->where("id_producto",$id)
                     ->where("id_pedido",$id_pedido)
                     ->where("lote",$lote)
                     ->first();
                     
                 }else{
-                    $checkIfExits = items_pedidos::where("id_producto",$id)->where("id_pedido",$id_pedido)->first();
+                    $checkIfExits = items_pedidos::select(["cantidad"])->where("id_producto",$id)->where("id_pedido",$id_pedido)->first();
 
                 }
                 
@@ -149,11 +149,10 @@ class InventarioController extends Controller
 
                 $this->checkFalla($id,$ctSeter);
             }else if($type=="upd"){
-                $checkIfExits = items_pedidos::find($id);
+                $checkIfExits = items_pedidos::select(["lote","id_producto","cantidad"])->find($id);
                 (new PedidosController)->checkPedidoAuth($id,"item");
 
-
-                $producto = inventario::find($checkIfExits->id_producto);
+                $producto = inventario::select(["precio","cantidad"])->find($checkIfExits->id_producto);
                 $precio = $producto->precio;
 
                 $old_ct = $checkIfExits->cantidad;
@@ -180,12 +179,12 @@ class InventarioController extends Controller
             }else if($type=="del"){
                 (new PedidosController)->checkPedidoAuth($id,"item");
                 
-                    $item = items_pedidos::find($id);
+                    $item = items_pedidos::select(["cantidad","id_producto","lote"])->find($id);
                     $old_ct = $item->cantidad;
                     $id_producto = $item->id_producto;
                     $lote = $item->lote;
                 
-                    $producto = inventario::find($id_producto);
+                    $producto = inventario::select(["cantidad"])->find($id_producto);
                     
                 if($item->delete()){
                     if ($lote) {

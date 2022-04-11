@@ -93,6 +93,7 @@ peso,
 
 showinputaddCarritoFast,
 setshowinputaddCarritoFast,
+qProductosMain,
 }) {
 
   const debitoBs = (met) =>{
@@ -223,6 +224,7 @@ setshowinputaddCarritoFast,
             <div className="col">
               
               {ModaladdproductocarritoToggle&&<Modaladdproductocarrito 
+                qProductosMain={qProductosMain}
                 showinputaddCarritoFast={showinputaddCarritoFast}
                 setshowinputaddCarritoFast={setshowinputaddCarritoFast}
 

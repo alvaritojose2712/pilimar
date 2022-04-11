@@ -14,6 +14,7 @@ function Modaladdproductocarrito({
 
   showinputaddCarritoFast,
   setshowinputaddCarritoFast,
+  qProductosMain,
 }) {
 
   return (

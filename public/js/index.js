@@ -2510,7 +2510,8 @@ function Modaladdproductocarrito(_ref) {
       orderBy = _ref.orderBy,
       onchangeinputmain = _ref.onchangeinputmain,
       showinputaddCarritoFast = _ref.showinputaddCarritoFast,
-      setshowinputaddCarritoFast = _ref.setshowinputaddCarritoFast;
+      setshowinputaddCarritoFast = _ref.setshowinputaddCarritoFast,
+      qProductosMain = _ref.qProductosMain;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("section", {
       className: "modal-custom",
@@ -2549,6 +2550,7 @@ function Modaladdproductocarrito(_ref) {
               className: "form-control",
               placeholder: "Buscar...",
               ref: inputaddcarritointernoref,
+              value: qProductosMain,
               onChange: onchangeinputmain
             })]
           })
@@ -7262,8 +7264,8 @@ function Facturar(_ref) {
               setshowinputaddCarritoFast(false);
             }
 
-            setView("seleccionar");
-            getPedidos();
+            setView("seleccionar"); // getPedidos()
+
             getPedidosList();
             getProductos();
             setSelectItem(null);
@@ -8995,6 +8997,7 @@ function Facturar(_ref) {
       setorderByColumEstaInv: setorderByColumEstaInv,
       dataEstaInven: dataEstaInven
     }) : null, view == "ViewPedidoVendedor" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)((_components_viewPedidoVendedor__WEBPACK_IMPORTED_MODULE_20___default()), {}) : null, view == "pagar" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_components_pagar__WEBPACK_IMPORTED_MODULE_9__["default"], {
+      qProductosMain: qProductosMain,
       showinputaddCarritoFast: showinputaddCarritoFast,
       setshowinputaddCarritoFast: setshowinputaddCarritoFast,
       dolar: dolar,
@@ -12127,7 +12130,8 @@ function Pagar(_ref) {
       dolar = _ref.dolar,
       peso = _ref.peso,
       showinputaddCarritoFast = _ref.showinputaddCarritoFast,
-      setshowinputaddCarritoFast = _ref.setshowinputaddCarritoFast;
+      setshowinputaddCarritoFast = _ref.setshowinputaddCarritoFast,
+      qProductosMain = _ref.qProductosMain;
 
   var debitoBs = function debitoBs(met) {
     try {
@@ -12273,6 +12277,7 @@ function Pagar(_ref) {
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
             className: "col",
             children: [ModaladdproductocarritoToggle && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)(_components_Modaladdproductocarrito__WEBPACK_IMPORTED_MODULE_1__["default"], {
+              qProductosMain: qProductosMain,
               showinputaddCarritoFast: showinputaddCarritoFast,
               setshowinputaddCarritoFast: setshowinputaddCarritoFast,
               toggleModalProductos: toggleModalProductos,
