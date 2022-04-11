@@ -5898,6 +5898,7 @@ function Facturar(_ref) {
     if (view == "pagar") {
       toggleModalProductos(true, function () {
         inputaddcarritointernoref.current.focus();
+        setQProductosMain("");
       });
     } else if (selectItem === null && view == "seleccionar") {
       getPedido("ultimo", function () {

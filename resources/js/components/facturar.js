@@ -374,6 +374,7 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
     if(view=="pagar"){
       toggleModalProductos(true,()=>{
         inputaddcarritointernoref.current.focus()
+        setQProductosMain("")
 
       })
       
