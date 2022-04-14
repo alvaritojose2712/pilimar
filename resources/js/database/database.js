@@ -100,7 +100,11 @@ const db = {
   getPedidosCentral: data=>axios.post(host+"getPedidosCentral",data),
 
   getSucursal: data=>axios.get(host+"getSucursal",{params:data}),
+  
   getCategorias: data=>axios.get(host+"getCategorias",{params:data}),
+  delCategoria: data=>axios.post(host+"delCategoria",data),
+  setCategorias: data=>axios.post(host+"setCategorias",data),
+  
 
 
 
@@ -118,6 +122,8 @@ const db = {
   setPagoProveedor: data => axios.post(host + "setPagoProveedor", data),
   getPagoProveedor: data => axios.post(host + "getPagoProveedor", data),
   delPagoProveedor: data=>axios.post(host+"delPagoProveedor",data),
+
+
   
   
   

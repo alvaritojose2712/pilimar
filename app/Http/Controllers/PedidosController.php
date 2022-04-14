@@ -16,6 +16,7 @@ use App\Models\movimientos;
 use App\Models\items_movimiento;
 
 
+use Illuminate\Support\Facades\Cache;
 
 
 use Illuminate\Http\Request;
@@ -62,9 +63,23 @@ class PedidosController extends Controller
         ->get(["id","estado"]);
     }
     public function get_moneda()
-    {
-        $cop = moneda::where("tipo",2)->orderBy("id","desc")->first()["valor"];
-        $bs = moneda::where("tipo",1)->orderBy("id","desc")->first()["valor"];
+    {   
+        if (Cache::has('cop')) {
+            $cop = Cache::get('cop');
+        }else{
+            $cop = moneda::where("tipo",2)->orderBy("id","desc")->first()["valor"];
+            Cache::put('cop', $cop);
+        }
+
+        
+        if (Cache::has('bs')) {
+            $bs = Cache::get('bs');
+    //
+        }else{
+            $bs = moneda::where("tipo",1)->orderBy("id","desc")->first()["valor"];
+            Cache::put('bs', $bs);
+        }
+
         return ["cop"=>$cop, "bs"=>$bs];
     }
     public function today()
@@ -376,15 +391,16 @@ class PedidosController extends Controller
     }
     public function pedidoAuth($id,$tipo="pedido")
     {
+
         if ($id===null) {
             $fecha_creada = $tipo;
             $estado = true;
         }else{
 
             if ($tipo=="pedido") {
-                $pedido = pedidos::find($id);
+                $pedido = pedidos::select(["estado","created_at"])->find($id);
             }else{
-                $pedido = pedidos::find(items_pedidos::find($id)->id_pedido);
+                $pedido = pedidos::select(["estado","created_at"])->find(items_pedidos::find($id)->id_pedido);
             }
             $fecha_creada = date("Y-m-d",strtotime($pedido->created_at));
            

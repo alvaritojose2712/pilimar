@@ -13,6 +13,8 @@ import { moneda, number } from './assets';
 import ProductosList from '../components/productoslist';
 import ModalAddCarrito from '../components/modaladdcarrito';
 import ModalMovimientos from '../components/ModalMovimientos';
+import Configuracion from '../components/configuracion';
+
 
 import Pagar from '../components/pagar';
 import Header from '../components/header';
@@ -31,7 +33,6 @@ import Inventario from '../components/inventario';
 
 import Cajagastos from '../components/cajagastos';
 import Ventas from '../components/ventas';
-import Usuarios from '../components/usuarios';
 
 import ViewPedidoVendedor from '../components/viewPedidoVendedor';
 
@@ -68,7 +69,6 @@ export default function Facturar({user,notificar,setLoading}) {
   const [showinputaddCarritoFast,setshowinputaddCarritoFast] = useState(false)
   
   const [productos,setProductos] = useState([])
-  const [categorias,setcategorias] = useState([])
 
   const [productosInventario,setProductosInventario] = useState([])
 
@@ -298,17 +298,7 @@ export default function Facturar({user,notificar,setLoading}) {
   const [qBuscarUsuario, setQBuscarUsuario] = useState("")
   const [indexSelectUsuarios, setIndexSelectUsuarios] = useState(null)
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+    
   const [toggleClientesBtn, settoggleClientesBtn] = useState(false)
 
   const [modViewInventario, setmodViewInventario] = useState("unique")
@@ -359,7 +349,13 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
   precio:"",
   cantidad:"",
 });
+
+///Configuracion Component
+  const [subViewConfig, setsubViewConfig] = useState("usuarios")
   
+
+///End Configuracion Component
+
   
   
 
@@ -701,10 +697,86 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
     
   }, [showinputaddCarritoFast])
 
+
+  const [qBuscarCategorias,setQBuscarCategorias] = useState("")
+  const [categorias,setcategorias] = useState([])
+
+  const [categoriasDescripcion,setcategoriasDescripcion] = useState("")
+  const [indexSelectCategorias,setIndexSelectCategorias] = useState(null)
+
+  const delCategorias = () => {
+    setLoading(true)
+    let id = null
+    if (indexSelectCategorias) {
+      if (categorias[indexSelectCategorias]) {
+        id = categorias[indexSelectCategorias].id
+      }
+    }
+
+    db.delCategoria({id}).then(res=>{
+      setLoading(false)
+      getCategorias()
+      notificar(res)
+      setIndexSelectCategorias(null)
+    })
+  }
+
+  const addNewCategorias = e => {
+    e.preventDefault()
+
+    let id = null
+    if (indexSelectCategorias) {
+      if (categorias[indexSelectCategorias]) {
+        id = categorias[indexSelectCategorias].id
+      }
+    }
+
+    if (categoriasDescripcion) {
+      setLoading(true)
+      db.setCategorias({id,categoriasDescripcion})
+      .then(res=>{
+        notificar(res)
+        setLoading(false)
+        getCategorias()
+      })
+    }
+  }
+  const getCategorias = () => {
+    db.getCategorias({
+      q:qBuscarCategorias
+    }).then(res=>{
+      if (res.data) {
+        if (res.data.length) {
+          setcategorias(res.data)
+        }else{
+          setcategorias([])
+        }
+      }
+    })
+  }
+  const setInputsCats = () => {
+    if (indexSelectCategorias) {
+      let obj = categorias[indexSelectCategorias]
+      if (obj) {
+        setcategoriasDescripcion(obj.descripcion)
+      }
+      
+    }
+  }
+  useEffect(()=>{
+    setInputsCats()
+  }, [indexSelectCategorias])
+  useEffect(()=>{
+    getCategorias()
+  }, [qBuscarCategorias])
+
+
+
   useEffect(()=>{
     getUsuarios()
     
   }, [qBuscarUsuario])
+
 
   useEffect(() => {
     setInputsUsuarios()
@@ -1200,11 +1272,11 @@ const getMoneda = () => {
   setLoading(true)
   db.getMoneda().then(res=>{
     if (res.data.peso){
-      setPeso(res.data.peso.valor)
+      setPeso(res.data.peso)
     }
 
     if (res.data.dolar) {
-      setDolar(res.data.dolar.valor)
+      setDolar(res.data.dolar)
     }
     setLoading(false)
   })
@@ -1323,7 +1395,8 @@ const getPersona = q => {
         if(res.statusText=="OK"){
           if (res.data.length) {
             setPersona(res.data)
-
+          }else{
+            setPersona([])
           }
         }
         if (!res.data.length) {
@@ -1510,10 +1583,12 @@ const addCarritoRequest = (e,id_direct=null,id_pedido_direct=null) =>{
     db.setCarrito({ id, type, cantidad, numero_factura:id_pedido_direct?id_pedido_direct:numero_factura, loteIdCarrito}).then(res=>{
       // getProductos()
 
+      if (numero_factura=="nuevo") {
+        getPedidosList()
+      }
       switch(res.data.type){
         case "agregar":
           setSelectItem(null)
-          getPedidosList()
           notificar(res)
 
           if (showinputaddCarritoFast&&ModaladdproductocarritoToggle) {
@@ -1525,7 +1600,7 @@ const addCarritoRequest = (e,id_direct=null,id_pedido_direct=null) =>{
           getPedido(res.data.num_pedido,()=>{
             setView("pagar")
             setSelectItem(null)
-            getPedidosList()
+            
           })
         break;
       }
@@ -1915,8 +1990,11 @@ const buscarInventario = e => {
         
       }).then(res=>{
         if (res.data) {
-
-          setProductosInventario(res.data)
+          if (res.data.length) {
+            setProductosInventario(res.data)
+          }else{
+            setProductosInventario([])
+          }
           setIndexSelectInventario(null)
           if (res.data.length===1) {
             setIndexSelectInventario(0)
@@ -1946,7 +2024,11 @@ const getProveedores = e => {
     db.getProveedores({
       q:qBuscarProveedor
     }).then(res=>{
-      setProveedoresList(res.data)
+      if (res.data.length) {
+        setProveedoresList(res.data)
+      }else{
+        setProveedoresList([])
+      }
       setLoading(false)
       if (res.data.length===1) {
         setIndexSelectProveedores(0)
@@ -1956,10 +2038,7 @@ const getProveedores = e => {
   setTypingTimeout(time)
 
   if (!categorias.length) {
-    db.getCategorias({
-    }).then(res=>{
-      setcategorias(res.data)
-    })
+    getCategorias()
   }
   if (!depositosList.length) {
     db.getDepositos({
@@ -2453,6 +2532,8 @@ const getPedidosCentral = () => {
     if (res.data) {
       if (res.data.length) {
         setpedidoCentral(res.data)
+      }else{
+        setpedidoCentral([])
       }
       if (res.data.msj) {
         notificar(res)
@@ -3215,26 +3296,7 @@ const auth = permiso => {
           setTipoestadopedido={setTipoestadopedido}
         />:null}
 
-        {view=="usuarios"?<Usuarios
-          
-          addNewUsuario={addNewUsuario}
-          
-
-          usuarioNombre={usuarioNombre}
-          setusuarioNombre={setusuarioNombre}
-          usuarioUsuario={usuarioUsuario}
-          setusuarioUsuario={setusuarioUsuario}
-          usuarioRole={usuarioRole}
-          setusuarioRole={setusuarioRole}
-          usuarioClave={usuarioClave}
-          setusuarioClave={setusuarioClave}
-          indexSelectUsuarios={indexSelectUsuarios}
-          setIndexSelectUsuarios={setIndexSelectUsuarios}
-          qBuscarUsuario={qBuscarUsuario}
-          setQBuscarUsuario={setQBuscarUsuario}
-          delUsuario={delUsuario}
-          usuariosData={usuariosData}
-        />:null}
+        
         {view=="inventario"?<Inventario
           delPagoProveedor={delPagoProveedor}
           busqAvanzInputsFun={busqAvanzInputsFun}
@@ -3561,6 +3623,39 @@ const auth = permiso => {
           sumPedidosArr={sumPedidosArr}
           setsumPedidosArr={setsumPedidosArr}
         />
+        :null}
+
+        {view=="configuracion"?
+          <Configuracion
+            subViewConfig={subViewConfig}
+            setsubViewConfig={setsubViewConfig}
+
+            categorias={categorias}
+            addNewCategorias={addNewCategorias}
+            categoriasDescripcion={categoriasDescripcion}
+            setcategoriasDescripcion={setcategoriasDescripcion}
+            indexSelectCategorias={indexSelectCategorias}
+            setIndexSelectCategorias={setIndexSelectCategorias}
+            qBuscarCategorias={qBuscarCategorias}
+            setQBuscarCategorias={setQBuscarCategorias}
+            delCategorias={delCategorias}
+
+            addNewUsuario={addNewUsuario}
+            usuarioNombre={usuarioNombre}
+            setusuarioNombre={setusuarioNombre}
+            usuarioUsuario={usuarioUsuario}
+            setusuarioUsuario={setusuarioUsuario}
+            usuarioRole={usuarioRole}
+            setusuarioRole={setusuarioRole}
+            usuarioClave={usuarioClave}
+            setusuarioClave={setusuarioClave}
+            indexSelectUsuarios={indexSelectUsuarios}
+            setIndexSelectUsuarios={setIndexSelectUsuarios}
+            qBuscarUsuario={qBuscarUsuario}
+            setQBuscarUsuario={setQBuscarUsuario}
+            delUsuario={delUsuario}
+            usuariosData={usuariosData}
+          />
         :null}
       
     </>

@@ -25,11 +25,13 @@ function Header({
 
           </div>
           <div className="col-5 d-flex header-justify-content-end align-items-center">
+            {auth(1)?<span className={"btn m-1 text-success"} onClick={() => setView("configuracion")}><i className="fa fa-cogs"></i></span>:null}
+            
             <div>
               <span className="fw-bold">{user.nombre}</span><br/>
               <span className="fst-italic">{user.role}</span>
             </div>
-            <button className="m-1 btn text-danger" onClick={logout}><i className="fa fa-times"></i></button>
+            <span className="m-1 btn text-danger" onClick={logout}><i className="fa fa-times"></i></span>
           </div>
         </div>
       </div>
@@ -58,10 +60,6 @@ function Header({
                 </li>
               </ul>
             </div>:null}
-
-
-            
-              {auth(1)?<span className={(view=="usuarios"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("usuarios")}>Usuarios</span>:null}
 
               {auth(2)?<span className={(view=="cierres"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("cierres")}>Cierre</span>:null}
             

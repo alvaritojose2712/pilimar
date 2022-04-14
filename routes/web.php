@@ -26,6 +26,10 @@ use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\LotesController;
 use App\Http\Controllers\PagoFacturasController;
 
+Route::get('/test', function()
+{
+	return "THis is a test";
+});
 Route::get('', [HomeController::class,"index"]);
 Route::get('setCarrito', [InventarioController::class,"setCarrito"]);
 
@@ -106,6 +110,11 @@ Route::group(['middleware' => ['login']], function () {
 		
 		Route::post('getProveedores', [ProveedoresController::class,"getProveedores"]);
 		Route::get('getCategorias', [CategoriasController::class,"getCategorias"]);
+		Route::post('delCategoria', [CategoriasController::class,"delCategoria"]);
+		Route::post('setCategorias', [CategoriasController::class,"setCategorias"]);
+
+
+
 
 	
 		Route::post('delProveedor', [ProveedoresController::class,"delProveedor"]);

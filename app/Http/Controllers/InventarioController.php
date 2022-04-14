@@ -20,7 +20,7 @@ use App\Models\movimientos;
 use App\Models\items_movimiento;
 
 
-
+use DB;
 
             
 
@@ -137,6 +137,9 @@ class InventarioController extends Controller
                     "monto" => $setprecio,
                     "lote" => $lote,
                 ]);
+
+                // DB::insert('INSERT INTO items_pedidos (id_producto,id_pedido,cantidad,monto,lote) VALUES "$id","$id_pedido","$setcantidad","$setprecio","$lote"');
+
                 if ($lote) {
                     $lote_obj = lotes::find($lote);
                     $ctSeter = (($lote_obj->cantidad + ($old_ct)) - $setcantidad);
@@ -385,8 +388,9 @@ class InventarioController extends Controller
                 $exacto = "id_only";
             }
         }
-        $cop = moneda::where("tipo",2)->orderBy("id","desc")->first();
-        $bs = moneda::where("tipo",1)->orderBy("id","desc")->first();
+        $mon = (new PedidosController)->get_moneda();
+        $cop = $mon["cop"];
+        $bs = $mon["bs"];
 
 
         $data = [];
@@ -514,8 +518,8 @@ class InventarioController extends Controller
 
         $data->map(function($q) use ($bs,$cop)
         {
-            $q->bs = number_format($q->precio*$bs["valor"],2,".",",");
-            $q->cop = number_format($q->precio*$cop["valor"],2,".",",");
+            $q->bs = number_format($q->precio*$bs,2,".",",");
+            $q->cop = number_format($q->precio*$cop,2,".",",");
             $q->lotes_ct = $q->lotes->sum("cantidad");
             return $q;
         });
@@ -899,7 +903,8 @@ class InventarioController extends Controller
     {   
         if ($id) {
             if ($ct>1) {
-                $f = fallas::where("id_producto",$id);
+
+                $f = fallas::where("id_producto",$id)->first();
                 if ($f) {
                     $f->delete();
                 }

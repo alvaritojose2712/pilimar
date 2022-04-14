@@ -20,7 +20,7 @@ export default function VentasComponet({
 		<div className="container">
 			<div className="input-group mb-4">
 				<div className="input-prepend-text">
-					<button className="btn btn-outline-success" onClick={getVentasClick}>Actualizar</button>
+					<button className="btn btn-outline-success" onClick={getVentasClick}><i className="fa fa-refresh"></i></button>
 				</div>
 				<input type="date" className="form-control" onChange={e=>setfechaventas(e.target.value)} value={fechaventas}/>
 			</div>	
@@ -50,7 +50,7 @@ export default function VentasComponet({
 				</div>
 			</div>
 			<div className='m-3 d-flex justify-content-center'>
-				<LineChart width={800} height={300} data={dataGrafica}>
+				<LineChart width={1000} height={350} data={dataGrafica}>
 					<Line type="monotone" dataKey="monto" stroke="#8884d8" />
 					<CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
 					<XAxis dataKey="hora" />
