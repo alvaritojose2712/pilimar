@@ -484,7 +484,9 @@ class PedidosController extends Controller
     public function getPedidoFun($id_pedido,$filterMetodoPagoToggle="todos",$cop=1,$bs=1,$factor=1,$clean=false)
     {
         
-        $pedido = pedidos::with(["vendedor"=>function($q){
+        $pedido = pedidos::with(["referencias"=>function($q){
+            $q->select(["id","tipo","descripcion","monto","id_pedido"]);
+        },"vendedor"=>function($q){
             $q->select(["id","usuario","tipo_usuario","nombre"]);
         },"cliente"=>function($q){
             $q->select(["id","identificacion","nombre"]);

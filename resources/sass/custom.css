@@ -38,6 +38,20 @@ body *::-webkit-scrollbar-thumb {
   border-radius: 5px;
   outline: 1px solid slategrey;
 }
+.ref {
+  display: none;
+}
+.addref .ref{
+  display: initial;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background: var(--sinapsis-color-light);
+  color: #4a4a4a;
+  padding: 2px;
+  border-radius: 4px;
+}
+
 .input-50{
   width: 50px;
   outline: none;

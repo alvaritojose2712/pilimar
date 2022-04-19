@@ -4,7 +4,12 @@ import Modaladdproductocarrito from '../components/Modaladdproductocarrito';
 import ModaladdPersona from '../components/ModaladdPersona';
 
 
-function Pagar({
+export default function Pagar({
+addRefPago,
+delRefPago,
+refPago,
+setrefPago,
+
 pedidosFast,
 pedidoData,
 getPedido,
@@ -336,17 +341,18 @@ qProductosMain,
                     <>
                       <div className="col p-0">
                         
-                        <div className={(debito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
+                        <div className={(debito!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
                           <div className="card-body">
                             <div className="card-title pointer" onClick={getDebito}>Déb.</div>
                             <div className="card-text pago-numero"><input type="text" value={debito} onChange={(e)=>syncPago(e.target.value,"Debito")} placeholder="D"/></div>
                             <small className="text-muted fs-4">{debitoBs("debito")}</small>
+                            <span className='ref pointer' data-type="2" onClick={addRefPago}>Ref. <i className="fa fa-plus"></i></span>
                           </div>
                         </div>
                       </div>
                       <div className="col p-0">
                         
-                        <div className={(efectivo!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
+                        <div className={(efectivo!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
                           <div className="card-body">
                             <div className="card-title pointer" onClick={getEfectivo}>Efec.</div>
                             <div className="card-text pago-numero"><input type="text" value={efectivo} onChange={(e)=>syncPago(e.target.value,"Efectivo")} placeholder="E"/></div>
@@ -357,11 +363,13 @@ qProductosMain,
 
                       <div className="col p-0">
                         
-                        <div className={(transferencia!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
+                        <div className={(transferencia!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
                           <div className="card-body">
                             <div className="card-title pointer" onClick={getTransferencia}>Tran.</div>
                             <div className="card-text pago-numero"><input type="text" value={transferencia} onChange={(e)=>syncPago(e.target.value,"Transferencia")} placeholder="T"/></div>
                             <small className="text-muted fs-4">{debitoBs("transferencia")}</small>
+                            <span className='ref pointer' data-type="1" onClick={addRefPago}>Ref. <i className="fa fa-plus"></i></span>
+
                             
                           </div>
                         </div>
@@ -439,7 +447,7 @@ qProductosMain,
                             <div className="card-text pago-numero">                
                               {vuelto}
                             </div>
-                            <small className="text-success fst-italic " className="pointer">Entregar</small><br/>
+                              <small className="text-success fst-italic pointer">Entregar</small><br/>
                             {vuelto_entregado?vuelto_entregado.map(e=><div title={e.created_at} key={e.id}>
                               Entregado = <b>{e.monto}</b>
                               
@@ -453,13 +461,33 @@ qProductosMain,
 
               </div>
               {editable?
-                <div className="text-right">
+                <div className="container p-0 m-0">
+                  <div className="row">
+                    <div className="col">
+                      <ul className="list-group">
+                        {refPago ? refPago.length ? refPago.map(e=>
+                          <li key={e.id} className='list-group-item d-flex justify-content-between align-items-start'>
+                            {e.descripcion}
+                            {e.tipo==1&&e.monto!=0?<span className="btn-sm btn-info btn">Trans. Bs.{moneda(e.monto)} </span>:null}
+	                          {e.tipo==2&&e.monto!=0?<span className="btn-sm btn-secondary btn">Deb. Bs.{moneda(e.monto)} </span>:null}
+                            <span className="badge bg-danger rounded-pill" data-id={e.id} onClick={delRefPago}><i className="fa fa-times"></i></span>
+                          </li>
+                        )
+                        :null:null}
+                      </ul>
+
+                    </div>
+                    <div className="col text-right">
+                      {autoCorrector?
+                        <button className="btn btn-outline-success btn-sm" onClick={()=>setautoCorrector(false)}>Auto On</button>:
+                        <button className="btn btn-outline-danger btn-sm" onClick={()=>setautoCorrector(true)}>Off Auto</button>
+                      }
+                      
+                    </div>
+
+                  </div>
                   
 
-                  {autoCorrector?
-                    <button className="btn btn-outline-success btn-sm pull-right" onClick={()=>setautoCorrector(false)}>Auto On</button>:
-                    <button className="btn btn-outline-danger btn-sm pull-right" onClick={()=>setautoCorrector(true)}>Off Auto</button>
-                  }
 
                 </div>:null
               }
@@ -472,7 +500,7 @@ qProductosMain,
                       <td className="text-right">{subtotal}</td>
                     </tr>
                     <tr className='hover'>
-                      <th className="" data-index={id} onClick={setDescuentoTotal} className="pointer clickme">Desc. {total_porciento}%
+                      <th data-index={id} onClick={setDescuentoTotal} className="pointer clickme">Desc. {total_porciento}%
                       </th>
                       <td className="text-right">{total_des}</td>
                     </tr>
@@ -541,4 +569,3 @@ qProductosMain,
 
   }
 }
-export default Pagar

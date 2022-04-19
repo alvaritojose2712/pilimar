@@ -25,6 +25,8 @@ use App\Http\Controllers\sendCentral;
 use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\LotesController;
 use App\Http\Controllers\PagoFacturasController;
+use App\Http\Controllers\PagosReferenciasController;
+
 
 Route::get('/test', function()
 {
@@ -63,6 +65,9 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('getpersona', [ClientesController::class,"getpersona"]);
 		
 		Route::post('setPagoPedido', [PagoPedidosController::class,"setPagoPedido"]);
+
+		Route::post('addRefPago', [PagosReferenciasController::class,"addRefPago"]);
+		Route::post('delRefPago', [PagosReferenciasController::class,"delRefPago"]);
 		
 		Route::post('setMoneda', [MonedaController::class,"setMoneda"]);
 		
