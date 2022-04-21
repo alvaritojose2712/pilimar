@@ -3911,7 +3911,7 @@ class CreateInventariosTable extends Migration
                         "descripcion" => $value[4],
                         "iva" => 0,
                         "porcentaje_ganancia" => 0,
-                        "precio_base" => $faker->numberBetween(1,1000),
+                        "precio_base" => 15,
                         "precio" => 20,
                         "cantidad" => 10,
                     ]

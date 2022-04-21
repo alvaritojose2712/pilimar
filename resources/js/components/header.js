@@ -77,7 +77,7 @@ function Header({
               auth(2)?
                 view=="seleccionar"?
                 <>
-                  <span className={(viewCaja?"btn btn-sinapsis":null)+(" p-3 pointer")} onClick={()=>setViewCaja(!viewCaja)}>Caja/Gastos</span>
+                  <span className={(viewCaja?"btn btn-sinapsis":null)+(" p-3 pointer")} onClick={()=>setViewCaja(!viewCaja)}>Caja</span>
                   <span className={(showModalMovimientos?"btn btn-sinapsis":null)+(" p-3 pointer")} onClick={()=>setShowModalMovimientos(!showModalMovimientos)}>Movimientos</span>
                 </>:null
               :null

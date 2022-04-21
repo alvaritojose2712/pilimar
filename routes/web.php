@@ -26,6 +26,8 @@ use App\Http\Controllers\UsuariosController;
 use App\Http\Controllers\LotesController;
 use App\Http\Controllers\PagoFacturasController;
 use App\Http\Controllers\PagosReferenciasController;
+use App\Http\Controllers\GastosController;
+
 
 
 Route::get('/test', function()
@@ -108,6 +110,7 @@ Route::group(['middleware' => ['login']], function () {
 	Route::group(['middleware' => ['admin']], function () {
 		
 		
+		/* GastosController */
 		
 		Route::post('setProveedor', [ProveedoresController::class,"setProveedor"]);
 		Route::post('guardarNuevoProducto', [InventarioController::class,"guardarNuevoProducto"]);

@@ -24,7 +24,7 @@ function Cajagastos({
         <div className="text-danger" onClick={()=>setViewCaja(false)}><span className="closeModal">&#10006;</span></div>
 
         <div className="modal-content">
-          <h4>Movimientos de caja y Gastos</h4>
+          <h4>Movimientos de caja</h4>
           <form onSubmit={setMovimientoCaja} >
             <table className="table table-sm table-hoverable">
               <thead> 
@@ -48,7 +48,7 @@ function Cajagastos({
     	              <td colSpan="2">
     	                <select onChange={e=>setMovCajacategoria(e.target.value)} value={movCajacategoria} className="form-control">
     	                  <option value="3">Funcionamiento</option>
-    	                  <option value="4">Pago a proveedores</option>
+    	                  
     	                  <option value="2">Nómina</option>
     	                  <option value="5">Otros</option>
     	                  <option value="6">Devolución</option>
@@ -74,7 +74,7 @@ function Cajagastos({
                   <td colSpan="2">
                     <table className="table table-sm table-hoverable">
                       <tbody>
-                        {movimientosCaja.filter(e=>e.tipo==1).map(e=>
+                        {movimientosCaja.length?movimientosCaja.filter(e=>e.tipo==1).map(e=>
                           <tr key={e.id} data-id={e.id} onClick={delMovCaja}>
                             <td>
                               {e.descripcion}
@@ -91,14 +91,14 @@ function Cajagastos({
                             </td>
                             <td>{e.monto}</td>
                           </tr>
-                        )}  
+                        ):null}  
                       </tbody>
                     </table>
                   </td>
                   <td colSpan="3">
                     <table className="table table-sm table-hoverable">
                       <tbody>
-                        {movimientosCaja.filter(e=>e.tipo==0).map(e=>
+                        {movimientosCaja.length?movimientosCaja.filter(e=>e.tipo==0).map(e=>
                           <tr key={e.id} data-id={e.id} onClick={delMovCaja}>
                             <td>
                               {e.descripcion}
@@ -115,7 +115,7 @@ function Cajagastos({
                             </td>
                             <td>{e.monto}</td>
                           </tr>
-                        )}  
+                        ):null}  
                       </tbody>
                     </table>
                   </td>

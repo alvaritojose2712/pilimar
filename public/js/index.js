@@ -2759,7 +2759,7 @@ function Cajagastos(_ref) {
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
         className: "modal-content",
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h4", {
-          children: "Movimientos de caja y Gastos"
+          children: "Movimientos de caja"
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("form", {
           onSubmit: setMovimientoCaja,
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
@@ -2822,9 +2822,6 @@ function Cajagastos(_ref) {
                         value: "3",
                         children: "Funcionamiento"
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
-                        value: "4",
-                        children: "Pago a proveedores"
-                      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
                         value: "2",
                         children: "N\xF3mina"
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
@@ -2867,7 +2864,7 @@ function Cajagastos(_ref) {
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("table", {
                     className: "table table-sm table-hoverable",
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
-                      children: movimientosCaja.filter(function (e) {
+                      children: movimientosCaja.length ? movimientosCaja.filter(function (e) {
                         return e.tipo == 1;
                       }).map(function (e) {
                         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
@@ -2884,7 +2881,7 @@ function Cajagastos(_ref) {
                             children: e.monto
                           })]
                         }, e.id);
-                      })
+                      }) : null
                     })
                   })
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
@@ -2892,7 +2889,7 @@ function Cajagastos(_ref) {
                   children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("table", {
                     className: "table table-sm table-hoverable",
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
-                      children: movimientosCaja.filter(function (e) {
+                      children: movimientosCaja.length ? movimientosCaja.filter(function (e) {
                         return e.tipo == 0;
                       }).map(function (e) {
                         return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
@@ -2909,7 +2906,7 @@ function Cajagastos(_ref) {
                             children: e.monto
                           })]
                         }, e.id);
-                      })
+                      }) : null
                     })
                   })
                 })]
@@ -7745,6 +7742,12 @@ function Facturar(_ref) {
       transferencia: cierre[1],
       entregadomenospend: cierre["entregadomenospend"],
       caja_inicial: cierre["caja_inicial"],
+      precio: cierre["precio"],
+      precio_base: cierre["precio_base"],
+      ganancia: cierre["ganancia"],
+      porcentaje: cierre["porcentaje"],
+      desc_total: cierre["desc_total"],
+      numventas: cierre["numventas"],
       notaCierre: notaCierre
     }).then(function (res) {
       setLoading(false);
@@ -10008,7 +10011,7 @@ function Header(_ref) {
               onClick: function onClick() {
                 return setViewCaja(!viewCaja);
               },
-              children: "Caja/Gastos"
+              children: "Caja"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
               className: (showModalMovimientos ? "btn btn-sinapsis" : null) + " p-3 pointer",
               onClick: function onClick() {

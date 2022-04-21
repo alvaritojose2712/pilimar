@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\movimientos_caja;
+use App\Models\gastos;
 use Illuminate\Http\Request;
 use Response;
 
@@ -31,6 +32,18 @@ class MovimientosCajaController extends Controller
             $mov->created_at = $fecha;
             $mov->monto = floatval($req->monto);
             $mov->save();
+            /*if ($mov->save()) {
+                 if ($req->categoria==2 || $req->categoria==3) {
+                    $gastos = new gastos;
+                    $gastos->descripcion = $req->descripcion;
+                    $gastos->categoria = $req->categoria;
+                    $gastos->monto = floatval($req->monto);
+                    $gastos->fecha = $req->fecha;
+                    $gastos->save();
+                } 
+            }*/
+
+
 
             return Response::json(["msj"=>"¡Éxito al registrar movimiento!","estado"=>true]);
         } catch (\Exception $e) {

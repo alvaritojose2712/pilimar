@@ -1876,6 +1876,14 @@ const guardar_cierre = (e,callback=null) => {
     entregadomenospend: cierre["entregadomenospend"],
     caja_inicial:cierre["caja_inicial"],
 
+    precio: cierre["precio"],
+    precio_base: cierre["precio_base"],
+    ganancia: cierre["ganancia"],
+    porcentaje: cierre["porcentaje"],
+    desc_total: cierre["desc_total"],
+    numventas: cierre["numventas"],
+    
+
     notaCierre,
   }).then(res=>{
     
