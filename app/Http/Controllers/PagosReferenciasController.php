@@ -12,6 +12,7 @@ class PagosReferenciasController extends Controller
     {
          try {
             
+            (new PedidosController)->checkPedidoAuth($req->id_pedido);
 
             $item = new pagos_referencias;
             $item->tipo = $req->tipo;

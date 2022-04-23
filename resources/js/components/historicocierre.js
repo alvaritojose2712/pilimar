@@ -4,11 +4,14 @@ export default function Historicocierre({
 	setfechaGetCierre,
 	getCierres,
 	verCierreReq,
+	fechaGetCierre2,
+	setfechaGetCierre2,
 }) {
 	return (
-		<div className="container">
+		<div className="container-fluid">
 			<div className="input-group">
-				<input type="date" className="form-control" value={fechaGetCierre} onChange={e=>setfechaGetCierre(e.target.value)}/>
+				<input type="date" className="form-control" value={fechaGetCierre} onChange={e => setfechaGetCierre(e.target.value)} />
+				<input type="date" className="form-control" value={fechaGetCierre2} onChange={e=>setfechaGetCierre2(e.target.value)}/>
 				<div className="inputr-group-append">
 					<button className="btn" onClick={getCierres}><i className="fa fa-search"></i></button>
 				</div>
@@ -28,7 +31,7 @@ export default function Historicocierre({
 						<th>Guardado BS</th>
 						<th>Tasa</th>
 					</tr>
-					{cierres?cierres.map(e=>
+					{cierres ? cierres.cierres ? cierres.cierres.length ? cierres.cierres.map(e=>
 						<tr key={e.id}>
 							<th>{e.fecha}</th>
 							<td>{e.debito}</td>
@@ -47,9 +50,33 @@ export default function Historicocierre({
 							</td>
 						</tr>
 
-					):null}
+					):null:null:null}
 				</thead>
 			</table>
+			{cierres?cierres.numventas?
+				<table className="table">
+					<thead>
+						<tr>
+							<th>numventas</th>
+							<th>debito</th>
+							<th>efectivo</th>
+							<th>transferencia</th>
+							<th>ganancia</th>
+							<th>porcentaje</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{cierres.numventas}</td>
+							<td>{cierres.debito}</td>
+							<td>{cierres.efectivo}</td>
+							<td>{cierres.transferencia}</td>
+							<td>{cierres.ganancia}</td>
+							<td>{cierres.porcentaje}</td>
+						</tr>
+					</tbody>
+				</table>
+			:null:null}
 		</div>
 	)
 }

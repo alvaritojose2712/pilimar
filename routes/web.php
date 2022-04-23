@@ -121,7 +121,9 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('delCategoria', [CategoriasController::class,"delCategoria"]);
 		Route::post('setCategorias', [CategoriasController::class,"setCategorias"]);
 
-
+		Route::post('delGastos', [GastosController::class,"delGastos"]);
+		Route::post('getGastos', [GastosController::class,"getGastos"]);
+		Route::post('setGasto', [GastosController::class,"setGasto"]);
 
 
 	

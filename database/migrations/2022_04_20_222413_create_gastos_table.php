@@ -21,7 +21,8 @@ class CreateGastosTable extends Migration
             $table->decimal("monto",10,2);
             
             $table->date("fecha");
-
+            
+            $table->integer("id_mov_caja")->nullable();
             $table->timestamps();
         });
     }

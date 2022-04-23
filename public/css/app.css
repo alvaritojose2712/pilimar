@@ -111,6 +111,9 @@ td,th{
 .cell4{
   width: 40% !important;
 }
+.cell45 {
+  width: 45% !important;
+}
 .cell5{
   width: 50% !important;
 }

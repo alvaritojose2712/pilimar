@@ -14,6 +14,7 @@ use App\Models\movimientos_caja;
 use App\Models\sucursal;
 use App\Models\movimientos;
 use App\Models\items_movimiento;
+use App\Models\pagos_referencias;
 
 
 use Illuminate\Support\Facades\Cache;
@@ -875,12 +876,23 @@ class PedidosController extends Controller
     }
     public function getCierres(Request $req)
     {
-        if ($req->fechaGetCierre=="") {
-            return cierres::orderBy("id","desc")->get();
-            // code...
-        }else{
-            return cierres::where("fecha",$req->fechaGetCierre)->orderBy("id","desc")->limit(10)->get();
-        }
+
+        $fechaGetCierre = $req->fechaGetCierre;
+        $fechaGetCierre2 = $req->fechaGetCierre2;
+        $cierres = cierres::whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2]);
+        
+        return [
+            "cierres"=>$cierres->get(),
+            "numventas"=>$cierres->sum("numventas"),
+            
+            "debito" => $cierres->sum("debito"),
+            "efectivo" => $cierres->sum("efectivo"),
+            "transferencia" => $cierres->sum("transferencia"),
+            "ganancia" => $cierres->sum("ganancia"),
+            "porcentaje" => $cierres->avg("porcentaje"),
+            
+        ];
+        
     }
     public function cerrar(Request $req)
     {
@@ -919,8 +931,10 @@ class PedidosController extends Controller
             $last_cierre = cierres::orderBy("fecha","desc")->first();
             $check = cierres::where("fecha",$req->fechaCierre)->first();
             
-
-            $fecha_ultimo_cierre = $last_cierre->fecha;
+            $fecha_ultimo_cierre = "0";
+            if ($last_cierre) {
+                $fecha_ultimo_cierre = $last_cierre["fecha"];
+            }
 
             /* $last_debito = $last_cierre->debito;
             $last_efectivo = $last_cierre->efectivo;
@@ -985,6 +999,8 @@ class PedidosController extends Controller
         $total_inventario = inventario::sum("precio");
         $vueltos = pago_pedidos::where("tipo",6)->where("monto","<>",0);
         $vueltos_totales = $vueltos->sum("monto");
+        
+        $pagos_referencias = pagos_referencias::where("created_at","LIKE",$req->fecha."%")->orderBy("tipo","desc")->get();
 
 
         
@@ -995,6 +1011,7 @@ class PedidosController extends Controller
         // return $vueltos_des;
         $facturado = $this->cerrarFun($req->fecha,0,0);
         $arr_send = [
+            "referencias"=>$pagos_referencias,
             "cierre" => $cierre,
             "cierre_tot" => number_format($cierre->debito+$cierre->efectivo+$cierre->transferencia,2,",","."),
             "total_inventario" =>($total_inventario),

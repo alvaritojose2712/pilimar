@@ -44,7 +44,6 @@ categorias,
               
               <button className={("btn ")+(subViewConfig=="categorias"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewConfig("categorias")}>Categorías</button>
               
-              <button className={("btn ") + (subViewConfig=="cat_gastos"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewConfig("cat_gastos")}>Categorías de Gastos</button>
 	          </div>
 	        </div>
           

@@ -126,6 +126,9 @@ const db = {
   addRefPago: data => axios.post(host + "addRefPago", data),
   delRefPago: data=>axios.post(host+"delRefPago",data),
 
+  delGastos: data=>axios.post(host+"delGastos",data),
+  getGastos: data=>axios.post(host+"getGastos",data),
+  setGasto: data=>axios.post(host+"setGasto",data),
   
   
   

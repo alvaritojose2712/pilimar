@@ -467,10 +467,12 @@ qProductosMain,
                       <ul className="list-group">
                         {refPago ? refPago.length ? refPago.map(e=>
                           <li key={e.id} className='list-group-item d-flex justify-content-between align-items-start'>
-                            {e.descripcion}
-                            {e.tipo==1&&e.monto!=0?<span className="btn-sm btn-info btn">Trans. Bs.{moneda(e.monto)} </span>:null}
-	                          {e.tipo==2&&e.monto!=0?<span className="btn-sm btn-secondary btn">Deb. Bs.{moneda(e.monto)} </span>:null}
-                            <span className="badge bg-danger rounded-pill" data-id={e.id} onClick={delRefPago}><i className="fa fa-times"></i></span>
+                            <span className='cell45'>Ref.{e.descripcion}</span>
+                            {e.tipo==1&&e.monto!=0?<span className="cell45 btn-sm btn-info btn">Trans. Bs.{moneda(e.monto)} </span>:null}
+	                          {e.tipo==2&&e.monto!=0?<span className="cell45 btn-sm btn-secondary btn">Deb. Bs.{moneda(e.monto)} </span>:null}
+                            <span className="cell1 text-danger text-right" data-id={e.id} onClick={delRefPago}>
+                              <i className="fa fa-times"></i>
+                            </span>
                           </li>
                         )
                         :null:null}

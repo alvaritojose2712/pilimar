@@ -48,7 +48,6 @@ function Cajagastos({
     	              <td colSpan="2">
     	                <select onChange={e=>setMovCajacategoria(e.target.value)} value={movCajacategoria} className="form-control">
     	                  <option value="3">Funcionamiento</option>
-    	                  
     	                  <option value="2">Nómina</option>
     	                  <option value="5">Otros</option>
     	                  <option value="6">Devolución</option>

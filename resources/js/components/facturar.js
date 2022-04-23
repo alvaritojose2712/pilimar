@@ -121,6 +121,8 @@ export default function Facturar({user,notificar,setLoading}) {
   const [efectivo,setEfectivo] = useState("")
   const [transferencia,setTransferencia] = useState("")
   const [credito, setCredito] = useState("")
+
+  
   
   const [vuelto,setVuelto] = useState("")
   
@@ -170,7 +172,7 @@ export default function Facturar({user,notificar,setLoading}) {
   
   const [qDeudores,setQDeudores] = useState("")
   const [deudoresList,setDeudoresList] = useState([])
-  const [cierres,setCierres] = useState([])
+  const [cierres,setCierres] = useState({})
 
 
   const [selectDeudor,setSelectDeudor] = useState(null)
@@ -311,6 +313,9 @@ export default function Facturar({user,notificar,setLoading}) {
   const [valbodypedidocentral, setvalbodypedidocentral] = useState("12341238123456123456123451234123712345612345612345123412361234561234561234512341235123456123456123451234123412345612345612345")
 
   const [fechaGetCierre, setfechaGetCierre] = useState("")
+  const [fechaGetCierre2, setfechaGetCierre2] = useState("")
+  
+  
   
   const [modFact, setmodFact] = useState("factura")
   
@@ -699,18 +704,18 @@ useHotkeys("tab",()=>{
 
   const [refPago, setrefPago] = useState([])
   const addRefPago = e => {
+    
     let tipo = e.currentTarget.attributes["data-type"].value
     let descripcion = window.prompt("Referencia")
     let monto = window.prompt("Monto")
     if (pedidoData.id&&descripcion&&monto){
-
       db.addRefPago({
         tipo,
         descripcion,
         monto,
         id_pedido: pedidoData.id,
       }).then(res=>{
-        getPedido()
+        getPedido(null,null,false)
         notificar(res)
       })
     }
@@ -729,6 +734,57 @@ useHotkeys("tab",()=>{
     }
 
   }
+  //Gastos component
+  
+  const [qgastosfecha1,setqgastosfecha1] = useState("")
+  const [qgastosfecha2,setqgastosfecha2] = useState("")
+  const [qgastos,setqgastos] = useState("")
+  const [qcatgastos,setqcatgastos] = useState("")
+  const [gastosdescripcion,setgastosdescripcion] = useState("")
+  const [gastoscategoria,setgastoscategoria] = useState("3")
+  const [gastosmonto,setgastosmonto] = useState("")
+  const [gastosData,setgastosData] = useState({})
+  
+  const delGastos = e => {
+    let id = e.currentTarget.attributes["data-id"].value
+    if (id && confirm("Confirme eliminación de gasto")) {
+      db.delGastos({id}).then(res=>{
+        notificar(res)
+        getGastos()
+      })
+      
+    }
+  }
+  const getGastos = () => {
+
+    db.getGastos({
+      qgastosfecha1,
+      qgastosfecha2,
+      qgastos,
+      qcatgastos,
+    }).then(res=>{
+      if (res.data) {
+        if (res.data.gastos) {
+          setgastosData(res.data)
+        }else {
+          setgastosData({})
+        }
+      }
+    })
+  }
+  const setGasto = e => {
+    e.preventDefault()
+
+    db.setGasto({
+      gastosdescripcion,
+      gastoscategoria,
+      gastosmonto
+    }).then(res=>{
+      notificar(res)
+      getGastos()
+    })
+  }
+  //End Gastos Component
   
   const [qBuscarCategorias,setQBuscarCategorias] = useState("")
   const [categorias,setcategorias] = useState([])
@@ -1051,8 +1107,14 @@ const focusInputSibli = (tar, mov) => {
   }
 }
 const getCierres = () => {
-  db.getCierres({fechaGetCierre}).then(res=>{
-    setCierres(res.data)
+  db.getCierres({fechaGetCierre,fechaGetCierre2}).then(res=>{
+    if (res.data) {
+      if (res.data.cierres) {
+        setCierres(res.data)
+      } else {
+        setCierres({})
+      }
+    }
   })
 }
 const cerrar_dia = (e) => {
@@ -1198,6 +1260,8 @@ const getToday = () =>{
     setFechaMovimientos(today)
     setMovCajaFecha(today)
     setfechaventas(today)
+    setqgastosfecha1(today)
+    setqgastosfecha2(today)
 
   })
 }
@@ -1482,7 +1546,7 @@ const getPedidosList = (callback=null)=>{
     if(callback){callback()}
   })
 }
-const getPedido = (id,callback=null) => {
+  const getPedido = (id, callback = null, clearPagosPedido=true) => {
   setLoading(true)
   if (!id) {
     id = pedidoSelect
@@ -1493,12 +1557,14 @@ const getPedido = (id,callback=null) => {
     setLoading(false)
     if (res.data) {
       setPedidoData(res.data)
-  
-      setTransferencia("")
-      setDebito("")
-      setEfectivo("")
-      setCredito("")
-      setVuelto("")
+      
+      if (clearPagosPedido) {
+        setTransferencia("")
+        setDebito("")
+        setEfectivo("")
+        setCredito("")
+        setVuelto("")
+      }
       setrefPago([])
       
       getPedidosFast()
@@ -1514,7 +1580,7 @@ const getPedido = (id,callback=null) => {
         if (d.filter(e=>e.tipo==1)[0]) {
           let var_setTransferencia = d.filter(e=>e.tipo==1)[0].monto
           if (var_setTransferencia=="0.00") {
-            setTransferencia("")
+            if(clearPagosPedido){setTransferencia("")}
   
           }else{
             setTransferencia(d.filter(e=>e.tipo==1)[0].monto)
@@ -1525,7 +1591,7 @@ const getPedido = (id,callback=null) => {
         if (d.filter(e=>e.tipo==2)[0]) {
           let var_setDebito = d.filter(e=>e.tipo==2)[0].monto
           if (var_setDebito=="0.00") {
-            setDebito("")
+            if(clearPagosPedido){setDebito("")}
   
           }else{
             setDebito(d.filter(e=>e.tipo==2)[0].monto)
@@ -1536,7 +1602,7 @@ const getPedido = (id,callback=null) => {
         if (d.filter(e=>e.tipo==3)[0]) {
           let var_setEfectivo = d.filter(e=>e.tipo==3)[0].monto
           if (var_setEfectivo=="0.00") {
-            setEfectivo("")
+            if(clearPagosPedido){setEfectivo("")}
   
           }else{
             setEfectivo(d.filter(e=>e.tipo==3)[0].monto)
@@ -1547,7 +1613,7 @@ const getPedido = (id,callback=null) => {
         if (d.filter(e=>e.tipo==4)[0]) {
           let var_setCredito = d.filter(e=>e.tipo==4)[0].monto
           if (var_setCredito=="0.00") {
-            setCredito("")
+            if(clearPagosPedido){setCredito("")}
   
           }else{
             setCredito(d.filter(e=>e.tipo==4)[0].monto)
@@ -1558,7 +1624,7 @@ const getPedido = (id,callback=null) => {
         if (d.filter(e=>e.tipo==6)[0]) {
           let var_setVuelto = d.filter(e=>e.tipo==6)[0].monto
           if (var_setVuelto=="0.00") {
-            setVuelto("")
+            if(clearPagosPedido){setVuelto("")}
   
           }else{
             setVuelto(d.filter(e=>e.tipo==6)[0].monto)
@@ -1570,7 +1636,6 @@ const getPedido = (id,callback=null) => {
         alert("Sin pagos registrados")
       }
       if (callback) { callback() }
-      
     }
 
   })
@@ -1895,10 +1960,12 @@ const guardar_cierre = (e,callback=null) => {
         verCierreReq(fechaCierre,type)
       }else{
         setLoading(true)
-        db.sendCierre({type,fecha:fechaCierre}).then(res=>{
-          notificar(res,false)
-          setLoading(false)
-        })
+        if(confirm("Confirme envio")){
+          db.sendCierre({type,fecha:fechaCierre}).then(res=>{
+            notificar(res,false)
+            setLoading(false)
+          })
+        }
       }
 
     }     
@@ -3265,6 +3332,8 @@ const auth = permiso => {
         :null}
 
         {view=="cierres"?<Cierres
+          fechaGetCierre2={fechaGetCierre2}
+          setfechaGetCierre2={setfechaGetCierre2}
           verCierreReq={verCierreReq}
           fechaGetCierre={fechaGetCierre}
           setfechaGetCierre={setfechaGetCierre}
@@ -3349,6 +3418,25 @@ const auth = permiso => {
 
         
         {view=="inventario"?<Inventario
+          qgastosfecha1={qgastosfecha1}
+          setqgastosfecha1={setqgastosfecha1}
+          qgastosfecha2={qgastosfecha2}
+          setqgastosfecha2={setqgastosfecha2}
+          qgastos={qgastos}
+          setqgastos={setqgastos}
+          qcatgastos={qcatgastos}
+          setqcatgastos={setqcatgastos}
+          gastosdescripcion={gastosdescripcion}
+          setgastosdescripcion={setgastosdescripcion}
+          gastoscategoria={gastoscategoria}
+          setgastoscategoria={setgastoscategoria}
+          gastosmonto={gastosmonto}
+          setgastosmonto={setgastosmonto}
+          gastosData={gastosData}
+          delGastos={delGastos}
+          getGastos={getGastos}
+          setGasto={setGasto}
+
           delPagoProveedor={delPagoProveedor}
           busqAvanzInputsFun={busqAvanzInputsFun}
           busqAvanzInputs={busqAvanzInputs}

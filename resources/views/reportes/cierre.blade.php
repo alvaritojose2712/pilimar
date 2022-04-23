@@ -147,7 +147,7 @@
 						{{($vueltos_totales)}}
 					</td>
 				</tr>
-				<tr>
+				
 				
 				<tr>
 					<th>DÉBITO</th>
@@ -164,6 +164,26 @@
 					<td>{{($facturado[4])}}</td>
 					<td>{{($facturado["entregado"])}} - {{($facturado["pendiente"])}} = {{($facturado["entregadomenospend"])}}</td>
 				</tr>
+				<tr>
+					<th colspan="5">REFERENCIAS DE PAGOS ELECTRÓNICOS</th>
+
+				</tr>
+				@foreach ($referencias as $e)
+					<tr>
+						<td>
+							@if ($e->tipo==1)
+							Transferencia
+							@endif
+							@if ($e->tipo==2)
+							Débito
+							@endif
+						</td>
+						<th>{{$e->descripcion}}</th>
+						<td>{{$e->monto}}</td>
+						<td>Pedido #{{$e->id_pedido}}</td>
+						<th>{{$e->created_at}}</th>
+					</tr>
+				@endforeach
 				<tr>
 					<th colspan="3">
 						<h3>TOTAL FACTURADO:</h3>
@@ -212,8 +232,8 @@
 						</div>
 					</th>
 				</tr>
-
 				
+				<tr>
 					<th class="right sin-borde">DÉBITO</th>
 					<td class="sin-borde">{{($cierre->debito)}}</td>
 					<td rowspan="4" colspan="3">
@@ -282,6 +302,7 @@
 						</th>
 					</tr>
 				@endforeach
+				
 				
 			</tbody>
 		</table>

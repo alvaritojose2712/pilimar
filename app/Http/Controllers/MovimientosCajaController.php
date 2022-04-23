@@ -32,16 +32,17 @@ class MovimientosCajaController extends Controller
             $mov->created_at = $fecha;
             $mov->monto = floatval($req->monto);
             $mov->save();
-            /*if ($mov->save()) {
+            if ($mov->save()) {
                  if ($req->categoria==2 || $req->categoria==3) {
                     $gastos = new gastos;
                     $gastos->descripcion = $req->descripcion;
                     $gastos->categoria = $req->categoria;
                     $gastos->monto = floatval($req->monto);
                     $gastos->fecha = $req->fecha;
+                    $gastos->id_mov_caja = $mov->id;
                     $gastos->save();
                 } 
-            }*/
+            }
 
 
 
@@ -90,10 +91,12 @@ class MovimientosCajaController extends Controller
                     $cat = "Devolución";
                     break;
                 }
-                (new InventarioController)->setMovimientoNotCliente(null,$data->descripcion,$cat,$data->monto,"Eliminación de Movimiento de caja");
+                (new InventarioController)->setMovimientoNotCliente(null,"","",$data->monto,"Eliminación de Movimiento de caja");
 
+                if ($mov->delete()) {
+                    gastos::where("id_mov_caja",$req->id)->delete();
+                }
                 
-                $mov->delete();
                 return Response::json(["msj"=>"¡Éxito al eliminar movimiento!","estado"=>true]);
 
                 

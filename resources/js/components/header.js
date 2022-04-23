@@ -83,7 +83,7 @@ function Header({
               :null
             }
 
-            {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Inventario</span>:null}
+            {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Administración</span>:null}
           </div>
         </div>
       </div>
