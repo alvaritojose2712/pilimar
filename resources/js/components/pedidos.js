@@ -81,7 +81,8 @@ filterMetodoPagoToggle,
 										  	</span>
 										  </h1>
 									    <h6 className=" mb-2 text-muted">{e.descripcion}</h6>
-									    <h6 className=" mb-2 text-muted">{e.codigo_proveedor}</h6>
+										<h6 className=" mb-2 text-muted">{e.codigo_proveedor}</h6>
+											<h6 className=" mb-2 text-muted">{e.precio_base} / {e.precio}</h6>
 									  </div>
 									  <div className="w-50">
 								    	<ul className="list-group">

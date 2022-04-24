@@ -23,6 +23,7 @@ export default function Categorias({
 	}
 	const setNuevoCat = () => {
 		setcategoriasDescripcion("")
+		setIndexSelectCategorias(null)
 	}
 	return (
 		<>

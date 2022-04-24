@@ -18,6 +18,7 @@ class PagosReferenciasController extends Controller
             $item->tipo = $req->tipo;
             $item->descripcion = $req->descripcion;
             $item->monto = $req->monto;
+            $item->banco = $req->banco;
             $item->id_pedido = $req->id_pedido;
             $item->save();
 

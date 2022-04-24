@@ -103,14 +103,17 @@ class InventarioController extends Controller
                 $setcantidad = $cantidad;
                 $setprecio = $precio;
                 if ($lote) {
-                    $checkIfExits = items_pedidos::select(["cantidad"])->where("id_producto",$id)
+                    $checkIfExits = items_pedidos::select(["cantidad"])
+                    ->where("id_producto",$id)
                     ->where("id_pedido",$id_pedido)
                     ->where("lote",$lote)
                     ->first();
                     
                 }else{
-                    $checkIfExits = items_pedidos::select(["cantidad"])->where("id_producto",$id)->where("id_pedido",$id_pedido)->first();
-
+                    $checkIfExits = items_pedidos::select(["cantidad"])
+                    ->where("id_producto",$id)
+                    ->where("id_pedido",$id_pedido)
+                    ->first();
                 }
                 
 
@@ -120,8 +123,10 @@ class InventarioController extends Controller
                 if ($checkIfExits) {
                     $old_ct = $checkIfExits["cantidad"];
 
-                    // $setcantidad = $cantidad + $old_ct;
+                    // $setcantidad = $cantidad + $old_ct; //Sumar cantidad a lo que ya existe
                     $setcantidad = $cantidad;
+                    $setprecio = $setcantidad*$precio;
+                }else{
                     $setprecio = $setcantidad*$precio;
                 }
 

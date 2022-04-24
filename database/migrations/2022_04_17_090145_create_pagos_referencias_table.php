@@ -23,6 +23,7 @@ class CreatePagosReferenciasTable extends Migration
             // 5 Otros
             // 6 vuelto
             $table->string('descripcion');
+            $table->string('banco');
             $table->decimal("monto",8,2);
 
 

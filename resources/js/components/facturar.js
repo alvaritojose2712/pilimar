@@ -708,11 +708,13 @@ useHotkeys("tab",()=>{
     let tipo = e.currentTarget.attributes["data-type"].value
     let descripcion = window.prompt("Referencia")
     let monto = window.prompt("Monto")
+    let banco = window.prompt("Banco")
     if (pedidoData.id&&descripcion&&monto){
       db.addRefPago({
         tipo,
         descripcion,
         monto,
+        banco,
         id_pedido: pedidoData.id,
       }).then(res=>{
         getPedido(null,null,false)
@@ -1960,12 +1962,12 @@ const guardar_cierre = (e,callback=null) => {
         verCierreReq(fechaCierre,type)
       }else{
         setLoading(true)
-        if(confirm("Confirme envio")){
-          db.sendCierre({type,fecha:fechaCierre}).then(res=>{
-            notificar(res,false)
-            setLoading(false)
-          })
-        }
+        
+        db.sendCierre({type,fecha:fechaCierre}).then(res=>{
+          notificar(res,false)
+          setLoading(false)
+        })
+        
       }
 
     }     
@@ -1974,7 +1976,9 @@ const guardar_cierre = (e,callback=null) => {
 }
 const verCierreReq = (fechaCierre,type="ver") => {
   // console.log(fecha)
-  db.openVerCierre({fechaCierre,type})
+  if (window.confirm("Confirme envio")) {
+    db.openVerCierre({fechaCierre,type})
+  }
 }
 const setPagoCredito = e =>{
   e.preventDefault()

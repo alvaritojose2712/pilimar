@@ -171,6 +171,7 @@
 				@foreach ($referencias as $e)
 					<tr>
 						<td>
+							{{$e->banco}}
 							@if ($e->tipo==1)
 							Transferencia
 							@endif

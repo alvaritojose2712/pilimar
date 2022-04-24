@@ -879,17 +879,26 @@ class PedidosController extends Controller
 
         $fechaGetCierre = $req->fechaGetCierre;
         $fechaGetCierre2 = $req->fechaGetCierre2;
-        $cierres = cierres::whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2]);
+        if (!$fechaGetCierre&&!$fechaGetCierre2) {
+            $cierres = cierres::orderBy("fecha","desc");
+        }else{
+            $cierres = cierres::whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2]);
+        }
+        
         
         return [
             "cierres"=>$cierres->get(),
             "numventas"=>$cierres->sum("numventas"),
             
-            "debito" => $cierres->sum("debito"),
-            "efectivo" => $cierres->sum("efectivo"),
-            "transferencia" => $cierres->sum("transferencia"),
-            "ganancia" => $cierres->sum("ganancia"),
-            "porcentaje" => $cierres->avg("porcentaje"),
+            "debito" => number_format($cierres->sum("debito"),2),
+            "efectivo" => number_format($cierres->sum("efectivo"),2),
+            "transferencia" => number_format($cierres->sum("transferencia"),2),
+
+            "precio" => number_format($cierres->sum("precio"),2),
+            "precio_base" => number_format($cierres->sum("precio_base"),2),
+
+            "ganancia" => number_format($cierres->sum("ganancia"),2),
+            "porcentaje" => number_format($cierres->avg("porcentaje"),2),
             
         ];
         
@@ -1124,9 +1133,7 @@ class PedidosController extends Controller
             $from = $sucursal->sucursal;
             $subject = $sucursal->sucursal." ".$req->fecha;
             $sends = [
-                "omarelhenaoui@gmail.com",
-                "amerelhenaoui@outlook.com",
-                "yeisersalah2@gmail.com",
+                
             ];
             try {
                 Mail::to($sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    

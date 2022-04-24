@@ -3612,6 +3612,7 @@ function Categorias(_ref) {
 
   var setNuevoCat = function setNuevoCat() {
     setcategoriasDescripcion("");
+    setIndexSelectCategorias(null);
   };
 
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
@@ -6472,12 +6473,14 @@ function Facturar(_ref) {
     var tipo = e.currentTarget.attributes["data-type"].value;
     var descripcion = window.prompt("Referencia");
     var monto = window.prompt("Monto");
+    var banco = window.prompt("Banco");
 
     if (pedidoData.id && descripcion && monto) {
       _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].addRefPago({
         tipo: tipo,
         descripcion: descripcion,
         monto: monto,
+        banco: banco,
         id_pedido: pedidoData.id
       }).then(function (res) {
         getPedido(null, null, false);
@@ -7869,16 +7872,13 @@ function Facturar(_ref) {
           verCierreReq(fechaCierre, type);
         } else {
           setLoading(true);
-
-          if (confirm("Confirme envio")) {
-            _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].sendCierre({
-              type: type,
-              fecha: fechaCierre
-            }).then(function (res) {
-              notificar(res, false);
-              setLoading(false);
-            });
-          }
+          _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].sendCierre({
+            type: type,
+            fecha: fechaCierre
+          }).then(function (res) {
+            notificar(res, false);
+            setLoading(false);
+          });
         }
       }
     });
@@ -7886,11 +7886,14 @@ function Facturar(_ref) {
 
   var verCierreReq = function verCierreReq(fechaCierre) {
     var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "ver";
+
     // console.log(fecha)
-    _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].openVerCierre({
-      fechaCierre: fechaCierre,
-      type: type
-    });
+    if (window.confirm("Confirme envio")) {
+      _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].openVerCierre({
+        fechaCierre: fechaCierre,
+        type: type
+      });
+    }
   };
 
   var setPagoCredito = function setPagoCredito(e) {
@@ -10392,9 +10395,9 @@ function Historicocierre(_ref) {
       fechaGetCierre2 = _ref.fechaGetCierre2,
       setfechaGetCierre2 = _ref.setfechaGetCierre2;
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-    className: "container-fluid",
+    className: "container-fluid p-0",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-      className: "input-group",
+      className: "input-group mb-3",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
         type: "date",
         className: "form-control",
@@ -10423,8 +10426,8 @@ function Historicocierre(_ref) {
       className: "table table-sm",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("thead", {
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-            children: "Fecha"
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+            children: "Num. Ventas"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
             children: "D\xE9bito"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
@@ -10445,11 +10448,13 @@ function Historicocierre(_ref) {
             children: "Guardado BS"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
             children: "Tasa"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+            children: "Fecha"
           })]
         }), cierres ? cierres.cierres ? cierres.cierres.length ? cierres.cierres.map(function (e) {
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-              children: e.fecha
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+              children: e.numventas
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
               children: e.debito
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
@@ -10470,6 +10475,8 @@ function Historicocierre(_ref) {
               children: e.efectivo_guardado_bs
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
               children: e.tasa
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+              children: e.fecha
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
                 className: "btn btn-outline-success",
@@ -10492,22 +10499,36 @@ function Historicocierre(_ref) {
           }, e.id);
         }) : null : null : null]
       })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+      children: ["Total ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("b", {
+        children: fechaGetCierre
+      }), " - ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("b", {
+        children: fechaGetCierre2
+      })]
     }), cierres ? cierres.numventas ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
       className: "table",
       children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("thead", {
         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-            children: "numventas"
+            children: "Num. Ventas"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-            children: "debito"
+            children: "D\xE9bito"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-            children: "efectivo"
+            children: "Efectivo"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-            children: "transferencia"
+            children: "Transferencia"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-            children: "ganancia"
+            className: "bg-success text-right",
+            children: "Inversi\xF3n"
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-            children: "porcentaje"
+            className: "bg-success text-right",
+            children: "Venta"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+            className: "bg-success text-right",
+            children: "Ganancia Estimada"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+            className: "bg-success text-right",
+            children: "Porcentaje promedio"
           })]
         })
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
@@ -10521,9 +10542,17 @@ function Historicocierre(_ref) {
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
             children: cierres.transferencia
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-            children: cierres.ganancia
+            className: "fw-bold text-right",
+            children: cierres.precio_base
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-            children: cierres.porcentaje
+            className: "fw-bold text-right",
+            children: cierres.precio
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+            className: "fw-bold  text-success text-right",
+            children: cierres.ganancia
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
+            className: "fw-bold text-right",
+            children: [cierres.porcentaje, "%"]
           })]
         })
       })]
@@ -13867,6 +13896,9 @@ function Pedidos(_ref) {
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("h6", {
                   className: " mb-2 text-muted",
                   children: e.codigo_proveedor
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("h6", {
+                  className: " mb-2 text-muted",
+                  children: [e.precio_base, " / ", e.precio]
                 })]
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
                 className: "w-50",
