@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Créditos</title>
+	<title>Cuentas por cobrar</title>
 	<style type="text/css">
 
 		body{
@@ -78,9 +78,6 @@
 		.d-flex div{
 			display: inline-block;
 		}
-		.img{
-			filter: sepia(100%);
-		}
 		
 
 	</style>
@@ -90,11 +87,11 @@
 		<table class="table">
 			<tbody>
 				<tr>
-					<td colspan="2">
+					<td colspan="3">
 						@if (isset($message))
-							<img src="{{$message->embed('images/logo.png')}}" width="200px" class="img">
+							<img src="{{$message->embed('images/logo-small.jpg')}}" width="200px" >
 						@else
-							<img src="{{asset('images/logo.png')}}" width="200px" class="img">
+							<img src="{{asset('images/logo-small.jpg')}}" width="200px" >
 						@endif
 						
 
@@ -112,28 +109,32 @@
                     </td>
 				</tr>
                 <tr>
-                    <td colSpan="3">
-                        <h2>Créditos</h2>
+                    <td colSpan="4">
+                        <h2>Cuentas por cobrar {{$today}}</h2>
                     </td>
                 </tr>
                 <tr>
                     <th>Nombres y Apellidos (Identificación)</th>
                     <th>Contacto</th>
-                    <th>Balance</th>
+                    <th>Vence</th>
+                    <th>Saldo</th>
                 </tr>
                 @foreach ($data as $e)
-                    <tr>
-                        <td>
-                            {{$e->nombre}}
-                            {{$e->apellido}}
-                            ({{$e->identificacion}})
-                        </td>
-                        <td>{{$e->telefono}}</td>
-                        <td>
-                            {{$e->saldo}}
+                	@if ($e->saldo)
+	                    <tr>
+	                        <td>
+	                            {{$e->nombre}}
+	                            {{$e->apellido}}
+	                            ({{$e->identificacion}})
+	                        </td>
+	                        <td>{{$e->telefono}}</td>
+	                        <td>{{$e->vence}} ({{$e->dias}} días)</td>
+	                        <td>
+	                            {{number_format($e->saldo,2)}}
 
-                        </td>
-                    </tr>
+	                        </td>
+	                    </tr>
+                	@endif
                 @endforeach
                 <tr></tr>
 			</tbody>

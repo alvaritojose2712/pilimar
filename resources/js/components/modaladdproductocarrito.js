@@ -30,10 +30,10 @@ function Modaladdproductocarrito({
          <div>
          <div className="input-group">
           <span className="">
-            <button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"sinapsis")}>Agg. rápido</button>
+            {/*<button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"sinapsis")}>Agg. rápido</button>*/}
             
             </span>
-            <input type="text" className="form-control" placeholder="Buscar..." ref={inputaddcarritointernoref} value={qProductosMain} onChange={onchangeinputmain}/>
+            <input type="text" className="form-control" placeholder="Buscar..." ref={inputaddcarritointernoref} onChange={e=>getProductos(e.target.value)}/>
            
          </div>
          </div>
@@ -80,11 +80,11 @@ function Modaladdproductocarrito({
                   <td className="cell1">{e.unidad}</td>
                   <td className="cell2">
                     <div className='btn-group w-75'>
-                        <button type="button" className='m-0 btn-sm btn btn-success'>{e.precio}</button>
-                        <button type="button" className='m-0 btn-sm btn btn-secondary'>BsS. {e.bs}</button>
+                        <button type="button" className='m-0 btn btn-success text-light fs-4 fw-bold'>{e.precio}</button>
+                        <button type="button" className='m-0 btn btn-secondary text-light'>BsS. {e.bs}</button>
                     </div>
                     <div className='btn-group w-75'>
-                        <button type="button" className='m-0 btn-sm btn btn-secondary'>Cop. {e.cop}</button>
+                        <button type="button" className='m-0 btn btn-secondary text-light'>Cop. {e.cop}</button>
                     </div>
                   </td>
                 </tr>

@@ -41,6 +41,10 @@ import ViewPedidoVendedor from '../components/viewPedidoVendedor';
 
 
 export default function Facturar({user,notificar,setLoading}) {
+
+  
+  
+  const [dropprintprice, setdropprintprice] = useState(false)
   
   const [num, setNum] = useState(50)
   const [showOptionQMain, setshowOptionQMain] = useState(false)
@@ -122,7 +126,11 @@ export default function Facturar({user,notificar,setLoading}) {
   const [transferencia,setTransferencia] = useState("")
   const [credito, setCredito] = useState("")
 
-  
+  const [viewconfigcredito,setviewconfigcredito] = useState(false)
+  const [fechainiciocredito,setfechainiciocredito] = useState("")
+  const [fechavencecredito,setfechavencecredito] = useState("")
+  const [formatopagocredito,setformatopagocredito] = useState(1)
+  const [datadeudacredito,setdatadeudacredito] = useState({})
   
   const [vuelto,setVuelto] = useState("")
   
@@ -171,6 +179,10 @@ export default function Facturar({user,notificar,setLoading}) {
   const [notaCierre,setNotaCierre] = useState("")
   
   const [qDeudores,setQDeudores] = useState("")
+  const [orderbycolumdeudores,setorderbycolumdeudores] = useState("saldo")
+  const [orderbyorderdeudores,setorderbyorderdeudores] = useState("asc")
+
+
   const [deudoresList,setDeudoresList] = useState([])
   const [cierres,setCierres] = useState({})
 
@@ -303,7 +315,7 @@ export default function Facturar({user,notificar,setLoading}) {
   
   const [toggleClientesBtn, settoggleClientesBtn] = useState(false)
   
-  const [modViewInventario, setmodViewInventario] = useState("unique")
+  const [modViewInventario, setmodViewInventario] = useState("list")
   
   const [loteIdCarrito, setLoteIdCarrito] = useState(null)
   const refsInpInvList = useRef(null)
@@ -618,6 +630,7 @@ useHotkeys("tab",()=>{
 
   }, [view, counterListProductos, countListInter, countListPersoInter, subViewInventario, modViewInventario]);
   useHotkeys('enter', event => {
+    
     if(typeof(selectItem)!="number"&&view=="seleccionar"){
       try{
         if (tbodyproductosref.current) {
@@ -636,7 +649,7 @@ useHotkeys("tab",()=>{
 
       }catch(err){}
       
-    }else if(typeof(selectItem)=="number"&&view=="seleccionar"){
+    }else if(typeof(selectItem)=="number"&&view=="seleccionar"&&productos[selectItem]){
       addCarritoRequest("agregar")
     }else if(view=="pagar"){
       if (ModaladdproductocarritoToggle) {
@@ -958,7 +971,15 @@ useHotkeys("tab",()=>{
       }else if (subViewInventario=="pedidosCentral") {
         getPedidosCentral()
       }
+    }
 
+    if (view=="seleccionar") {
+      if (inputbusquedaProductosref) {
+        if (inputbusquedaProductosref.current) {
+          inputbusquedaProductosref.current.value = ""
+          inputbusquedaProductosref.current.focus()
+        }
+      }
     }
   },[view,subViewInventario])  
 
@@ -967,14 +988,14 @@ useHotkeys("tab",()=>{
       getDeudores()
       getDeudor()
     }
-  }, [view,qDeudores]);
+  }, [view,qDeudores,orderbycolumdeudores,orderbyorderdeudores]);
 
   useEffect(()=>{
     getProductos()
   },[
     num,
     itemCero,
-    qProductosMain,
+    //qProductosMain,
     orderColumn,
     orderBy,
   ])
@@ -1108,6 +1129,11 @@ const focusInputSibli = (tar, mov) => {
     }
   }
 }
+const sendCuentasporCobrar = () => {
+  db.sendCuentasporCobrar({}).then(res=>{
+    notificar(res)
+  })
+}
 const getCierres = () => {
   db.getCierres({fechaGetCierre,fechaGetCierre2}).then(res=>{
     if (res.data) {
@@ -1216,16 +1242,17 @@ const getDeudor = () => {
 }
 const entregarVuelto = () => {
     let monto = window.prompt("Monto a entregar")
-    if (monto) {
+    if(monto){
+
       if (pedidoData.id&&number(monto)) {
           setLoading(true)
-
+  
         db.entregarVuelto({id_pedido:pedidoData.id,monto}).then(res=>{
           notificar(res)
           getPedido()
           getMovimientosCaja()
           setLoading(false)
-
+  
         })
       }
     }
@@ -1266,6 +1293,7 @@ const getToday = () =>{
     setfechaventas(today)
     setqgastosfecha1(today)
     setqgastosfecha2(today)
+    setfechainiciocredito(today)
 
   })
 }
@@ -1394,7 +1422,7 @@ const toggleModalProductos = (prop,callback=null) => {
 }
 const toggleImprimirTicket = () => {
   if (pedidoData) {
-    let moneda = window.prompt("Moneda: $ | bs | cop","bs")
+    let moneda = window.prompt("Moneda: $ | bs | cop","$")
     let identificacion = window.prompt("Identificación", pedidoData.cliente.identificacion)
 
     if (identificacion) {
@@ -1433,12 +1461,18 @@ const onChangePedidos = e =>{
 }
 const getPedidos = e => {
   setLoading(true)
+  setPedidos([])
+
   db.getPedidos({vendedor:showMisPedido?[user.id_usuario]:[],busquedaPedido,fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle}).then(res=>{
-    setPedidos(res.data)
+    if (res.data) {
+      setPedidos(res.data)
+    }else{
+      setPedidos([])
+    }
     setLoading(false)
   })
 }
-const getProductos = () => {
+const getProductos = (valmain=null) => {
 
   setpermisoExecuteEnter(false)
   setLoading(true)
@@ -1448,7 +1482,7 @@ const getProductos = () => {
   }
 
   let time = window.setTimeout(()=>{
-    db.getinventario({vendedor:showMisPedido?[user.id_usuario]:[],num,itemCero,qProductosMain,orderColumn,orderBy}).then(res=>{
+    db.getinventario({vendedor:showMisPedido?[user.id_usuario]:[],num,itemCero,qProductosMain:valmain?valmain:qProductosMain,orderColumn,orderBy}).then(res=>{
       if (res.data) {
         let len = res.data.length
         if (len) {
@@ -1534,7 +1568,7 @@ const setPersonaFast = e => {
   })
 }
 const printCreditos = () => {
-  db.openPrintCreditos("")
+  db.openPrintCreditos("qDeudores="+qDeudores+"&orderbycolumdeudores="+orderbycolumdeudores+"&orderbyorderdeudores="+orderbyorderdeudores+"")
 }
 const getPedidosList = (callback=null)=>{
   db.getPedidosList({vendedor:user.id_usuario?user.id_usuario:1}).then(res=>{
@@ -1561,6 +1595,8 @@ const getPedidosList = (callback=null)=>{
     setLoading(false)
     if (res.data) {
       setPedidoData(res.data)
+      setdatadeudacredito({})
+      setviewconfigcredito(false)
       
       if (clearPagosPedido) {
         setTransferencia("")
@@ -1573,8 +1609,11 @@ const getPedidosList = (callback=null)=>{
       
       getPedidosFast()
       
-      if (res.data.referencias.length) {
-        setrefPago(res.data.referencias)
+      if (res.data.referencias) {
+        if (res.data.referencias.length) {
+          setrefPago(res.data.referencias)
+        }
+        
       }else{
         setrefPago([])
       }
@@ -1718,8 +1757,11 @@ const addCarritoRequest = (e,id_direct=null,id_pedido_direct=null) =>{
       }
       setCantidad("")
       if (inputbusquedaProductosref) {
-        setQProductosMain("")
-        inputbusquedaProductosref.current.focus()
+        if (inputbusquedaProductosref.current) {
+          inputbusquedaProductosref.current.value = ""
+          inputbusquedaProductosref.current.focus()
+
+        }
       }
       
       setLoading(false)
@@ -1771,6 +1813,32 @@ const delItemPedido = (e) => {
     notificar(res)
   })
 }
+const setPrecioAlternoCarrito = e => {
+  let iditem = e.currentTarget.attributes["data-iditem"].value
+  let p = window.prompt("p1 | p2","p1")
+  if (p=="p1" || p=="p2") {
+    db.setPrecioAlternoCarrito({iditem,p}).then(res=>{
+      notificar(res)
+      getPedido()
+    })
+  }
+
+} 
+
+const setCtxBultoCarrito = e => {
+  let iditem = e.currentTarget.attributes["data-iditem"].value
+  let ct = window.prompt("Cantidad por bulto")
+  if (ct) {
+    db.setCtxBultoCarrito({iditem,ct}).then(res=>{
+      notificar(res)
+      getPedido()
+    })
+  }
+
+} 
+
+
+
 const setDescuentoTotal = (e) => {
   // setLoading(true)
 
@@ -1871,34 +1939,71 @@ const facturar_e_imprimir = () => {
   toggleImprimirTicket();
   facturar_pedido();
 }
+const setPagoPedido = () => {
+  setLoading(true)
+
+  db.setPagoPedido({
+    id:pedidoData.id,
+    debito,
+    efectivo,
+    transferencia,
+    credito,
+    vuelto,
+  }).then(res=>{
+    notificar(res)
+    setLoading(false)
+    
+    if (res.data.estado) {
+      if(showinputaddCarritoFast){
+        setshowinputaddCarritoFast(false)
+      }
+      setView("seleccionar")
+      // getPedidos()
+      getPedidosList()
+      getProductos()
+
+      setSelectItem(null)
+      setviewconfigcredito(false)
+
+    }
+  })
+}
+
+
+
+const setconfigcredito = e => {
+  e.preventDefault()
+
+  if (pedidoData.id) {
+    setLoading(true)
+    db.setconfigcredito({
+      fechainiciocredito,
+      fechavencecredito,
+      formatopagocredito,
+      id_pedido: pedidoData.id,
+    }).then(res=>{
+      notificar(res)
+      setLoading(false)
+    })
+  }
+}
 const facturar_pedido = () => {
   if (refinputaddcarritofast.current !== document.activeElement) {
-    setLoading(true)
     if (pedidoData.id) {
-      db.setPagoPedido({
-        id:pedidoData.id,
-        debito,
-        efectivo,
-        transferencia,
-        credito,
-        vuelto,
-      }).then(res=>{
-        notificar(res)
-        setLoading(false)
+      if (credito) {
         
-        if (res.data.estado) {
-          if(showinputaddCarritoFast){
-            setshowinputaddCarritoFast(false)
+        db.checkDeuda({id_cliente:pedidoData.id_cliente}).then(res=>{
+          if (res.data) {
+            let p = res.data.pedido_total
+            setdatadeudacredito(p)
+            setviewconfigcredito(true)
+            
           }
-          setView("seleccionar")
-          // getPedidos()
-          getPedidosList()
-          getProductos()
-
-          setSelectItem(null)
-
-        }
-      })
+        })
+      }else{
+        setPagoPedido()
+      }
+      
 
     }
   }
@@ -1978,9 +2083,9 @@ const guardar_cierre = (e,callback=null) => {
 }
 const verCierreReq = (fechaCierre,type="ver") => {
   // console.log(fecha)
-  if (window.confirm("Confirme envio")) {
+  // if (window.confirm("Confirme envio")) {
     db.openVerCierre({fechaCierre,type})
-  }
+  // }
 }
 const setPagoCredito = e =>{
   e.preventDefault()
@@ -2001,7 +2106,12 @@ const setPagoCredito = e =>{
 }
 const getDeudores = e =>{
   setLoading(true)
-  db.getDeudores({qDeudores,view}).then(res=>{
+  db.getDeudores({
+    qDeudores,
+    view,
+    orderbycolumdeudores,
+    orderbyorderdeudores,
+  }).then(res=>{
     if (res.data) {
       if (res.data.length) {
         setDeudoresList(res.data)
@@ -2092,7 +2202,6 @@ const buscarInventario = e => {
     e.unidad == ""||
     e.id_proveedor == ""||
     e.cantidad == ""||
-    e.precio_base == ""||
     e.precio == "")
 
   if (!checkempty.length) {
@@ -3003,7 +3112,6 @@ const guardarNuevoProductoLote = () => {
     e.unidad == ""||
     e.id_proveedor == ""||
     e.cantidad == ""||
-    e.precio_base == ""||
     e.precio == "")
 
   if (lotesFil.length && !checkempty.length) {
@@ -3062,6 +3170,29 @@ const setPagoProveedor = e => {
   }
 
 }
+const setCtxBulto = e => {
+    let id = e.currentTarget.attributes["data-id"].value
+    let bulto = window.prompt("Cantidad por bulto")
+    if (bulto) {
+      db.setCtxBulto({id,bulto}).then(res=>{
+        buscarInventario()
+        notificar(res)
+      })
+    }
+
+}
+const setPrecioAlterno = e => {
+    let id = e.currentTarget.attributes["data-id"].value
+    let type = e.currentTarget.attributes["data-type"].value
+    let precio = window.prompt("PRECIO "+type)
+    if (precio) {
+      db.setPrecioAlterno({id,type,precio}).then(res=>{
+        buscarInventario()
+        notificar(res)
+      })
+    }
+
+}
 const changeInventario = (val, i, id, type, name = null) => {
   let obj = cloneDeep(productosInventario)
 
@@ -3113,6 +3244,15 @@ const changeInventario = (val, i, id, type, name = null) => {
       break;
   }
   setProductosInventario(obj)
+}
+const printPrecios = type => {
+  if (productosInventario.length) {
+    db.printPrecios({type,ids:productosInventario.map(e=>e.id)}).then(res=>{
+      console.log(res.data)
+      setdropprintprice(false)
+    })
+
+  }
 }
 const logout = () => {
   db.logout().then(e=>{
@@ -3173,6 +3313,8 @@ const auth = permiso => {
               pedidoList={pedidoList}
               setFalla={setFalla}
               number={number}
+              moneda={moneda}
+
               inputCantidadCarritoref={inputCantidadCarritoref}
               addCarritoRequest={addCarritoRequest}/>:null:null}
 
@@ -3203,9 +3345,8 @@ const auth = permiso => {
                 className="form-control" 
                 ref={inputbusquedaProductosref}
                 placeholder="Buscar... Presiona (ESC)"
-                value={qProductosMain}
-                onChange={onchangeinputmain}/>
-                <button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"sinapsis")}>Agg. rápido</button>
+                onChange={e=>getProductos(e.target.value)}/>
+                {/*<button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"sinapsis")}>Agg. rápido</button>*/}
               
                 {showOptionQMain?<>
                 <span className="input-group-text pointer" onClick={() => setshowOptionQMain(false)}><i className="fa fa-arrow-right"></i></span>
@@ -3218,6 +3359,7 @@ const auth = permiso => {
               
             </div>
             <ProductosList 
+              moneda={moneda}
               auth={auth}
               productos={productos} 
               addCarrito={addCarrito}
@@ -3338,6 +3480,7 @@ const auth = permiso => {
         :null}
 
         {view=="cierres"?<Cierres
+          sendCuentasporCobrar={sendCuentasporCobrar}
           fechaGetCierre2={fechaGetCierre2}
           setfechaGetCierre2={setfechaGetCierre2}
           verCierreReq={verCierreReq}
@@ -3424,6 +3567,11 @@ const auth = permiso => {
 
         
         {view=="inventario"?<Inventario
+          setdropprintprice={setdropprintprice}
+          dropprintprice={dropprintprice}
+          printPrecios={printPrecios}
+          setCtxBulto={setCtxBulto}
+          setPrecioAlterno={setPrecioAlterno}
           qgastosfecha1={qgastosfecha1}
           setqgastosfecha1={setqgastosfecha1}
           qgastosfecha2={qgastosfecha2}
@@ -3630,6 +3778,21 @@ const auth = permiso => {
         
         />:null}
         {view=="pagar"?<Pagar 
+          setPagoPedido={setPagoPedido}
+          viewconfigcredito={viewconfigcredito}
+          setviewconfigcredito={setviewconfigcredito}
+          fechainiciocredito={fechainiciocredito}
+          setfechainiciocredito={setfechainiciocredito}
+          fechavencecredito={fechavencecredito}
+          setfechavencecredito={setfechavencecredito}
+          formatopagocredito={formatopagocredito}
+          setformatopagocredito={setformatopagocredito}
+          datadeudacredito={datadeudacredito}
+          setdatadeudacredito={setdatadeudacredito}
+          setconfigcredito={setconfigcredito}
+
+          setCtxBultoCarrito={setCtxBultoCarrito}
+          setPrecioAlternoCarrito={setPrecioAlternoCarrito}
           addRefPago={addRefPago}
           delRefPago={delRefPago}
           refPago={refPago}
@@ -3731,6 +3894,11 @@ const auth = permiso => {
           />
         :null}
         {view=="credito"?<Credito
+          moneda={moneda}
+          orderbycolumdeudores={orderbycolumdeudores}
+          setorderbycolumdeudores={setorderbycolumdeudores}
+          orderbyorderdeudores={orderbyorderdeudores}
+          setorderbyorderdeudores={setorderbyorderdeudores}
           printCreditos={printCreditos}
           onchangecaja={onchangecaja}
           qDeudores={qDeudores}

@@ -121,14 +121,9 @@ const db = {
   getEstaInventario: data => axios.post(host + "getEstaInventario", data),
   setPagoProveedor: data => axios.post(host + "setPagoProveedor", data),
   getPagoProveedor: data => axios.post(host + "getPagoProveedor", data),
-  delPagoProveedor: data => axios.post(host + "delPagoProveedor", data),
-  
-  addRefPago: data => axios.post(host + "addRefPago", data),
-  delRefPago: data=>axios.post(host+"delRefPago",data),
+  delPagoProveedor: data=>axios.post(host+"delPagoProveedor",data),
 
-  delGastos: data=>axios.post(host+"delGastos",data),
-  getGastos: data=>axios.post(host+"getGastos",data),
-  setGasto: data=>axios.post(host+"setGasto",data),
+
   
   
   

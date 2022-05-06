@@ -2,6 +2,11 @@
 import Clientes from '../components/clientes';
 
 function Credito({
+  orderbycolumdeudores,
+  setorderbycolumdeudores,
+  orderbyorderdeudores,
+  setorderbyorderdeudores,
+
   onchangecaja,
 
   qDeudores,
@@ -22,6 +27,7 @@ function Credito({
   sumPedidosArr,
   setsumPedidosArr,
   printCreditos,
+  moneda,
 
 }) {
 
@@ -29,7 +35,7 @@ function Credito({
     <div className="container"> 
       <div className="row">
         <div className="col">
-          <h3>Créditos</h3> 
+          <h3>Cuentas por cobrar</h3> 
         </div>
         <div className="col text-right">
           <button className="btn btn-outline-success m-2" onClick={printCreditos}>
@@ -45,23 +51,25 @@ function Credito({
           <table className="table table-hoverable">
             <thead>
               <tr>
-                <th className="text-right">Balance</th>
                 <th className="text-center">Nombres</th>
+                <th className="text-center pointer hover" onClick={()=>orderbycolumdeudores=="vence"?setorderbyorderdeudores(orderbyorderdeudores=="desc"?"asc":"desc"):setorderbycolumdeudores("vence")}>Vence</th>
+                <th className="text-right pointer hover" onClick={()=>orderbycolumdeudores=="saldo"?setorderbyorderdeudores(orderbyorderdeudores=="desc"?"asc":"desc"):setorderbycolumdeudores("saldo")}>Balance</th>
               </tr>
             </thead>
             <tbody>
               {deudoresList.length?deudoresList.map((e,i)=>
                 e?
-                <tr key={e.id} className="text-center pointer">
-                  <td  className={(e.saldo>0?"text-success":"text-danger")+(" h2 text-right")}>
-                    <button className={("btn ")+(e.saldo<0?"btn-outline-danger":"btn-outline-success")} onClick={()=>{
+                <tr key={e.id} className="text-center pointer" onClick={()=>{
                       setOnlyVueltos(0)
                       setSelectDeudor(i)
                       setsumPedidosArr([])
 
-                    }}>{e.saldo}</button>
-                  </td>
+                    }}>
                   <td>{e.id} - {e.nombre} - {e.identificacion}</td>
+                  <td>{e.vence} ({e.dias} días)</td>
+                  <td  className={(e.saldo>0?"text-success":"text-danger")+(" h2 text-right")}>
+                    <button className={("btn ")+(e.saldo<0?"btn-outline-danger":"btn-outline-success")}>{moneda(e.saldo)}</button>
+                  </td>
                 </tr>
                 :null
               ):null}
@@ -100,15 +108,15 @@ function Credito({
                       {!onlyVueltos?
                         <>
                             <td className="text-right">Balance: <h2 className={(detallesDeudor["pedido_total"]["diferencia"]>0?"text-success":"text-danger")}>{detallesDeudor["pedido_total"]["diferencia"]}</h2></td>
-                            <td className="text-right h3 text-danger">{detallesDeudor["pedido_total"][1]}</td>
-                            <td className="text-right h3 text-success">{detallesDeudor["pedido_total"][0]}</td>
+                            <td className="text-right h3 text-danger">{moneda(detallesDeudor["pedido_total"][1])}</td>
+                            <td className="text-right h3 text-success">{moneda(detallesDeudor["pedido_total"][0])}</td>
                         </>
                       :null}
                     </>
                     :null}
                   </tr>
                 <tr>
-                  <th className="text-right">FECHA</th>
+                  <th className="text-right">VENCE</th>
                   <th>PEDIDO</th>
                   <th>TIPO PAGO</th>
                   <th className="text-right ">CRÉDITO</th>
@@ -149,7 +157,7 @@ function Credito({
                   detallesDeudor&&detallesDeudor["pedido"]?
                     detallesDeudor["pedido"].map(e=>
                       <tr key={e.id}>
-                        <td className="d-flex justify-content-between">
+                        <td className="d-flex justify-content-between align-items-center">
                           {!sumPedidosArr.filter(id_save=>id_save==e.id).length?
                             <button className="btn btn-outline-success" data-id={e.id} data-tipo="add" onClick={sumPedidos}>Select</button>
                             :
@@ -159,11 +167,12 @@ function Credito({
                           {/*<span title="Eliminar pedido">
                             Eliminar <i className="fa fa-times text-danger" data-type="getDeudor" onClick={onCLickDelPedido} data-id={e.id}></i> {e.created_at}
                           </span>*/}
+                          <span>{e.fecha_vence}</span>
                         </td>
-                        <td>
+                        <td className="align-middle">
                           <button className="btn btn-secondary btn-lg w-50" data-id={e.id} onClick={onClickEditPedido}>{e.id} <i className="fa fa-eye"></i></button>
                         </td>
-                        <td>
+                        <td className="align-middle">
                           {e.pagos.map(ee=><div key={ee.id}>
                             {ee.tipo==1&&ee.monto!=0?<span className="w-50 btn-sm btn-info btn">Trans. {ee.monto}</span>:null}
                             {ee.tipo==2&&ee.monto!=0?<span className="w-50 btn-sm btn-secondary btn">Deb. {ee.monto}</span>:null}
@@ -177,13 +186,13 @@ function Credito({
                         </td>
                         {e.saldoDebe?
                           <>
-                            <th className="text-danger h2 text-right">{e.saldoDebe}</th>
+                            <th className="text-danger h2 text-right align-middle">{moneda(e.saldoDebe)}</th>
                             <td></td>
                             
                           </>:
                           <>
                             <td></td>
-                            <th className="text-success h2 text-right">{e.saldoAbono}</th>
+                            <th className="text-success h2 text-right align-middle">{moneda(e.saldoAbono)}</th>
                           </>
                         }
                       </tr>

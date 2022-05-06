@@ -1,10 +1,28 @@
-import {useEffect} from 'react';
+import {useEffect,useState} from 'react';
 
 import Modaladdproductocarrito from '../components/Modaladdproductocarrito';
 import ModaladdPersona from '../components/ModaladdPersona';
+import Modalconfigcredito from '../components/Modalconfigcredito';
+
 
 
 export default function Pagar({
+setPagoPedido,
+viewconfigcredito,
+setviewconfigcredito,
+fechainiciocredito,
+setfechainiciocredito,
+fechavencecredito,
+setfechavencecredito,
+formatopagocredito,
+setformatopagocredito,
+datadeudacredito,
+setdatadeudacredito,
+setconfigcredito,
+
+setPrecioAlternoCarrito,
+setCtxBultoCarrito,
+
 addRefPago,
 delRefPago,
 refPago,
@@ -101,6 +119,9 @@ setshowinputaddCarritoFast,
 qProductosMain,
 }) {
 
+  const [vuelto_penddolar,setvuelto_penddolar] = useState(0)
+  const [vuelto_pendbs,setvuelto_pendbs] = useState(0)
+  const [vuelto_pendcop,setvuelto_pendcop] = useState(0)
   const debitoBs = (met) =>{
     try{
       if (met=="debito") {
@@ -176,6 +197,8 @@ qProductosMain,
       })
     }
   }
+
+  
   useEffect(()=>{
     if (refinputaddcarritofast.current) {
       refinputaddcarritofast.current.value = ""
@@ -192,6 +215,11 @@ qProductosMain,
       total_des,
       subtotal,
       total,
+
+      clean_total,
+      cop_clean,
+      bs_clean,
+      
       total_porciento,
       cop,
       bs,
@@ -204,8 +232,60 @@ qProductosMain,
       ivas,
       monto_iva,
     } = pedidoData
+
+    const setvueltopend = e => {
+    let type = e.currentTarget.attributes["data-type"].value
+    let billete = window.prompt("Billete")
+
+    if (billete) {
+      if (parseFloat(billete)) {
+        let valorbillete = 0
+        switch(type){
+          case "dolar":
+              valorbillete = moneda((billete-total))
+              setvuelto_penddolar(valorbillete)
+                        
+          break;
+
+          case "bs":
+              valorbillete = moneda((billete-bs_clean))
+              setvuelto_pendbs(valorbillete)
+            
+          break;
+
+          case "cop":
+
+            valorbillete = moneda((billete-cop_clean))
+            setvuelto_pendcop(valorbillete)
+            
+          
+          break;
+        }
+      }
+    }
+
+
+    return;
+  }
     return (
       <>
+        {viewconfigcredito?
+          <Modalconfigcredito
+            pedidoData={pedidoData}
+            setPagoPedido={setPagoPedido}
+            viewconfigcredito={viewconfigcredito}
+            setviewconfigcredito={setviewconfigcredito}
+            fechainiciocredito={fechainiciocredito}
+            setfechainiciocredito={setfechainiciocredito}
+            fechavencecredito={fechavencecredito}
+            setfechavencecredito={setfechavencecredito}
+            formatopagocredito={formatopagocredito}
+            setformatopagocredito={setformatopagocredito}
+            datadeudacredito={datadeudacredito}
+            setdatadeudacredito={setdatadeudacredito}
+            setconfigcredito={setconfigcredito}
+          />
+        :null}
         <div className="container-fluid">
           <div className="row">
             <div className="col-md-auto p-0">
@@ -274,11 +354,11 @@ qProductosMain,
                 <thead>
                   <tr>
                     <th className="text-sinapsis cell2">Código</th>
-                    <th className="text-sinapsis cell3">Árticulo</th>
+                    <th className="text-sinapsis cell3">Producto</th>
                     <th className="text-sinapsis cell1">Cant.</th>
                     <th className="text-sinapsis cell1">Precio</th>
                     {/*<th className="text-sinapsis">Sub-total</th>*/}
-                    {/*<th className="text-sinapsis">Desc. %</th>*/}
+                    <th className="text-sinapsis">Desc.%</th>
                     {/*<th className="text-sinapsis">Tot.Desc.</th>*/}
                     <th className="text-sinapsis cell2">Total</th>
                     {editable?
@@ -294,8 +374,8 @@ qProductosMain,
                       <td>{e.abono}</td>
                       <td>{e.cantidad} </td>
                       <td>{e.monto}</td>
+                      <td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer clickme">{e.descuento}</td>
                       {/*<td>{e.subtotal}</td>
-                      <td onClick={setDescuentoUnitario} data-index={e.id} className="pointer clickme">{e.descuento}</td>
                       {/*<td>{e.total_des}</td>*/}
 
                       <th className="font-weight-bold">{e.total}</th>
@@ -304,15 +384,25 @@ qProductosMain,
                     :<tr key={e.id} title={showTittlePrice(e.producto.precio,e.total)}>
                       <td className="align-middle">{e.producto.codigo_barras}</td>
                       <td className="align-middle">
-                        {e.producto.descripcion}
+                        {/*{e.producto.descripcion} {e.producto.bulto?<span className="btn btn-outline-secondary btn-sm-sm" data-iditem={e.id} onClick={setCtxBultoCarrito}>1x {e.producto.bulto}</span>:null}*/}
                         <div className='fst-italic fs-6 text-success'>
                             {e.lotedata?<>
                               Lote. {e.lotedata ? e.lotedata.lote : null} - Exp. {e.lotedata ? e.lotedata.vence : null}
                             </>:null} 
                         </div>
                       </td>
-                      <td onClick={setCantidadCarrito} data-index={e.id} className="pointer clickme align-middle">{e.cantidad.replace(".00","")} </td>
-                      <td className="align-middle">{e.producto.precio}</td>
+                      <td className="pointer clickme align-middle" onClick={setCantidadCarrito} data-index={e.id}>
+                        {e.cantidad.replace(".00","")} 
+                      </td>
+                      {e.producto.precio1?
+                      <td className="align-middle text-success pointer" data-iditem={e.id} onClick={setPrecioAlternoCarrito} >{e.producto.precio}</td>
+                        :
+                      <td className="align-middle pointer">{e.producto.precio}</td>
+                      }
+                      <td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer">{e.descuento}</td>
+                      {/*<td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer clickme">{e.descuento}</td>*/}
+                      
+
 
                       <th className="font-weight-bold align-middle">{e.total}</th>
                       {editable?
@@ -322,7 +412,7 @@ qProductosMain,
                   ):null}
                   <tr>
                     <td><button className="btn btn-outline-success fs-5">{items?items.length:null}</button></td>
-                    <th colSpan="5" className="p-2 align-middle">{cliente?cliente.nombre:null} <b>{cliente?cliente.identificacion:null}</b></th>
+                    <th colSpan="6" className="p-2 align-middle">{cliente?cliente.nombre:null} <b>{cliente?cliente.identificacion:null}</b></th>
                   </tr>
                 </tbody>
               </table>
@@ -499,34 +589,50 @@ qProductosMain,
                   <tbody>
                     <tr className='hover'>
                       <th className="">Sub-Total</th>
-                      <td className="text-right">{subtotal}</td>
+                      <td colSpan="2" className="text-right">{subtotal}</td>
                     </tr>
                     <tr className='hover'>
                       <th data-index={id} onClick={setDescuentoTotal} className="pointer clickme">Desc. {total_porciento}%
                       </th>
-                      <td className="text-right">{total_des}</td>
+                      <td colSpan="2" className="text-right">{total_des}</td>
                     </tr>
                     <tr className='hover'>
                       <th className="">Monto Exento</th>
-                      <td className="text-right">{exento}</td>
+                      <td colSpan="2" className="text-right">{exento}</td>
                     </tr>
                     <tr className='hover'>
                       <th className="">Monto Gravable</th>
-                      <td className="text-right">{gravable}</td>
+                      <td colSpan="2" className="text-right">{gravable}</td>
                     </tr>
                     <tr className='hover'>
                       <th className="">IVA <span>({ivas})</span></th>
-                      <td className="text-right">{monto_iva}</td>
+                      <td colSpan="2" className="text-right">{monto_iva}</td>
                     </tr>
                     <tr className="hover h4">
                       <th className="">Total</th>
-                      <td className="text-right text-success fw-bold">{total}</td>
+                      <td className="text-left text-muted align-bottom">
+                        {vuelto_penddolar?<>
+                          <span>Vuelto: {vuelto_penddolar}</span>
+                        </>:null}
+                      </td>
+                      <td className="text-right text-success fw-bold fs-11">
+                        <span onClick={setvueltopend} data-type="dolar" className="pointer">{total}</span>
+                      </td>
                     </tr>
 
                     <tr className="text-muted">
+                      <td></td>
+                      <td className="text-left text-muted">
+                        {vuelto_pendbs?<>
+                          <span className="fs-2">Vuelto: {vuelto_pendbs}</span><br/>
+                        </>:null}
+                        {vuelto_pendcop?<>
+                          <span className="fs-5">Vuelto: {vuelto_pendcop}</span>
+                        </>:null}
+                      </td>
                       <th className="text-right" colSpan="2">
-                        <span className='fs-4'> Bs {bs}</span><br/>
-                        <span className='fs-5'>COP {cop}</span>
+                        <span onClick={setvueltopend} data-type="bs" className='fs-2 pointer'> Bs {bs}</span><br/>
+                        <span onClick={setvueltopend} data-type="cop" className='fs-5 pointer'>COP {cop}</span>
                       </th>
                     </tr>
                   </tbody>

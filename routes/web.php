@@ -30,14 +30,12 @@ use App\Http\Controllers\GastosController;
 
 
 
-Route::get('/test', function()
-{
-	return "THis is a test";
-});
+
 Route::get('', [HomeController::class,"index"]);
 Route::get('setCarrito', [InventarioController::class,"setCarrito"]);
 
 Route::post('getinventario', [InventarioController::class,"index"]);
+Route::post('printPrecios', [tickera::class,"precio"]);
 
 
 Route::get('error', function (){
@@ -67,6 +65,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('getpersona', [ClientesController::class,"getpersona"]);
 		
 		Route::post('setPagoPedido', [PagoPedidosController::class,"setPagoPedido"]);
+		Route::post('setconfigcredito', [PagoPedidosController::class,"setconfigcredito"]);
+		
 
 		Route::post('addRefPago', [PagosReferenciasController::class,"addRefPago"]);
 		Route::post('delRefPago', [PagosReferenciasController::class,"delRefPago"]);
@@ -77,6 +77,8 @@ Route::group(['middleware' => ['login']], function () {
 		
 		Route::post('getDeudores', [PagoPedidosController::class,"getDeudores"]);
 		Route::post('getDeudor', [PagoPedidosController::class,"getDeudor"]);
+		Route::post('checkDeuda', [PagoPedidosController::class,"checkDeuda"]);
+		
 		
 		Route::post('entregarVuelto', [PagoPedidosController::class,"entregarVuelto"]);
 		
@@ -99,6 +101,7 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('verCierre', [PedidosController::class,"verCierre"]);
 		Route::post('cerrar', [PedidosController::class,"cerrar"]);
 		Route::get('getCierres', [PedidosController::class,"getCierres"]);
+		Route::get('sendCuentasporCobrar', [PedidosController::class,"sendCuentasporCobrar"]);
 
 		
 	});
@@ -115,6 +118,9 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('setProveedor', [ProveedoresController::class,"setProveedor"]);
 		Route::post('guardarNuevoProducto', [InventarioController::class,"guardarNuevoProducto"]);
 		Route::post('guardarNuevoProductoLote', [InventarioController::class,"guardarNuevoProductoLote"]);
+
+		Route::post('setCtxBulto', [InventarioController::class,"setCtxBulto"]);
+		Route::post('setPrecioAlterno', [InventarioController::class,"setPrecioAlterno"]);
 		
 		Route::post('getProveedores', [ProveedoresController::class,"getProveedores"]);
 		Route::get('getCategorias', [CategoriasController::class,"getCategorias"]);
@@ -178,6 +184,10 @@ Route::group(['middleware' => ['login']], function () {
 	Route::post('delpedido', [PedidosController::class,"delpedido"]);
 	Route::post('setCantidad', [ItemsPedidosController::class,"setCantidad"]);
 	Route::post('setpersonacarrito', [PedidosController::class,"setpersonacarrito"]);
+
+	Route::post('setPrecioAlternoCarrito', [ItemsPedidosController::class,"setPrecioAlternoCarrito"]);
+	Route::post('setCtxBultoCarrito', [ItemsPedidosController::class,"setCtxBultoCarrito"]);
+	
 
 	
 	

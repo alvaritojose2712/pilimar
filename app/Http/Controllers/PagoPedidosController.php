@@ -17,7 +17,36 @@ use Response;
 
 class PagoPedidosController extends Controller
 {   
-    
+    public function setconfigcredito(Request $req)
+    {
+        try {
+
+            $fechainiciocredito = $req->fechainiciocredito;
+            $fechavencecredito = $req->fechavencecredito;
+            $formatopagocredito = $req->formatopagocredito;
+            $id_pedido = $req->id_pedido;
+
+            $ped = pedidos::find($id_pedido);
+            if ($ped->id_cliente==1) {
+                return Response::json(["msj"=>"Error: En caso de crédito, debe registrar los datos del cliente","estado"=>false]);
+            }
+
+            $ped->fecha_inicio = $fechainiciocredito;
+            $ped->fecha_vence = $fechavencecredito;
+            $ped->formato_pago = $formatopagocredito;
+
+            $ped->save();
+            
+            return Response::json(["msj"=>"Configuración de crédito registrada con éxito","estado"=>true]);
+
+            
+        } catch (\Exception $e) {
+            return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+
+            
+        }
+
+    }
     public function entregarVuelto(Request $req)
     {
         try {
@@ -122,9 +151,9 @@ class PagoPedidosController extends Controller
             
         }
     }
-    public function getDeudor(Request $req)
+
+    public function getDeudaFun($onlyVueltos,$id_cliente)
     {
-        $onlyVueltos = $req->onlyVueltos;
         $pedidos = pedidos::with(["pagos"=>function($q) use ($onlyVueltos){
             if ($onlyVueltos) {
                 $q->where("tipo",6)->where("monto","<>",0);
@@ -142,7 +171,7 @@ class PagoPedidosController extends Controller
 
             }
         })
-        ->where("id_cliente",$req->id)
+        ->where("id_cliente",$id_cliente)
         ->orderBy("created_at","desc")
         ->get()
         ->map(function($q){
@@ -165,87 +194,112 @@ class PagoPedidosController extends Controller
         // if ($pedido_total[1] && $pedido_total[0]) {
         // $diferencia = ;
         // }
-        $pedido_total["diferencia"] = number_format($pedido_total[0] - $pedido_total[1],2);
+        $d = $pedido_total[0] - $pedido_total[1];
+
+        $check = true;
+
+        if ($d<0) {
+            $check = false;
+        }
+        $pedido_total["diferencia"] = number_format($d,2);
+        $pedido_total["diferencia_clean"] = $d;
+        $pedido_total["check"] = $check;
         return [
             "pedido" => $pedidos,
             "pedido_total" => $pedido_total,
         ]; 
+    }
+    public function getDeudor(Request $req)
+    {
+        $onlyVueltos = $req->onlyVueltos;
+        $id_cliente = $req->id;
+
+        return $this->getDeudaFun($onlyVueltos,$id_cliente);
+        
+
+    }
+
+    public function checkDeuda(Request $req)
+    {
+        $id_cliente = $req->id_cliente;
+        return $this->getDeudaFun(false,$id_cliente);
 
     }
     public function verCreditos(Request $req)
     {
         $sucursal = sucursal::all()->first();
+        $today = (new PedidosController)->today();
 
-        $busqueda = $req->qDeudores;
-        $data = clientes::with(["pedidos"=>function($q){
-            $q->with(["pagos"]);
-            $q->orderBy("created_at","desc");
-        }])
-        ->where("id","<>",1)->where(function($q) use ($busqueda){
-            $q->orWhere("identificacion","LIKE","%".$busqueda."%")
-            ->orWhere("nombre","LIKE","%".$busqueda."%");
-        })
-        ->get()
-        ->map(function($q){
 
-            $q->totalVuelto = 0; 
-            $q->saldo = 0;
-            
-            $q->saldo = $q->pedidos->map(function($q){
-                return $q->pagos->where("cuenta",0)->sum("monto")-$q->pagos->where("tipo",4)->sum("monto");
-            })->sum();
+        $qDeudores = $req->qDeudores;
+        $orderbycolumdeudores = $req->orderbycolumdeudores;
+        $orderbyorderdeudores = $req->orderbyorderdeudores;
 
-            return $q;
-        })->sortBy("saldo");
-        return view("reportes.creditos",["data" => $data,"sucursal" => $sucursal]);
+        $data = $this->getDeudoresFun($qDeudores,$orderbycolumdeudores,$orderbyorderdeudores,$today);
+        
+        return view("reportes.creditos",["data" => $data,"sucursal" => $sucursal,"today"=>$today]);
     }
     public function getDeudores(Request $req)
-    {
+    {   
+        $today = (new PedidosController)->today();
         $busqueda = $req->qDeudores;
         $view = $req->view;
-        return array_slice(clientes::with(["pedidos"=>function($q){
-            $q->with(["pagos"]);
-            $q->orderBy("created_at","desc");
-        }])
-        ->where("id","<>",1)->where(function($q) use ($busqueda){
-            $q->orWhere("identificacion","LIKE","%".$busqueda."%")
-            ->orWhere("nombre","LIKE","%".$busqueda."%");
-        })
-        ->get()
-        ->map(function($q) use ($view) {
 
-            $q->totalVuelto = 0; 
-            $q->saldo = 0;
-            if ($view==="vueltos") {
-                // code...
-                $q->totalVuelto = $q->pedidos->map(function($q){
-
-                    $check_vuelto_entregado = movimientos_caja::where("id_pedido",$q->id)->sum("monto");
-                    $sum_entregado = 0;
-                    if ($check_vuelto_entregado) {
-                        
-                        $sum_entregado = $check_vuelto_entregado;
-                    }
-
-                    return $q->pagos->where("tipo",6)->sum("monto")-$sum_entregado;
-                })->sum();
-            }else if($view==="credito"){
-                $q->saldo = number_format($q->pedidos->map(function($q){
-                    return $q->pagos->where("cuenta",0)->sum("monto")-$q->pagos->where("tipo",4)->sum("monto");
-                })->sum(),2);
-
-            }
-
-            
-                
+        $orderbycolumdeudores = $req->orderbycolumdeudores;
+        $orderbyorderdeudores = $req->orderbyorderdeudores;
 
 
+        if ($view==="vueltos") {
+            return clientes::with(["pedidos"=>function($q){
+                $q->with(["pagos"]);
+                $q->orderBy("created_at","desc");
+            }])
+            ->where("id","<>",1)->where(function($q) use ($busqueda){
+                $q->orWhere("identificacion","LIKE","%".$busqueda."%")
+                ->orWhere("nombre","LIKE","%".$busqueda."%");
+            })
+            ->get()
+            ->map(function($q) use ($view,$today) {
 
-            return $q;
-        })->sortBy("saldo")
-        ->values()
-        ->all(),0,50);
+                $q->totalVuelto = 0; 
+                $q->saldo = 0;
+                if ($view==="vueltos") {
+                    // code...
+                    $q->totalVuelto = $q->pedidos->map(function($q){
 
+                        $check_vuelto_entregado = movimientos_caja::where("id_pedido",$q->id)->sum("monto");
+                        $sum_entregado = 0;
+                        if ($check_vuelto_entregado) {
+                            
+                            $sum_entregado = $check_vuelto_entregado;
+                        }
+
+                        return $q->pagos->where("tipo",6)->sum("monto")-$sum_entregado;
+                    })->sum();
+                }
+                return $q;
+            });
+        }else{
+            return $this->getDeudoresFun($busqueda,$orderbycolumdeudores,$orderbyorderdeudores,$today);
+        }
+
+
+    }
+    public function getDeudoresFun($busqueda,$orderbycolumdeudores,$orderbyorderdeudores,$today)
+    {   
+        return clientes::with(["pedidos"=>function($q){
+                // $q->with(["pagos"]);
+                $q->orderBy("created_at","desc");
+            }])
+            ->selectRaw("*,@credito := (SELECT COALESCE(sum(monto),0) FROM pago_pedidos WHERE id_pedido IN (SELECT id FROM pedidos WHERE id_cliente=clientes.id) AND tipo=4) as credito, @abono := (SELECT COALESCE(sum(monto),0) FROM pago_pedidos WHERE id_pedido IN (SELECT id FROM pedidos WHERE id_cliente=clientes.id) AND cuenta=0) as abono, (@abono-@credito) as saldo, @vence := (SELECT fecha_vence FROM pedidos WHERE id_cliente=clientes.id AND fecha_vence > $today ORDER BY pedidos.fecha_vence ASC LIMIT 1) as vence , (COALESCE(DATEDIFF(@vence,'$today 00:00:00'),0)) as dias")
+            // ->where("saldo","<",0)
+            ->where("id","<>",1)->where(function($q) use ($busqueda){
+                $q->orWhere("identificacion","LIKE","%".$busqueda."%")
+                ->orWhere("nombre","LIKE","%".$busqueda."%");
+            })
+            // ->having("saldo","<",0)
+            ->orderBy($orderbycolumdeudores,$orderbyorderdeudores)
+            ->get();
     }
 
     public function setPagoCredito(Request $req)

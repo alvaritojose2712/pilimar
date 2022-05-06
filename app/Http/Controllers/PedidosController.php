@@ -24,11 +24,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 use App\Mail\enviarCierre;
+use App\Mail\enviarCuentaspagar;
 
 use Response;
 
 class PedidosController extends Controller
-{  
+{   
+
+    protected $sends = [
+        "alvaroospino79@gmail.com"            
+    ];
     protected  $letras = [
                 1=>"L",
                 2=>"R",
@@ -164,25 +169,25 @@ class PedidosController extends Controller
             // code...
            
 
-            foreach ($this->letras as $key => $value) {
+            // foreach ($this->letras as $key => $value) {
                 if (isset($arr["total"])) {
-                    $arr["total"] = str_replace($key, $value, ($arr["total"]));
+                    $arr["total"] = ($arr["total"]);
                     // code...
                 }
                 if (isset($arr["3"])) {
                     // code...
-                    $arr["3"] = str_replace($key, $value, ($arr["3"]));
+                    $arr["3"] = ($arr["3"]);
                 }
                 if (isset($arr["2"])) {
-                    $arr["2"] = str_replace($key, $value, ($arr["2"]));
+                    $arr["2"] = ($arr["2"]);
                     // code...
                 }
 
                 if (isset($arr["1"])) {
-                    $arr["1"] = str_replace($key, $value, ($arr["1"]));
+                    $arr["1"] = ($arr["1"]);
                     // code...
                 }
-            }
+            // }
         }
         
 
@@ -511,7 +516,17 @@ class PedidosController extends Controller
                 "monto",
             ]);
             $q->with(["producto"=>function($q){
-                $q->select(["id","codigo_barras","codigo_proveedor","descripcion","precio","precio_base","iva"]);
+                $q->select([
+                "id",
+                "codigo_barras",
+                "codigo_proveedor",
+                "descripcion",
+                "precio",
+                "precio_base",
+                "iva",
+                "precio1",
+                "bulto",
+            ]);
             },"lotedata"]);
             $q->orderBy("id","asc");
 
@@ -609,6 +624,9 @@ class PedidosController extends Controller
 
             $pedido->cop = number_format($total_ped*$cop,2,".",",");
             $pedido->bs = number_format($total_ped*$bs,2,".",",");
+
+            $pedido->cop_clean = $total_ped*$cop;
+            $pedido->bs_clean = $total_ped*$bs;
 
 
         }
@@ -1131,12 +1149,10 @@ class PedidosController extends Controller
 
             $from1 = $sucursal->correo;
             $from = $sucursal->sucursal;
-            $subject = $sucursal->sucursal." ".$req->fecha;
-            $sends = [
-                
-            ];
+            $subject = "CIERRE DIARIO ".$sucursal->sucursal." ".$req->fecha;
             try {
-                Mail::to($sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
+                
+                Mail::to($this->sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
                 
                 return Response::json(["msj"=>"Cierre enviado con Éxito","estado"=>true]);
             
@@ -1146,6 +1162,32 @@ class PedidosController extends Controller
                 
             }
 
+        }
+    }
+
+    public function sendCuentasporCobrar()
+    {   
+        $today = $this->today();
+        $sucursal = sucursal::all()->first();
+
+        $from1 = $sucursal->correo;
+        $from = $sucursal->sucursal;
+        $subject = "CUENTAS POR COBRAR ".$sucursal->sucursal." ".$today;
+        $data = (new PagoPedidosController)->getDeudoresFun("","saldo","asc",$today);
+        try {
+            
+            Mail::to($this->sends)->send(new enviarCuentaspagar([
+                "data" => $data,
+                "sucursal" => $sucursal,
+                "today"=>$today
+            ],$from1,$from,$subject));    
+            
+            return Response::json(["msj"=>"Cuentas enviadas con Éxito","estado"=>true]);
+        
+        } catch (\Exception $e) {
+
+            return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+            
         }
     }
 
