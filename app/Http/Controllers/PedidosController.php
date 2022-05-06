@@ -171,20 +171,20 @@ class PedidosController extends Controller
 
             // foreach ($this->letras as $key => $value) {
                 if (isset($arr["total"])) {
-                    $arr["total"] = ($arr["total"]);
+                    $arr["total"] = toLetras(number_format($arr["total"],2));
                     // code...
                 }
                 if (isset($arr["3"])) {
                     // code...
-                    $arr["3"] = ($arr["3"]);
+                    $arr["3"] = toLetras(number_format($arr["3"],2));
                 }
                 if (isset($arr["2"])) {
-                    $arr["2"] = ($arr["2"]);
+                    $arr["2"] = toLetras(number_format($arr["2"],2));
                     // code...
                 }
 
                 if (isset($arr["1"])) {
-                    $arr["1"] = ($arr["1"]);
+                    $arr["1"] = toLetras(number_format($arr["1"],2));
                     // code...
                 }
             // }
@@ -1149,7 +1149,7 @@ class PedidosController extends Controller
 
             $from1 = $sucursal->correo;
             $from = $sucursal->sucursal;
-            $subject = "CIERRE DIARIO ".$sucursal->sucursal." ".$req->fecha;
+            $subject = $sucursal->sucursal." | CIERRE DIARIO | ".$req->fecha;
             try {
                 
                 Mail::to($this->sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
@@ -1172,7 +1172,7 @@ class PedidosController extends Controller
 
         $from1 = $sucursal->correo;
         $from = $sucursal->sucursal;
-        $subject = "CUENTAS POR COBRAR ".$sucursal->sucursal." ".$today;
+        $subject = $sucursal->sucursal." | CUENTAS POR COBRAR | ".$today;
         $data = (new PagoPedidosController)->getDeudoresFun("","saldo","asc",$today);
         try {
             

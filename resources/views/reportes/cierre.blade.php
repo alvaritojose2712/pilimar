@@ -133,7 +133,7 @@
 					<th class="right">
 						VENTAS DEL DÍA
 					</th>
-					<td class=""><span class="text-success-only fs-3">{{($facturado["numventas"])}}</span></td>
+					<td class=""><span class="fs-3">{{($facturado["numventas"])}}</span></td>
 					<th class="right">
 						INVENTARIO
 					</th>
