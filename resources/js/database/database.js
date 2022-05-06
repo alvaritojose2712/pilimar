@@ -28,6 +28,10 @@ const db = {
   setDescuentoTotal: data=>axios.post(host+"setDescuentoTotal",data),
 
   setCantidad: data=>axios.post(host+"setCantidad",data),
+  setPrecioAlternoCarrito: data=>axios.post(host+"setPrecioAlternoCarrito",data),
+  setCtxBultoCarrito: data=>axios.post(host+"setCtxBultoCarrito",data),
+  
+
   
   getpersona: data=>axios.post(host+"getpersona",data),
   setpersonacarrito: data=>axios.post(host+"setpersonacarrito",data),
@@ -49,7 +53,9 @@ const db = {
   setPagoCredito: data=>axios.post(host+"setPagoCredito",data),
 
   getDeudores: data=>axios.post(host+"getDeudores",data),
+  
   getDeudor: data=>axios.post(host+"getDeudor",data),
+  checkDeuda: data=>axios.post(host+"checkDeuda",data),
   
   entregarVuelto: data=>axios.post(host+"entregarVuelto",data),
 
@@ -115,21 +121,33 @@ const db = {
   delUsuario: data => axios.post(host + "delUsuario", data),
   getUsuarios: data => axios.get(host + "getUsuarios", { params: data }),
   getCierres: data=>axios.get(host+"getCierres",{params:data}),
+  sendCuentasporCobrar: data=>axios.get(host+"sendCuentasporCobrar",{params:data}),
   
   
   removeLote: data=>axios.post(host+"removeLote",data),
   getEstaInventario: data => axios.post(host + "getEstaInventario", data),
   setPagoProveedor: data => axios.post(host + "setPagoProveedor", data),
   getPagoProveedor: data => axios.post(host + "getPagoProveedor", data),
-  delPagoProveedor: data=>axios.post(host+"delPagoProveedor",data),
+  delPagoProveedor: data => axios.post(host + "delPagoProveedor", data),
+  
+  addRefPago: data => axios.post(host + "addRefPago", data),
+  delRefPago: data=>axios.post(host+"delRefPago",data),
 
+  delGastos: data=>axios.post(host+"delGastos",data),
+  getGastos: data=>axios.post(host+"getGastos",data),
+  setGasto: data=>axios.post(host+"setGasto",data),
+  
+  setCtxBulto: data=>axios.post(host+"setCtxBulto",data),
+  setPrecioAlterno: data=>axios.post(host+"setPrecioAlterno",data),
+  printPrecios: data=>axios.post(host+"printPrecios",data),
 
+  setconfigcredito: data=>axios.post(host+"setconfigcredito",data),
   
   
   
   
   
-  openPrintCreditos: (param) => window.open(host + "verCreditos","targed=blank"),
+  openPrintCreditos: (param) => window.open(host + "verCreditos?"+param,"targed=blank"),
   openVerCierre: ({ type,fechaCierre }) => window.open(host + "verCierre?type=" + type + "&fecha=" + fechaCierre,"targed=blank"),
   openNotaentregapedido: ({ id }) => window.open(host + "/notaentregapedido?id=" + id, "targed=blank"),
   openVerFactura: ({ id }) => window.open(host + "verFactura?id=" + id, "targed=blank"),
