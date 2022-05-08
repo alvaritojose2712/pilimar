@@ -29,7 +29,13 @@ use App\Http\Controllers\PagosReferenciasController;
 use App\Http\Controllers\GastosController;
 
 
+Route::get('/backup', function () {
 
+    \Illuminate\Support\Facades\Artisan::call('backup:run --only-db');
+
+    return 'Successful backup!';
+
+});
 
 Route::get('', [HomeController::class,"index"]);
 Route::get('setCarrito', [InventarioController::class,"setCarrito"]);

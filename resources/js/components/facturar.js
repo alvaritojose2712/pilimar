@@ -388,6 +388,7 @@ useHotkeys("tab",()=>{
       toggleModalProductos(true,()=>{
         inputaddcarritointernoref.current.focus()
         setQProductosMain("")
+        setCountListInter(0)
 
       })
       

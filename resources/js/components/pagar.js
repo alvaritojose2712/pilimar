@@ -357,9 +357,11 @@ qProductosMain,
                     <th className="text-sinapsis cell3">Producto</th>
                     <th className="text-sinapsis cell1">Cant.</th>
                     <th className="text-sinapsis cell1">Precio</th>
-                    {/*<th className="text-sinapsis">Sub-total</th>*/}
+                    {/*
+                    <th className="text-sinapsis">Sub-total</th>
                     <th className="text-sinapsis">Desc.%</th>
-                    {/*<th className="text-sinapsis">Tot.Desc.</th>*/}
+                    <th className="text-sinapsis">Tot.Desc.</th>
+                    */}
                     <th className="text-sinapsis cell2">Total</th>
                     {editable?
                     <th className='cell1'><button className="btn btn-circle text-white btn-sinapsis btn-sm" onClick={toggleModalProductos}>F1 <i className="fa fa-plus"></i></button></th>
@@ -374,8 +376,8 @@ qProductosMain,
                       <td>{e.abono}</td>
                       <td>{e.cantidad} </td>
                       <td>{e.monto}</td>
-                      <td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer clickme">{e.descuento}</td>
-                      {/*<td>{e.subtotal}</td>
+                      {/*<td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer clickme">{e.descuento}</td>
+                      <td>{e.subtotal}</td>
                       {/*<td>{e.total_des}</td>*/}
 
                       <th className="font-weight-bold">{e.total}</th>
@@ -399,8 +401,8 @@ qProductosMain,
                         :
                       <td className="align-middle pointer">{e.producto.precio}</td>
                       }
-                      <td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer">{e.descuento}</td>
-                      {/*<td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer clickme">{e.descuento}</td>*/}
+                      {/* <td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer">{e.descuento}</td>
+                      <td onClick={setDescuentoUnitario} data-index={e.id} className="align-middle pointer clickme">{e.descuento}</td>*/}
                       
 
 
@@ -412,7 +414,7 @@ qProductosMain,
                   ):null}
                   <tr>
                     <td><button className="btn btn-outline-success fs-5">{items?items.length:null}</button></td>
-                    <th colSpan="6" className="p-2 align-middle">{cliente?cliente.nombre:null} <b>{cliente?cliente.identificacion:null}</b></th>
+                    <th colSpan="5" className="p-2 align-middle">{cliente?cliente.nombre:null} <b>{cliente?cliente.identificacion:null}</b></th>
                   </tr>
                 </tbody>
               </table>

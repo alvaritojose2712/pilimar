@@ -72,14 +72,26 @@ class tickera extends Controller
 
                     foreach ($pedido->items as $val) {
 
-                        $items[] = [
-                            'descripcion' => $val->producto->descripcion,
-                            'codigo_barras' => $val->producto->codigo_barras,
-                            'pu' => $val->producto->precio,
-                            'cantidad' => $val->cantidad,
-                            'totalprecio' => $val->total,
-                           
-                        ];
+                        if (!$val->producto) {
+                            $items[] = [
+                                'descripcion' => $val->abono,
+                                'codigo_barras' => 0,
+                                'pu' => $val->monto,
+                                'cantidad' => $val->cantidad,
+                                'totalprecio' => $val->total,
+                               
+                            ];
+                        }else{
+
+                            $items[] = [
+                                'descripcion' => $val->producto->descripcion,
+                                'codigo_barras' => $val->producto->codigo_barras,
+                                'pu' => $val->producto->precio,
+                                'cantidad' => $val->cantidad,
+                                'totalprecio' => $val->total,
+                               
+                            ];
+                        }
                     }
                 }
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
@@ -134,7 +146,8 @@ class tickera extends Controller
                 
                
                 $printer -> text("\n");
-
+                $printer->text($sucursal->sucursal);
+                $printer -> text("\n");
                 $printer->text("NOTA DE ENTREGA #".$pedido->id);
                 $printer->setEmphasis(false);
 
@@ -175,13 +188,26 @@ class tickera extends Controller
 
                     foreach ($pedido->items as $val) {
 
-                        $items[] = [
-                            'descripcion' => $val->producto->descripcion,
-                            'pu' => $val->producto->precio,
-                            'cantidad' => $val->cantidad,
-                            'totalprecio' => $val->total,
-                           
-                        ];
+                        if (!$val->producto) {
+                            $items[] = [
+                                'descripcion' => $val->abono,
+                                'codigo_barras' => 0,
+                                'pu' => $val->monto,
+                                'cantidad' => $val->cantidad,
+                                'totalprecio' => $val->total,
+                               
+                            ];
+                        }else{
+
+                            $items[] = [
+                                'descripcion' => $val->producto->descripcion,
+                                'codigo_barras' => $val->producto->codigo_barras,
+                                'pu' => $val->producto->precio,
+                                'cantidad' => $val->cantidad,
+                                'totalprecio' => $val->total,
+                               
+                            ];
+                        }
                     }
                 }
                
@@ -212,9 +238,9 @@ class tickera extends Controller
 
                 $printer->text("Desc: ".$pedido->total_des);
                 $printer->text("\n");
-                $printer->text("Sub-Total: ". $pedido->subtotal );
+                $printer->text("Sub-Total: ". number_format($pedido->clean_total/1.16,2) );
                 $printer->text("\n");
-                $printer->text("Monto IVA 16%: ".$pedido->iva);
+                $printer->text("Monto IVA 16%: ".number_format($pedido->clean_total*.16,2));
                 $printer->text("\n");
                 $printer->text("Total: ".$pedido->total);
                 $printer->text("\n");

@@ -11,7 +11,8 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.40",
         "laravel/tinker": "^2.5",
-        "mike42/escpos-php": "^3.0"
+        "mike42/escpos-php": "^3.0",
+        "spatie/laravel-backup": "^6.16"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
