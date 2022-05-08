@@ -1482,6 +1482,12 @@ const getProductos = (valmain=null) => {
     clearTimeout(typingTimeout)
   }
 
+  if(view=="seleccionar"){
+    if (inputbusquedaProductosref.current) {
+      valmain = inputbusquedaProductosref.current.value
+    }
+  }
+
   let time = window.setTimeout(()=>{
     db.getinventario({vendedor:showMisPedido?[user.id_usuario]:[],num,itemCero,qProductosMain:valmain?valmain:qProductosMain,orderColumn,orderBy}).then(res=>{
       if (res.data) {
