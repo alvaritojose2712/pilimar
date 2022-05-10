@@ -24,6 +24,8 @@ export default function InventarioForzado({
     setSameGanancia,
     setSameCat,
     setSamePro,
+    sameCatValue,
+    sameProValue,
     busquedaAvanazadaInv,
     setbusquedaAvanazadaInv,
 
@@ -156,7 +158,7 @@ export default function InventarioForzado({
                     </div>
                 </div>
                 <div className="cell1 text-right">
-                    <button className="btn btn-success text-light" onClick={guardarNuevoProductoLote}><i className="fa fa-send"></i> (f1)</button>
+                    <button className="btn btn-success text-light" onClick={guardarNuevoProductoLote}>Guardar (f1)</button>
                 </div>
             </div>
             <a href="#" onClick={() => setbusquedaAvanazadaInv(!busquedaAvanazadaInv)}>Búsqueda {busquedaAvanazadaInv ? "sencilla" :"avanazada"}</a>
@@ -183,7 +185,7 @@ export default function InventarioForzado({
                                 <br />
                                     <select
                                         className=""
-                                        defaultValue={""}
+                                        value={sameCatValue}
                                         onChange={e=>setSameCat(e.target.value)}
                                     >
                                         <option value="">--Select--</option>
@@ -197,7 +199,7 @@ export default function InventarioForzado({
                                 <br />
                                     <select
                                         className=""
-                                        defaultValue={""}
+                                        value={sameProValue}
                                         onChange={e => setSamePro(e.target.value)}
                                     >
                                         <option value="">--Select--</option>

@@ -1423,7 +1423,7 @@ const toggleModalProductos = (prop,callback=null) => {
 }
 const toggleImprimirTicket = () => {
   if (pedidoData) {
-    let moneda = window.prompt("Moneda: $ | bs | cop","$")
+    let moneda = window.prompt("Moneda: $ | bs | cop","bs")
     let identificacion = window.prompt("Identificación", pedidoData.cliente.identificacion)
 
     if (identificacion) {
@@ -1851,29 +1851,31 @@ const setDescuentoTotal = (e) => {
 
   let descuento = window.prompt("Descuento Total *0 para eliminar*")
   let index = e.currentTarget.attributes["data-index"].value
-  if (descuento=="0") {
-    db.setDescuentoTotal({index,descuento:0}).then(res=>{
-      getPedido()
-      setLoading(false)
-      notificar(res)
-
-    })
-  }else{
-    if (typeof parseFloat(descuento) == "number" && pedidoData.clean_subtotal) {
-
-      let total = parseFloat(pedidoData.clean_subtotal)
-
-      descuento = (100-((parseFloat(descuento)*100)/total).toFixed(3))
-
-
-      db.setDescuentoTotal({index,descuento}).then(res=>{
+  
+  if (descuento) {
+    if (descuento=="0") {
+      db.setDescuentoTotal({index,descuento:0}).then(res=>{
         getPedido()
         setLoading(false)
         notificar(res)
 
       })
-    }
+    }else{
+      if (typeof parseFloat(descuento) == "number" && pedidoData.clean_subtotal) {
 
+        let total = parseFloat(pedidoData.clean_subtotal)
+
+        descuento = (100-((parseFloat(descuento)*100)/total).toFixed(3))
+
+
+        db.setDescuentoTotal({index,descuento}).then(res=>{
+          getPedido()
+          setLoading(false)
+          notificar(res)
+
+        })
+      }
+    }
   }
 
 }
@@ -2429,6 +2431,9 @@ const setSameGanancia = () => {
     setProductosInventario(obj)    
   }
 }
+const [sameCatValue, setsameCatValue] = useState("")
+const [sameProValue, setsameProValue] = useState("")
+
 const setSameCat = (val) => {
   if (confirm("¿Confirma Generalizar categoría?")) {
     let obj = cloneDeep(productosInventario)
@@ -2439,6 +2444,7 @@ const setSameCat = (val) => {
       return e
     })
     setProductosInventario(obj)
+    setsameCatValue(val)
   }
 
 }
@@ -2452,6 +2458,7 @@ const setSamePro = (val) => {
       return e
     })
     setProductosInventario(obj)
+    setsameProValue(val)
   }
 }
 
@@ -3223,13 +3230,17 @@ const changeInventario = (val, i, id, type, name = null) => {
 
       if (facturas[factSelectIndex]) {
         pro = facturas[factSelectIndex].proveedor.id
+      }else{
+        pro = sameProValue
       }
+      
+      
       let newObj = [{
         id:null,
         codigo_proveedor: "",
         codigo_barras: "",
         descripcion: "",
-        id_categoria: "",
+        id_categoria: sameCatValue,
         id_marca: "",
         unidad: "UND",
         id_proveedor: pro,
@@ -3487,6 +3498,7 @@ const auth = permiso => {
         :null}
 
         {view=="cierres"?<Cierres
+          moneda={moneda}
           sendCuentasporCobrar={sendCuentasporCobrar}
           fechaGetCierre2={fechaGetCierre2}
           setfechaGetCierre2={setfechaGetCierre2}
@@ -3574,6 +3586,8 @@ const auth = permiso => {
 
         
         {view=="inventario"?<Inventario
+          sameCatValue={sameCatValue}
+          sameProValue={sameProValue}
           setdropprintprice={setdropprintprice}
           dropprintprice={dropprintprice}
           printPrecios={printPrecios}

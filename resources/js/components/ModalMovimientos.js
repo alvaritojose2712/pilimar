@@ -29,18 +29,26 @@ export default function ModalMovimientos({
    
     movimientos.length?movimientos.map((e,i)=>
       !e.items.length||e.items.filter(e=>e.tipo==2||!e.id_producto).length?null
-      :<tr key={e.id}>
+      :<><tr key={e.id}>
         <td className="align-middle">
             <h2>{e.id}</h2>
             
         </td>
         <td className="w-50">
           {retTipoSubMov(e.items,1)}
+          <h2 className="text-right">Tot. {e.tot1}</h2>
         </td>
         <td className="w-50">
           {retTipoSubMov(e.items,0)}
+          <h2 className="text-right">Tot. {e.tot0}</h2>
         </td>
-      </tr>):null
+      </tr>
+      <tr>
+        <td colSpan="3">
+          <h1 className="text-success text-center">Diff. {e.diff}</h1>
+        </td>
+      </tr>
+      </>):null
     
          
   )
@@ -60,19 +68,23 @@ export default function ModalMovimientos({
         <table className="table table-sm">
           <thead>
             <tr>
-              <th>Prod.</th>
-              <th>Ct.</th>
               <th>Cat.</th>
+              <th>Prod.</th>
+              <th>Precio</th>
+              <th>Ct.</th>
+              <th>Total</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {items.filter(e=>e.tipo==tipo).map(ee=>
               <tr key={ee.id}>
-                <td>{ee.producto.codigo_proveedor} {ee.producto.descripcion}</td>
-                <td>{ee.cantidad}</td>
                 <td>{retCat(ee.categoria)}</td>
-                <td><i className="fa fa-times tex-danger" data-id={ee.id} onClick={delMov}></i></td>
+                <th>{ee.producto.codigo_proveedor} {ee.producto.descripcion}</th>
+                <td>{ee.producto.precio}</td>
+                <td>{ee.cantidad}</td>
+                <td className="text-success">{ee.total}</td>
+                <td><i className="fa fa-times text-danger" data-id={ee.id} onClick={delMov}></i></td>
               </tr>)
             }
           </tbody>

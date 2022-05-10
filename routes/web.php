@@ -31,7 +31,7 @@ use App\Http\Controllers\GastosController;
 
 Route::get('/backup', function () {
 
-    \Illuminate\Support\Facades\Artisan::call('backup:run --only-db');
+    \Illuminate\Support\Facades\Artisan::call('backup:run');
 
     return 'Successful backup!';
 
@@ -173,10 +173,10 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('delPagoProveedor', [PagoFacturasController::class,"delPagoProveedor"]);
 		
 		Route::post('delMovCaja', [MovimientosCajaController::class,"delMovCaja"]);
-		Route::post('delMov', [MovimientosController::class,"delMov"]);
 
 
 	});
+		Route::post('delMov', [MovimientosController::class,"delMov"]);
 	Route::post('getPedidosList', [PedidosController::class,"getPedidosUser"]);
 
 	Route::post('getVentas', [PedidosController::class,"getVentas"]);
