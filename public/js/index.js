@@ -7482,23 +7482,31 @@ function Facturar(_ref) {
   var getPedidos = function getPedidos(e) {
     setLoading(true);
     setPedidos([]);
-    _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getPedidos({
-      vendedor: showMisPedido ? [user.id_usuario] : [],
-      busquedaPedido: busquedaPedido,
-      fecha1pedido: fecha1pedido,
-      fecha2pedido: fecha2pedido,
-      tipobusquedapedido: tipobusquedapedido,
-      tipoestadopedido: tipoestadopedido,
-      filterMetodoPagoToggle: filterMetodoPagoToggle
-    }).then(function (res) {
-      if (res.data) {
-        setPedidos(res.data);
-      } else {
-        setPedidos([]);
-      }
 
-      setLoading(false);
-    });
+    if (time != 0) {
+      clearTimeout(typingTimeout);
+    }
+
+    var time = window.setTimeout(function () {
+      _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getPedidos({
+        vendedor: showMisPedido ? [user.id_usuario] : [],
+        busquedaPedido: busquedaPedido,
+        fecha1pedido: fecha1pedido,
+        fecha2pedido: fecha2pedido,
+        tipobusquedapedido: tipobusquedapedido,
+        tipoestadopedido: tipoestadopedido,
+        filterMetodoPagoToggle: filterMetodoPagoToggle
+      }).then(function (res) {
+        if (res.data) {
+          setPedidos(res.data);
+        } else {
+          setPedidos([]);
+        }
+
+        setLoading(false);
+      });
+    }, 150);
+    setTypingTimeout(time);
   };
 
   var getProductos = function getProductos() {
@@ -14512,6 +14520,60 @@ function Pedidos(_ref) {
           })]
         })]
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+        className: "d-flex justify-content-between mt-2 mb-2",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
+          className: "input-group cell3",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+            className: "btn-group",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
+              onClick: function onClick() {
+                return setshowMisPedido(true);
+              },
+              className: "btn btn-sm btn-outline-" + (!showMisPedido ? null : "success"),
+              children: "Mis pedidos"
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
+              onClick: function onClick() {
+                return setshowMisPedido(false);
+              },
+              className: "btn btn-sm btn-outline-" + (showMisPedido ? null : "success"),
+              children: "Todos los pedidos"
+            })]
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+          className: "cell4",
+          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
+            className: (filterMetodoPagoToggle == "todos" ? "btn-dark" : "") + " pointer btn",
+            "data-type": "todos",
+            onClick: filterMetodoPago,
+            children: "Todos"
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
+            className: (filterMetodoPagoToggle == 1 ? "btn-info" : "") + " btn",
+            "data-type": "1",
+            onClick: filterMetodoPago,
+            children: "Trans."
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
+            className: (filterMetodoPagoToggle == 2 ? "btn-secondary" : "") + " btn",
+            "data-type": "2",
+            onClick: filterMetodoPago,
+            children: "Deb."
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
+            className: (filterMetodoPagoToggle == 3 ? "btn-success" : "") + " btn",
+            "data-type": "3",
+            onClick: filterMetodoPago,
+            children: "Efec."
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
+            className: (filterMetodoPagoToggle == 4 ? "btn-warning" : "") + " btn",
+            "data-type": "4",
+            onClick: filterMetodoPago,
+            children: "Cred."
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
+            className: (filterMetodoPagoToggle == 6 ? "btn-danger" : "") + " btn",
+            "data-type": "6",
+            onClick: filterMetodoPago,
+            children: "Vuel."
+          })]
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
         className: "m-3",
         children: [tipobusquedapedido == "prod" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.Fragment, {
           children: pedidos["prod"] ? pedidos["prod"].map(function (e) {
@@ -14560,64 +14622,13 @@ function Pedidos(_ref) {
           }) : null
         }) : null, tipobusquedapedido == "fact" || tipobusquedapedido == "cliente" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.Fragment, {
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
-            className: "p-0 card-pedidos-header d-flex justify-content-center align-items-center",
+            className: "p-0 card-pedidos-header d-flex justify-content-between align-items-center",
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
               className: "cell1",
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
                 className: "badge btn-sinapsis fs-2",
                 children: pedidos["totalventas"]
               })
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
-              className: "input-group cell3",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
-                className: "btn-group",
-                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
-                  onClick: function onClick() {
-                    return setshowMisPedido(true);
-                  },
-                  className: "btn btn-sm btn-outline-" + (!showMisPedido ? null : "success"),
-                  children: "Mis pedidos"
-                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
-                  onClick: function onClick() {
-                    return setshowMisPedido(false);
-                  },
-                  className: "btn btn-sm btn-outline-" + (showMisPedido ? null : "success"),
-                  children: "Todos los pedidos"
-                })]
-              })
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
-              className: "cell4",
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
-                className: (filterMetodoPagoToggle == "todos" ? "btn-dark" : "") + " pointer btn",
-                "data-type": "todos",
-                onClick: filterMetodoPago,
-                children: "Todos"
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
-                className: (filterMetodoPagoToggle == 1 ? "btn-info" : "") + " btn",
-                "data-type": "1",
-                onClick: filterMetodoPago,
-                children: "Trans."
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
-                className: (filterMetodoPagoToggle == 2 ? "btn-secondary" : "") + " btn",
-                "data-type": "2",
-                onClick: filterMetodoPago,
-                children: "Deb."
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
-                className: (filterMetodoPagoToggle == 3 ? "btn-success" : "") + " btn",
-                "data-type": "3",
-                onClick: filterMetodoPago,
-                children: "Efec."
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
-                className: (filterMetodoPagoToggle == 4 ? "btn-warning" : "") + " btn",
-                "data-type": "4",
-                onClick: filterMetodoPago,
-                children: "Cred."
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("span", {
-                className: (filterMetodoPagoToggle == 6 ? "btn-danger" : "") + " btn",
-                "data-type": "6",
-                onClick: filterMetodoPago,
-                children: "Vuel."
-              })]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
               className: "cell2",
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("b", {

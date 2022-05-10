@@ -67,6 +67,22 @@ filterMetodoPagoToggle,
 						<i className="fa fa-reload" onClick={()=>getPedidos()}></i>
 					</div>
 				</div>
+				<div className="d-flex justify-content-between mt-2 mb-2">
+					<div className="input-group cell3">
+	      		<div className="btn-group">
+	      			<button onClick={()=>setshowMisPedido(true)} className={("btn btn-sm btn-outline-")+(!showMisPedido?null:"success")}>Mis pedidos</button>
+	      			<button onClick={()=>setshowMisPedido(false)} className={("btn btn-sm btn-outline-")+(showMisPedido?null:"success")}>Todos los pedidos</button>
+	      		</div>
+	      	</div>
+					<div className="cell4">
+						<span className={(filterMetodoPagoToggle=="todos"?"btn-dark":"")+(" pointer btn")} data-type="todos" onClick={filterMetodoPago}>Todos</span>
+						<span className={(filterMetodoPagoToggle==1?"btn-info":"")+(" btn")} data-type="1" onClick={filterMetodoPago}>Trans.</span>
+						<span className={(filterMetodoPagoToggle==2?"btn-secondary":"")+(" btn")} data-type="2" onClick={filterMetodoPago}>Deb.</span>
+						<span className={(filterMetodoPagoToggle==3?"btn-success":"")+(" btn")} data-type="3" onClick={filterMetodoPago}>Efec.</span>
+						<span className={(filterMetodoPagoToggle==4?"btn-warning":"")+(" btn")} data-type="4" onClick={filterMetodoPago}>Cred.</span>
+						<span className={(filterMetodoPagoToggle==6?"btn-danger":"")+(" btn")} data-type="6" onClick={filterMetodoPago}>Vuel.</span>															
+					</div>
+				</div>
 
 				<div className="m-3">
 					{tipobusquedapedido=="prod"?
@@ -81,7 +97,7 @@ filterMetodoPagoToggle,
 										  	</span>
 										  </h1>
 									    <h6 className=" mb-2 text-muted">{e.descripcion}</h6>
-										<h6 className=" mb-2 text-muted">{e.codigo_proveedor}</h6>
+											<h6 className=" mb-2 text-muted">{e.codigo_proveedor}</h6>
 											<h6 className=" mb-2 text-muted">{e.precio_base} / {e.precio}</h6>
 									  </div>
 									  <div className="w-50">
@@ -109,26 +125,13 @@ filterMetodoPagoToggle,
 					{tipobusquedapedido=="fact"||tipobusquedapedido=="cliente"?
 						<>
 									
-							<div className="p-0 card-pedidos-header d-flex justify-content-center align-items-center">
+							<div className="p-0 card-pedidos-header d-flex justify-content-between align-items-center">
 									<div className="cell1">
                     <span className="badge btn-sinapsis fs-2">
                     {pedidos["totalventas"]}
                     </span>
 									</div>
-									<div className="input-group cell3">
-				        		<div className="btn-group">
-				        			<button onClick={()=>setshowMisPedido(true)} className={("btn btn-sm btn-outline-")+(!showMisPedido?null:"success")}>Mis pedidos</button>
-				        			<button onClick={()=>setshowMisPedido(false)} className={("btn btn-sm btn-outline-")+(showMisPedido?null:"success")}>Todos los pedidos</button>
-				        		</div>
-				        	</div>
-									<div className="cell4">
-	    							<span className={(filterMetodoPagoToggle=="todos"?"btn-dark":"")+(" pointer btn")} data-type="todos" onClick={filterMetodoPago}>Todos</span>
-	    							<span className={(filterMetodoPagoToggle==1?"btn-info":"")+(" btn")} data-type="1" onClick={filterMetodoPago}>Trans.</span>
-	    							<span className={(filterMetodoPagoToggle==2?"btn-secondary":"")+(" btn")} data-type="2" onClick={filterMetodoPago}>Deb.</span>
-	    							<span className={(filterMetodoPagoToggle==3?"btn-success":"")+(" btn")} data-type="3" onClick={filterMetodoPago}>Efec.</span>
-	    							<span className={(filterMetodoPagoToggle==4?"btn-warning":"")+(" btn")} data-type="4" onClick={filterMetodoPago}>Cred.</span>
-	    							<span className={(filterMetodoPagoToggle==6?"btn-danger":"")+(" btn")} data-type="6" onClick={filterMetodoPago}>Vuel.</span>															
-									</div>
+									
 									<div className="cell2">
 								  	<b className="fs-2 text-success">{pedidos["totaltotal"]}</b>
 									</div>

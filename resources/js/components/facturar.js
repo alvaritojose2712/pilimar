@@ -1469,14 +1469,21 @@ const getPedidos = e => {
   setLoading(true)
   setPedidos([])
 
-  db.getPedidos({vendedor:showMisPedido?[user.id_usuario]:[],busquedaPedido,fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle}).then(res=>{
-    if (res.data) {
-      setPedidos(res.data)
-    }else{
-      setPedidos([])
-    }
-    setLoading(false)
-  })
+  if (time!=0) {
+    clearTimeout(typingTimeout)
+  }
+  let time = window.setTimeout(()=>{
+    db.getPedidos({vendedor:showMisPedido?[user.id_usuario]:[],busquedaPedido,fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle}).then(res=>{
+      if (res.data) {
+        setPedidos(res.data)
+      }else{
+        setPedidos([])
+      }
+      setLoading(false)
+    })
+  },150)
+  setTypingTimeout(time)
+
 }
 const getProductos = (valmain=null) => {
 
