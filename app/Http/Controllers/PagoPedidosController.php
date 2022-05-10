@@ -247,6 +247,7 @@ class PagoPedidosController extends Controller
 
         $orderbycolumdeudores = $req->orderbycolumdeudores;
         $orderbyorderdeudores = $req->orderbyorderdeudores;
+        $limitdeudores = $req->limitdeudores;
 
 
         if ($view==="vueltos") {
@@ -280,12 +281,12 @@ class PagoPedidosController extends Controller
                 return $q;
             });
         }else{
-            return $this->getDeudoresFun($busqueda,$orderbycolumdeudores,$orderbyorderdeudores,$today);
+            return $this->getDeudoresFun($busqueda,$orderbycolumdeudores,$orderbyorderdeudores,$today,$limitdeudores);
         }
 
 
     }
-    public function getDeudoresFun($busqueda,$orderbycolumdeudores,$orderbyorderdeudores,$today)
+    public function getDeudoresFun($busqueda,$orderbycolumdeudores,$orderbyorderdeudores,$today,$limitdeudores)
     {   
         return clientes::with(["pedidos"=>function($q){
                 // $q->with(["pagos"]);
@@ -299,6 +300,7 @@ class PagoPedidosController extends Controller
             })
             // ->having("saldo","<",0)
             ->orderBy($orderbycolumdeudores,$orderbyorderdeudores)
+            ->limit($limitdeudores)
             ->get();
     }
 

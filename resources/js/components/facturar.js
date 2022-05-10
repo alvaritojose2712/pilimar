@@ -181,6 +181,8 @@ export default function Facturar({user,notificar,setLoading}) {
   const [qDeudores,setQDeudores] = useState("")
   const [orderbycolumdeudores,setorderbycolumdeudores] = useState("saldo")
   const [orderbyorderdeudores,setorderbyorderdeudores] = useState("asc")
+  const [limitdeudores,setlimitdeudores] = useState(100)
+
 
 
   const [deudoresList,setDeudoresList] = useState([])
@@ -1135,6 +1137,9 @@ const sendCuentasporCobrar = () => {
     notificar(res)
   })
 }
+const setBackup = () => {
+  db.backup({})
+}
 const getCierres = () => {
   db.getCierres({fechaGetCierre,fechaGetCierre2}).then(res=>{
     if (res.data) {
@@ -2081,7 +2086,15 @@ const guardar_cierre = (e,callback=null) => {
         
         db.sendCierre({type,fecha:fechaCierre}).then(res=>{
           notificar(res,false)
-          setLoading(false)
+
+          notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
+          setLoading(true)
+          db.backup({}).then(res=>{
+            notificar(res)
+            setLoading(false)
+          })
+          
+
         })
         
       }
@@ -2115,11 +2128,13 @@ const setPagoCredito = e =>{
 }
 const getDeudores = e =>{
   setLoading(true)
+
   db.getDeudores({
     qDeudores,
     view,
     orderbycolumdeudores,
     orderbyorderdeudores,
+    limitdeudores,
   }).then(res=>{
     if (res.data) {
       if (res.data.length) {
@@ -3915,6 +3930,9 @@ const auth = permiso => {
           />
         :null}
         {view=="credito"?<Credito
+          limitdeudores={limitdeudores}
+          setlimitdeudores={setlimitdeudores}
+
           moneda={moneda}
           orderbycolumdeudores={orderbycolumdeudores}
           setorderbycolumdeudores={setorderbycolumdeudores}

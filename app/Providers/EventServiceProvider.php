@@ -19,8 +19,9 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         
-        \Spatie\Backup\Events\BackupZipWasCreated::class => [
-            MailSuccessfulDatabaseBackup::class
+
+        'Spatie\Backup\Events\BackupZipWasCreated' => [
+            'App\Listeners\MailSuccessfulDatabaseBackup',
         ],
     ];
 

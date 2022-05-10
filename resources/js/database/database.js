@@ -54,6 +54,7 @@ const db = {
 
   getDeudores: data=>axios.post(host+"getDeudores",data),
   
+  backup: data=>axios.get(host+"backup",data),
   getDeudor: data=>axios.post(host+"getDeudor",data),
   checkDeuda: data=>axios.post(host+"checkDeuda",data),
   
