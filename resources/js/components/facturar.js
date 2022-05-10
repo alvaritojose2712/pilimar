@@ -2094,12 +2094,12 @@ const guardar_cierre = (e,callback=null) => {
         db.sendCierre({type,fecha:fechaCierre}).then(res=>{
           notificar(res,false)
 
-          notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
-          setLoading(true)
-          db.backup({}).then(res=>{
-            notificar(res)
-            setLoading(false)
-          })
+          // notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
+          // setLoading(true)
+          // db.backup({}).then(res=>{
+          //   notificar(res)
+          //   setLoading(false)
+          // })
           
 
         })
