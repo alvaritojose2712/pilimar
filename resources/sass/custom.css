@@ -21,6 +21,13 @@
 
   
 }
+
+.bg-success-super{
+  background-color: #d0f9c5 !important;
+}
+.bg-danger-super{
+  background-color: #f79292 !important;
+}
 body *::-webkit-scrollbar {
     width: 1em;
 }

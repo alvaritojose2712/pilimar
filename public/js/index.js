@@ -2105,41 +2105,29 @@ function ModalMovimientos(_ref) {
       setFechaMovimientos = _ref.setFechaMovimientos,
       fechaMovimientos = _ref.fechaMovimientos;
 
-  var retTipoMov = function retTipoMov() {
-    return movimientos.length ? movimientos.map(function (e, i) {
-      return !e.items.length || e.items.filter(function (e) {
-        return e.tipo == 2 || !e.id_producto;
-      }).length ? null : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-            className: "align-middle",
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h2", {
-              children: e.id
-            })
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
-            className: "w-50",
-            children: [retTipoSubMov(e.items, 1), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h2", {
-              className: "text-right",
-              children: ["Tot. ", e.tot1]
+  var retTipoMov = function retTipoMov(type) {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("table", {
+      className: "table",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
+        children: productosDevulucionSelect !== null && productosDevulucionSelect !== void 0 && productosDevulucionSelect.length ? productosDevulucionSelect.map(function (e) {
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
+            onClick: setDevolucion,
+            "data-id": e.id,
+            "data-type": type,
+            className: "hover",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+              children: e.codigo_proveedor
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
+              children: e.descripcion
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
+              children: ["Ct. ", e.cantidad]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
+              children: ["P/U. ", e.precio]
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
-            className: "w-50",
-            children: [retTipoSubMov(e.items, 0), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h2", {
-              className: "text-right",
-              children: ["Tot. ", e.tot0]
-            })]
-          })]
-        }, e.id), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-            colSpan: "3",
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
-              className: "text-success text-center",
-              children: ["Diff. ", e.diff]
-            })
-          })
-        })]
-      });
-    }) : null;
+          }, e.id);
+        }) : null
+      })
+    });
   };
 
   var retCat = function retCat(cat) {
@@ -2186,7 +2174,7 @@ function ModalMovimientos(_ref) {
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                 children: ee.cantidad
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                className: "text-success",
+                className: "",
                 children: ee.total
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
                 children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("i", {
@@ -2214,112 +2202,128 @@ function ModalMovimientos(_ref) {
           className: "closeModal",
           children: "\u2716"
         })
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
         className: "modal-content",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h4", {
-          children: "Movimientos del d\xEDa"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-          type: "date",
-          value: fechaMovimientos,
-          onChange: function onChange(e) {
-            return setFechaMovimientos(e.target.value);
-          }
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
-          className: "table",
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("thead", {
-            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                colSpan: "3",
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
-                  className: "form-group d-flex justify-content-between",
-                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
-                    type: "text",
-                    className: "form-control",
-                    placeholder: "Buscar...",
-                    onChange: function onChange(e) {
-                      return setBuscarDevolucion(e.target.value);
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+          className: "container-fluid",
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+            className: "row",
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+              className: "col-2",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h4", {
+                children: ["Devoluciones ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                  className: "btn btn-success",
+                  onClick: function onClick() {
+                    return setIdMovSelect("nuevo");
+                  },
+                  children: "Nuevo"
+                })]
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+                className: "list-items",
+                children: movimientos.length ? movimientos.map(function (e) {
+                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                    className: "card-pedidos pointer " + (e.id == idMovSelect ? "bg-sinapsis-light" : null),
+                    onClick: function onClick() {
+                      return setIdMovSelect(e.id);
                     },
-                    value: buscarDevolucion
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", {
-                    onChange: function onChange(e) {
-                      return setTipoMovMovimientos(e.target.value);
-                    },
-                    className: "form-control",
-                    value: tipoMovMovimientos,
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
-                      value: "1",
-                      children: "Entrada"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
-                      value: "0",
-                      children: "Salida"
-                    })]
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", {
-                    onChange: function onChange(e) {
-                      return setTipoCatMovimientos(e.target.value);
-                    },
-                    className: "form-control",
-                    value: tipoCatMovimientos,
-                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
-                      value: "1",
-                      children: "Garant\xEDa"
-                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
-                      value: "2",
-                      children: "Cambio"
-                    })]
-                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("select", {
-                    onChange: function onChange(e) {
-                      return setIdMovSelect(e.target.value);
-                    },
-                    className: "form-control",
-                    value: idMovSelect,
-                    children: [movimientos.length ? movimientos.map(function (e) {
-                      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
-                        value: e.id,
-                        children: e.id
-                      }, e.id);
-                    }) : null, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("option", {
-                      value: "nuevo",
-                      children: "Nuevo"
-                    })]
-                  })]
-                })
-              })
-            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
-              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-                children: "Num. Mov."
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-                children: "Entrada"
-              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
-                children: "Salida"
+                    children: ["Mov. ", e.id]
+                  }, e.id);
+                }) : null
+              })]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+              className: "col",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                className: "d-flex justify-content-between",
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                  className: "h1",
+                  children: ["Seleccionado: Mov. ", idMovSelect]
+                }), movimientos.length && movimientos.filter(function (e) {
+                  return e.id == idMovSelect;
+                }).length ? movimientos.filter(function (e) {
+                  return e.id == idMovSelect;
+                }).map(function (e) {
+                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                    className: "h1",
+                    children: ["Diff. ", e.diff]
+                  });
+                }) : null]
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                className: "container-fluid",
+                children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+                  className: "row",
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+                    className: "col",
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                      className: "header text-center bg-success-super",
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+                        onClick: function onClick() {
+                          return setTipoMovMovimientos(1);
+                        },
+                        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+                          className: "pointer",
+                          children: "Entrada"
+                        }), " ", tipoMovMovimientos == 1 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+                          type: "text",
+                          className: "form-control",
+                          placeholder: "Buscar...",
+                          onChange: function onChange(e) {
+                            return setBuscarDevolucion(e.target.value);
+                          },
+                          value: buscarDevolucion
+                        }) : null]
+                      }), buscarDevolucion == "" ? movimientos.length && movimientos.filter(function (e) {
+                        return e.id == idMovSelect;
+                      }).length ? movimientos.filter(function (e) {
+                        return e.id == idMovSelect;
+                      }).map(function (e) {
+                        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                          children: [retTipoSubMov(e.items, 1), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                            children: ["Tot. ", e.tot1]
+                          })]
+                        }, e.id);
+                      }) : null : tipoMovMovimientos == 1 ? retTipoMov(1) : null]
+                    })
+                  })
+                }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+                  className: "row",
+                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
+                    className: "col",
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                      className: "header text-center bg-danger-super",
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+                        onClick: function onClick() {
+                          return setTipoMovMovimientos(0);
+                        },
+                        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+                          className: "pointer",
+                          children: "Salida"
+                        }), " ", tipoMovMovimientos == 0 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+                          type: "text",
+                          className: "form-control",
+                          placeholder: "Buscar...",
+                          onChange: function onChange(e) {
+                            return setBuscarDevolucion(e.target.value);
+                          },
+                          value: buscarDevolucion
+                        }) : null]
+                      }), buscarDevolucion == "" ? movimientos.length && movimientos.filter(function (e) {
+                        return e.id == idMovSelect;
+                      }).length ? movimientos.filter(function (e) {
+                        return e.id == idMovSelect;
+                      }).map(function (e) {
+                        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                          children: [retTipoSubMov(e.items, 0), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
+                            children: ["Tot. ", e.tot0]
+                          })]
+                        }, e.id);
+                      }) : null : tipoMovMovimientos == 0 ? retTipoMov(0) : null]
+                    })
+                  })
+                })]
               })]
             })]
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
-            children: buscarDevolucion == "" ? retTipoMov() : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tr", {
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("table", {
-                  className: "table",
-                  children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
-                    children: productosDevulucionSelect !== null && productosDevulucionSelect !== void 0 && productosDevulucionSelect.length ? productosDevulucionSelect.map(function (e) {
-                      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
-                        onClick: setDevolucion,
-                        "data-id": e.id,
-                        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                          children: e.codigo_proveedor
-                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("td", {
-                          children: e.descripcion
-                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
-                          children: ["Ct. ", e.cantidad]
-                        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("td", {
-                          children: ["P/U. ", e.precio]
-                        })]
-                      }, e.id);
-                    }) : null
-                  })
-                })
-              })
-            })
-          })]
-        })]
+          })
+        })
       })]
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
       className: "overlay"
@@ -6941,7 +6945,7 @@ function Facturar(_ref) {
     if (view == "pedidos") {
       getPedidos();
     }
-  }, [busquedaPedido, fecha1pedido, fecha2pedido, tipobusquedapedido, tipoestadopedido, filterMetodoPagoToggle]);
+  }, [fecha1pedido, fecha2pedido, tipobusquedapedido, tipoestadopedido, filterMetodoPagoToggle]);
   (0,react__WEBPACK_IMPORTED_MODULE_2__.useEffect)(function () {
     if (selectDeudor == null) {
       getDeudores();
@@ -7210,8 +7214,8 @@ function Facturar(_ref) {
       fechaMovimientos: fechaMovimientos
     }).then(function (res) {
       setMovimientos(res.data); // if (!res.data.length) {
-
-      setIdMovSelect("nuevo"); // }else{
+      // setIdMovSelect("nuevo")
+      // }else{
       //   if (res.data[0]) {
       //     setIdMovSelect(res.data[0].id)
       //   }
@@ -7480,6 +7484,10 @@ function Facturar(_ref) {
   };
 
   var getPedidos = function getPedidos(e) {
+    if (e) {
+      e.preventDefault();
+    }
+
     setLoading(true);
     setPedidos([]);
 
@@ -8221,12 +8229,18 @@ function Facturar(_ref) {
             type: type,
             fecha: fechaCierre
           }).then(function (res) {
-            notificar(res, false); // notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
-            // setLoading(true)
-            // db.backup({}).then(res=>{
-            //   notificar(res)
-            //   setLoading(false)
-            // })
+            notificar(res, false);
+            notificar({
+              data: {
+                msj: "Respaldando Base de Datos",
+                estado: true
+              }
+            });
+            setLoading(true);
+            _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].backup({}).then(function (res) {
+              notificar(res);
+              setLoading(false);
+            });
           });
         }
       }
@@ -8332,6 +8346,7 @@ function Facturar(_ref) {
   var setDevolucion = function setDevolucion(e) {
     setLoading(true);
     var id = e.currentTarget.attributes["data-id"].value;
+    var type = e.currentTarget.attributes["data-type"].value;
     var cantidad = window.prompt("Cantidad");
 
     if (cantidad) {
@@ -8339,7 +8354,7 @@ function Facturar(_ref) {
         id: id,
         idMovSelect: idMovSelect,
         cantidad: cantidad,
-        tipoMovMovimientos: tipoMovMovimientos,
+        tipoMovMovimientos: type,
         tipoCatMovimientos: tipoCatMovimientos,
         fechaMovimientos: fechaMovimientos
       }).then(function (res) {
@@ -14487,13 +14502,17 @@ function Pedidos(_ref) {
                 })]
               })
             })
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("input", {
+          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("form", {
+            onSubmit: getPedidos,
             className: "form-control",
-            placeholder: "Buscar... #Factura, #Descripci\xF3n, #Cliente",
-            value: busquedaPedido,
-            "data-type": "busquedaPedido",
-            onChange: onChangePedidos,
-            autoComplete: "off"
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("input", {
+              className: "form-control",
+              placeholder: "Buscar... #Factura, #Descripci\xF3n, #Cliente",
+              value: busquedaPedido,
+              "data-type": "busquedaPedido",
+              onChange: onChangePedidos,
+              autoComplete: "off"
+            })
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("input", {
             type: "date",
             value: fecha1pedido,

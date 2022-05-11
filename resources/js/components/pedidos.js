@@ -61,7 +61,10 @@ filterMetodoPagoToggle,
               </div>
 	          </div>
 
-	          <input className="form-control" placeholder="Buscar... #Factura, #Descripción, #Cliente" value={busquedaPedido} data-type="busquedaPedido" onChange={onChangePedidos} autoComplete="off" />
+	          <form onSubmit={getPedidos} className="form-control">
+	          	
+	          	<input className="form-control" placeholder="Buscar... #Factura, #Descripción, #Cliente" value={busquedaPedido} data-type="busquedaPedido" onChange={onChangePedidos} autoComplete="off" />
+	          </form>
 	          <input type="date" value={fecha1pedido} data-type="fecha1pedido" onChange={onChangePedidos} className="form-control" />
 	          <input type="date" value={fecha2pedido} data-type="fecha2pedido" onChange={onChangePedidos} className="form-control" />
 						<i className="fa fa-reload" onClick={()=>getPedidos()}></i>

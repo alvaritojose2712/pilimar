@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\cierres;
 use App\Models\pedidos;
 use App\Models\moneda;
@@ -292,7 +293,7 @@ class PedidosController extends Controller
 
             // code...
         }else if ($tipobusquedapedido=="fact") {
-            $fact = pedidos::where("id","LIKE","$busquedaPedido")
+            $fact = pedidos::where("id","LIKE","$busquedaPedido%")
             ->where(function($q) use ( $tipoestadopedido){
 
                 if (!$tipoestadopedido) {
@@ -1027,7 +1028,8 @@ class PedidosController extends Controller
             return "No hay cierre guardado para esta fecha";
         }
 
-        $total_inventario = inventario::sum("precio");
+        $total_inventario = DB::table("inventarios")
+        ->select(DB::raw("sum(precio_base*cantidad) as suma"))->first()->suma;
         $vueltos = pago_pedidos::where("tipo",6)->where("monto","<>",0);
         $vueltos_totales = $vueltos->sum("monto");
         

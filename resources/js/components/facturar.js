@@ -927,7 +927,7 @@ useHotkeys("tab",()=>{
     if (view=="pedidos") {
       getPedidos()
     }
-  }, [busquedaPedido,fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle]);
+  }, [fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle]);
   useEffect(()=>{
     if (selectDeudor==null) {
       getDeudores()
@@ -1225,7 +1225,7 @@ const getMovimientos = () =>{
     setMovimientos(res.data)
 
     // if (!res.data.length) {
-      setIdMovSelect("nuevo")
+      // setIdMovSelect("nuevo")
     // }else{
     //   if (res.data[0]) {
     //     setIdMovSelect(res.data[0].id)
@@ -1466,6 +1466,9 @@ const onChangePedidos = e =>{
   }
 }
 const getPedidos = e => {
+  if (e) {
+    e.preventDefault()
+  }
   setLoading(true)
   setPedidos([])
 
@@ -2094,12 +2097,12 @@ const guardar_cierre = (e,callback=null) => {
         db.sendCierre({type,fecha:fechaCierre}).then(res=>{
           notificar(res,false)
 
-          // notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
-          // setLoading(true)
-          // db.backup({}).then(res=>{
-          //   notificar(res)
-          //   setLoading(false)
-          // })
+          notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
+          setLoading(true)
+          db.backup({}).then(res=>{
+            notificar(res)
+            setLoading(false)
+          })
           
 
         })
@@ -2204,6 +2207,7 @@ const delMov = e =>{
 const setDevolucion = e => {
   setLoading(true)
   let id = e.currentTarget.attributes["data-id"].value
+  let type = e.currentTarget.attributes["data-type"].value
 
   let cantidad = window.prompt("Cantidad")
 
@@ -2212,7 +2216,7 @@ const setDevolucion = e => {
       id,
       idMovSelect,
       cantidad,
-      tipoMovMovimientos,
+      tipoMovMovimientos:type,
       tipoCatMovimientos,
       fechaMovimientos,
     }).then(res=>{
