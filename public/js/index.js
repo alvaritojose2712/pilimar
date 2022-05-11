@@ -8221,18 +8221,12 @@ function Facturar(_ref) {
             type: type,
             fecha: fechaCierre
           }).then(function (res) {
-            notificar(res, false);
-            notificar({
-              data: {
-                msj: "Respaldando Base de Datos",
-                estado: true
-              }
-            });
-            setLoading(true);
-            _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].backup({}).then(function (res) {
-              notificar(res);
-              setLoading(false);
-            });
+            notificar(res, false); // notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
+            // setLoading(true)
+            // db.backup({}).then(res=>{
+            //   notificar(res)
+            //   setLoading(false)
+            // })
           });
         }
       }

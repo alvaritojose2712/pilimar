@@ -292,7 +292,7 @@ class PedidosController extends Controller
 
             // code...
         }else if ($tipobusquedapedido=="fact") {
-            $fact = pedidos::where("id","LIKE","$busquedaPedido%")
+            $fact = pedidos::where("id","LIKE","$busquedaPedido")
             ->where(function($q) use ( $tipoestadopedido){
 
                 if (!$tipoestadopedido) {
