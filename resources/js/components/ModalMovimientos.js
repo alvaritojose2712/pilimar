@@ -1,4 +1,5 @@
 export default function ModalMovimientos({
+  getMovimientos,
   setShowModalMovimientos,
   showModalMovimientos,
 
@@ -144,9 +145,9 @@ export default function ModalMovimientos({
             <div className="row">
               <div className="col-2">
                 <h4>Devoluciones <button className="btn btn-success" onClick={()=>setIdMovSelect("nuevo")}>Nuevo</button></h4>
-
+                <input type="text" className="form-control mb-1" placeholder="Buscar..." onChange={e=>getMovimientos(e.target.value)}/>
                 <div className="list-items">
-                  {movimientos.length?movimientos.map(e=>
+                  {movimientos.length?movimientos.filter(e=>!e.items.length).map(e=>
                     <div className={("card-pedidos pointer ")+(e.id==idMovSelect?"bg-sinapsis-light":null)} key={e.id} onClick={()=>setIdMovSelect(e.id)}>Mov. {e.id}</div>
 
                   ):null}
@@ -159,7 +160,7 @@ export default function ModalMovimientos({
                   {
                     movimientos.length&&movimientos.filter(e=>e.id==idMovSelect).length?
                       movimientos.filter(e=>e.id==idMovSelect).map(e=>
-                        <div className="h1">Diff. {e.diff}</div>
+                        <div className="h1" key={e.id}>Diff. {e.diff}</div>
                       )
                     :null
                   }
@@ -180,7 +181,7 @@ export default function ModalMovimientos({
                             movimientos.filter(e=>e.id==idMovSelect).map(e=>
                               <div key={e.id}>
                                 {retTipoSubMov(e.items,1)}
-                                <div>Tot. {e.tot1}</div>
+                                <div className="h3">Tot. {e.tot1}</div>
 
                               </div>
                             )
@@ -207,7 +208,7 @@ export default function ModalMovimientos({
                             movimientos.filter(e=>e.id==idMovSelect).map(e=>
                               <div key={e.id}>
                                 {retTipoSubMov(e.items,0)}
-                                <div>Tot. {e.tot0}</div>
+                                <div className="h3">Tot. {e.tot0}</div>
                               </div>
                             )
                           :null

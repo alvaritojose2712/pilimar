@@ -1219,9 +1219,9 @@ const setToggleAddPersonaFun = (prop,callback=null)=> {
   setToggleAddPersona(prop)
   if (callback) {callback()}
 }
-const getMovimientos = () =>{
+const getMovimientos = (val="") =>{
   setLoading(true)
-  db.getMovimientos({fechaMovimientos}).then(res=>{
+  db.getMovimientos({val,fechaMovimientos}).then(res=>{
     setMovimientos(res.data)
 
     // if (!res.data.length) {
@@ -3363,6 +3363,7 @@ const auth = permiso => {
               addCarritoRequest={addCarritoRequest}/>:null:null}
 
             {showModalMovimientos&&<ModalMovimientos 
+              getMovimientos={getMovimientos}
               setShowModalMovimientos={setShowModalMovimientos}
               showModalMovimientos={showModalMovimientos}
 

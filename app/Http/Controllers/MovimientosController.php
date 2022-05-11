@@ -76,14 +76,18 @@ class MovimientosController extends Controller
     public function getMovimientos(Request $req)
     {
         $today = $req->fechaMovimientos;
+        $val = $req->val;
         return movimientos::with(["items"=>function($q)
         {
             $q->with("producto");
         }])
 
         // ->selectRaw("*, @summov := (SELECT sum(precio) FROM inventarios WHERE id = items.id_producto) as summov")
+        ->where("tipo",NULL)
+        ->where("id","LIKE",$val."%")
         ->where("created_at","LIKE",$today."%")
-        ->orderBy("created_at","desc")
+        ->orderBy("id","desc")
+        ->limit(20)
         ->get()
         ->map(function($q){
             $items = $q->items->map(function($q){

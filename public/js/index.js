@@ -2087,7 +2087,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function ModalMovimientos(_ref) {
-  var setShowModalMovimientos = _ref.setShowModalMovimientos,
+  var getMovimientos = _ref.getMovimientos,
+      setShowModalMovimientos = _ref.setShowModalMovimientos,
       showModalMovimientos = _ref.showModalMovimientos,
       setBuscarDevolucion = _ref.setBuscarDevolucion,
       buscarDevolucion = _ref.buscarDevolucion,
@@ -2218,6 +2219,13 @@ function ModalMovimientos(_ref) {
                   },
                   children: "Nuevo"
                 })]
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("input", {
+                type: "text",
+                className: "form-control",
+                placeholder: "Buscar...",
+                onChange: function onChange(e) {
+                  return getMovimientos(e.target.value);
+                }
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
                 className: "list-items",
                 children: movimientos.length ? movimientos.map(function (e) {
@@ -2245,7 +2253,7 @@ function ModalMovimientos(_ref) {
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
                     className: "h1",
                     children: ["Diff. ", e.diff]
-                  });
+                  }, e.id);
                 }) : null]
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
                 className: "container-fluid",
@@ -7209,8 +7217,10 @@ function Facturar(_ref) {
   };
 
   var getMovimientos = function getMovimientos() {
+    var val = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
     setLoading(true);
     _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getMovimientos({
+      val: val,
       fechaMovimientos: fechaMovimientos
     }).then(function (res) {
       setMovimientos(res.data); // if (!res.data.length) {
@@ -9581,6 +9591,7 @@ function Facturar(_ref) {
         inputCantidadCarritoref: inputCantidadCarritoref,
         addCarritoRequest: addCarritoRequest
       }) : null : null, showModalMovimientos && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_components_ModalMovimientos__WEBPACK_IMPORTED_MODULE_8__["default"], {
+        getMovimientos: getMovimientos,
         setShowModalMovimientos: setShowModalMovimientos,
         showModalMovimientos: showModalMovimientos,
         setBuscarDevolucion: setBuscarDevolucion,
