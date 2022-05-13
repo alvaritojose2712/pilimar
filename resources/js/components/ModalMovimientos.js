@@ -147,7 +147,7 @@ export default function ModalMovimientos({
                 <h4>Devoluciones <button className="btn btn-success" onClick={()=>setIdMovSelect("nuevo")}>Nuevo</button></h4>
                 <input type="text" className="form-control mb-1" placeholder="Buscar..." onChange={e=>getMovimientos(e.target.value)}/>
                 <div className="list-items">
-                  {movimientos.length?movimientos.filter(e=>!e.items.length).map(e=>
+                  {movimientos.length?movimientos.map(e=>
                     <div className={("card-pedidos pointer ")+(e.id==idMovSelect?"bg-sinapsis-light":null)} key={e.id} onClick={()=>setIdMovSelect(e.id)}>Mov. {e.id}</div>
 
                   ):null}
