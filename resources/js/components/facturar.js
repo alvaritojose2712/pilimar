@@ -120,6 +120,10 @@ export default function Facturar({user,notificar,setLoading}) {
   const [pedidoList,setPedidoList] = useState([])
   const [showMisPedido,setshowMisPedido] = useState(true)
 
+  const [orderbycolumpedidos,setorderbycolumpedidos] = useState("id")
+  const [orderbyorderpedidos,setorderbyorderpedidos] = useState("desc")
+
+
 
   const [debito,setDebito] = useState("")
   const [efectivo,setEfectivo] = useState("")
@@ -181,7 +185,7 @@ export default function Facturar({user,notificar,setLoading}) {
   const [qDeudores,setQDeudores] = useState("")
   const [orderbycolumdeudores,setorderbycolumdeudores] = useState("saldo")
   const [orderbyorderdeudores,setorderbyorderdeudores] = useState("asc")
-  const [limitdeudores,setlimitdeudores] = useState(100)
+  const [limitdeudores,setlimitdeudores] = useState(25)
 
 
 
@@ -927,7 +931,7 @@ useHotkeys("tab",()=>{
     if (view=="pedidos") {
       getPedidos()
     }
-  }, [fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle]);
+  }, [fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle,orderbycolumpedidos,orderbyorderpedidos]);
   useEffect(()=>{
     if (selectDeudor==null) {
       getDeudores()
@@ -1476,7 +1480,16 @@ const getPedidos = e => {
     clearTimeout(typingTimeout)
   }
   let time = window.setTimeout(()=>{
-    db.getPedidos({vendedor:showMisPedido?[user.id_usuario]:[],busquedaPedido,fecha1pedido,fecha2pedido,tipobusquedapedido,tipoestadopedido,filterMetodoPagoToggle}).then(res=>{
+    db.getPedidos({
+      vendedor:showMisPedido?[user.id_usuario]:[],
+      busquedaPedido,
+      fecha1pedido,
+      fecha2pedido,
+      tipobusquedapedido,
+      tipoestadopedido,
+      filterMetodoPagoToggle,
+      orderbycolumpedidos,
+      orderbyorderpedidos}).then(res=>{
       if (res.data) {
         setPedidos(res.data)
       }else{
@@ -2139,22 +2152,32 @@ const setPagoCredito = e =>{
 const getDeudores = e =>{
   setLoading(true)
 
-  db.getDeudores({
-    qDeudores,
-    view,
-    orderbycolumdeudores,
-    orderbyorderdeudores,
-    limitdeudores,
-  }).then(res=>{
-    if (res.data) {
-      if (res.data.length) {
-        setDeudoresList(res.data)
-      }else{
-        setDeudoresList([])
+  if (time!=0) {
+    clearTimeout(typingTimeout)
+  }
+
+  let time = window.setTimeout(()=>{
+    
+    db.getDeudores({
+      qDeudores,
+      view,
+      orderbycolumdeudores,
+      orderbyorderdeudores,
+      limitdeudores,
+    }).then(res=>{
+      if (res.data) {
+        if (res.data.length) {
+          setDeudoresList(res.data)
+        }else{
+          setDeudoresList([])
+        }
       }
-    }
-    setLoading(false)
-  })
+      setLoading(false)
+    })
+  },150)
+  setTypingTimeout(time)
+
+
 }
 const clickSetOrderColumn = e => {
   let valor = e.currentTarget.attributes["data-valor"].value
@@ -2169,6 +2192,25 @@ const clickSetOrderColumn = e => {
   }else{
     setOrderColumn(valor)
   }
+
+}
+
+const clickSetOrderColumnPedidos = e => {
+  let valor = e.currentTarget.attributes["data-valor"].value
+
+  if (valor==orderbycolumpedidos) {
+    if (orderbyorderpedidos=="desc") {
+      setorderbyorderpedidos("asc")
+    }else{
+      setorderbyorderpedidos("desc")
+
+    }
+  }else{
+    setorderbycolumpedidos(valor)
+  }
+
+
+
 
 }
 const onchangeinputmain = e => {
@@ -3589,6 +3631,12 @@ const auth = permiso => {
           peso={peso} 
         />:null}
         {view=="pedidos"?<Pedidos
+          clickSetOrderColumnPedidos={clickSetOrderColumnPedidos}
+          orderbycolumpedidos={orderbycolumpedidos}
+          setorderbycolumpedidos={setorderbycolumpedidos}
+          orderbyorderpedidos={orderbyorderpedidos}
+          setorderbyorderpedidos={setorderbyorderpedidos}
+          moneda={moneda}
           setshowMisPedido={setshowMisPedido}
           showMisPedido={showMisPedido}
           tipobusquedapedido={tipobusquedapedido}

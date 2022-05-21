@@ -101,11 +101,9 @@ class tickera extends Controller
                     //Current item ROW 1
 
                     $printer->setEmphasis(true);
-                    $printer->text($sucursal->nombre_registro);
-
-                    $printer->setEmphasis(false);
                     $printer->text("\n");
                     $printer->text($item['codigo_barras']);
+                    $printer->setEmphasis(false);
                    $printer->text("\n");
                    $printer->text($item['descripcion']);
                    $printer->text("\n");

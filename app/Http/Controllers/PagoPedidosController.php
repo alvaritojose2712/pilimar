@@ -259,6 +259,8 @@ class PagoPedidosController extends Controller
                 $q->orWhere("identificacion","LIKE","%".$busqueda."%")
                 ->orWhere("nombre","LIKE","%".$busqueda."%");
             })
+
+            ->limit($limitdeudores)
             ->get()
             ->map(function($q) use ($view,$today) {
 

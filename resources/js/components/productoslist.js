@@ -48,7 +48,7 @@ function ProductosList({
           </tr>
         </thead>
         <tbody ref={tbodyproductosref}>
-          {productos?productos.map((e,i)=>
+          {productos?productos.length?productos.map((e,i)=>
             
               <tr data-index={i} tabIndex="-1" className={(counterListProductos == i ?"bg-sinapsis-light":null)+(' tr-producto hover')} key={e.id}>
                 <td data-index={i} onClick={event=>{
@@ -117,7 +117,7 @@ function ProductosList({
                 </td>
               </tr>
               
-            ):null}
+            ):null:null}
         </tbody>
       </table>
 

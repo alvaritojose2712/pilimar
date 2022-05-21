@@ -293,7 +293,14 @@ class PedidosController extends Controller
 
             // code...
         }else if ($tipobusquedapedido=="fact") {
-            $fact = pedidos::where("id","LIKE","$busquedaPedido%")
+            $orderbycolumpedidos = $req->orderbycolumpedidos;
+            $orderbyorderpedidos = $req->orderbyorderpedidos;
+            $fact = pedidos::with(["pagos"=>function($q){
+
+            },"items"=>function($q)
+            {
+                
+            },"vendedor","cliente"])->where("id","LIKE","$busquedaPedido%")
             ->where(function($q) use ( $tipoestadopedido){
 
                 if (!$tipoestadopedido) {
@@ -313,29 +320,32 @@ class PedidosController extends Controller
                 # code...
                 $fact->whereIn("id_vendedor",$vendedor);
             }
-            $fact = $fact->orderBy("created_at","desc")
+            $fact = $fact->selectRaw("*, (SELECT ROUND(sum(monto-(monto*(descuento/100))),2) FROM items_pedidos WHERE id_pedido=pedidos.id) as totales")
+            ->orderBy($orderbycolumpedidos, $orderbyorderpedidos)
             ->limit($limit)
-            ->get()
-            ->map(function($q) use (&$subtotal, &$desctotal, &$totaltotal,&$porctotal,&$itemstotal,&$totalventas,$filterMetodoPagoToggle){
-                // global ;
+            ->get();
+            $totaltotal = $fact->sum("totales");
 
-                $fun = $this->getPedidoFun($q->id,$filterMetodoPagoToggle,1,1,1,true);
-                $q->pedido = $fun;
+            // ->map(function($q) use (&$subtotal, &$desctotal, &$totaltotal,&$porctotal,&$itemstotal,&$totalventas,$filterMetodoPagoToggle){
+            //     // global ;
 
-                // $istrue = false; 
-                if ($filterMetodoPagoToggle=="todos"||count($q->pagos->where("tipo",$filterMetodoPagoToggle)->where("monto","<>",0))) {
-                    $totalventas++;
-                    $itemstotal += count($fun->items);
+            //     $fun = $this->getPedidoFun($q->id,$filterMetodoPagoToggle,1,1,1,true);
+            //     $q->pedido = $fun;
 
-                    $subtotal += $fun->clean_subtotal;
-                    $desctotal += $fun->clean_total_des;
-                    $totaltotal += $fun->clean_total;
-                    $porctotal += $fun->clean_total_porciento;
-                    return $q;
-                }else{
+            //     // $istrue = false; 
+            //     if ($filterMetodoPagoToggle=="todos"||count($q->pagos->where("tipo",$filterMetodoPagoToggle)->where("monto","<>",0))) {
+            //         $totalventas++;
+            //         $itemstotal += count($fun->items);
+
+            //         $subtotal += $fun->clean_subtotal;
+            //         $desctotal += $fun->clean_total_des;
+            //         $totaltotal += $fun->clean_total;
+            //         $porctotal += $fun->clean_total_porciento;
+            //         return $q;
+            //     }else{
                     
-                }
-            });  
+            //     }
+            // });  
         }else if($tipobusquedapedido=="cliente"){
             $fact = pedidos::whereIn("id_cliente",function($q) use ($busquedaPedido)
             {
