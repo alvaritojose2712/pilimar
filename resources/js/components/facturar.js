@@ -1618,7 +1618,13 @@ const getPedidosList = (callback=null)=>{
     }
     if(callback){callback()}
   })
-}
+} 
+  const [showModalPedidoFast, setshowModalPedidoFast] = useState(false)
+  const getPedidoFast = (e) => {
+    let id = e.currentTarget.attributes["data-id"].value
+    setshowModalPedidoFast(true)
+    getPedido(id)
+  }
   const getPedido = (id, callback = null, clearPagosPedido=true) => {
   setLoading(true)
   if (!id) {
@@ -3631,6 +3637,10 @@ const auth = permiso => {
           peso={peso} 
         />:null}
         {view=="pedidos"?<Pedidos
+          pedidoData={pedidoData}
+          showModalPedidoFast={showModalPedidoFast}
+          setshowModalPedidoFast={setshowModalPedidoFast}
+          getPedidoFast={getPedidoFast}
           clickSetOrderColumnPedidos={clickSetOrderColumnPedidos}
           orderbycolumpedidos={orderbycolumpedidos}
           setorderbycolumpedidos={setorderbycolumpedidos}

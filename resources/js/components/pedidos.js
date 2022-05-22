@@ -1,7 +1,13 @@
 import {useState} from 'react';
 
+import ModalShowPedidoFast from '../components/ModalShowPedidoFast';
+
 function Pedidos({
-	getPedidoFast,
+pedidoData,
+getPedidoFast,
+showModalPedidoFast,
+setshowModalPedidoFast,
+
 orderbycolumpedidos,
 setorderbycolumpedidos,
 orderbyorderpedidos,
@@ -36,6 +42,13 @@ clickSetOrderColumnPedidos,
 	try{
 		return (
 			<div className="container">
+				{showModalPedidoFast&&<ModalShowPedidoFast
+					pedidoData={pedidoData}
+					showModalPedidoFast={showModalPedidoFast}
+					setshowModalPedidoFast={setshowModalPedidoFast}
+					onClickEditPedido={onClickEditPedido}
+				/>}
+
         <div className="d-flex justify-content-center align-items-center">
 					<div className="input-group cell2">
 					  <div className="input-group-prepend">
@@ -211,9 +224,9 @@ clickSetOrderColumnPedidos,
 											    		<small>Items. {e.items.length}</small>
 											    	</td>
 											    	<td className="cell3">
-															<div className="btn-options">
+															<div className="btn-options btn-group">
+																<button className="btn btn-outline-success" data-id={e.id} onClick={getPedidoFast}><i className="fa fa-eye"></i></button>
 																<button className="btn btn-outline-danger" data-id={e.id} data-type="getPedidos" onClick={onCLickDelPedido}><i className="fa fa-times"></i></button>
-																<button className="btn btn-outline-success" data-id={e.id} onClick={getPedidoFast}><i className="fa fa-times"></i></button>
 															</div>
 											    	</td>
 								    				
