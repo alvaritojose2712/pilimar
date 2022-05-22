@@ -14480,7 +14480,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Pedidos(_ref) {
-  var orderbycolumpedidos = _ref.orderbycolumpedidos,
+  var getPedidoFast = _ref.getPedidoFast,
+      orderbycolumpedidos = _ref.orderbycolumpedidos,
       setorderbycolumpedidos = _ref.setorderbycolumpedidos,
       orderbyorderpedidos = _ref.orderbyorderpedidos,
       setorderbyorderpedidos = _ref.setorderbyorderpedidos,
@@ -14809,9 +14810,9 @@ function Pedidos(_ref) {
                         })
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("td", {
                         className: "cell3",
-                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
-                          className: "btn-group-vertical btn-options",
-                          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
+                        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
+                          className: "btn-options",
+                          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
                             className: "btn btn-outline-danger",
                             "data-id": e.id,
                             "data-type": "getPedidos",
@@ -14819,7 +14820,14 @@ function Pedidos(_ref) {
                             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("i", {
                               className: "fa fa-times"
                             })
-                          })
+                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("button", {
+                            className: "btn btn-outline-success",
+                            "data-id": e.id,
+                            onClick: getPedidoFast,
+                            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("i", {
+                              className: "fa fa-times"
+                            })
+                          })]
                         })
                       })]
                     })

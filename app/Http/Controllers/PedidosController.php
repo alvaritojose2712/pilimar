@@ -316,10 +316,20 @@ class PedidosController extends Controller
                 }
             })
             ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"]);
+            
             if (count($vendedor)) {
                 # code...
                 $fact->whereIn("id_vendedor",$vendedor);
             }
+            if ($filterMetodoPagoToggle!="todos") {
+                $fact->whereIn("id",function($q) use ($filterMetodoPagoToggle){
+                    $q->select('id_pedido')
+                    ->from("pago_pedidos")
+                    ->where("tipo",$filterMetodoPagoToggle)
+                    ->where("monto","<>",0);
+                });
+            }
+            
             $fact = $fact->selectRaw("*, (SELECT ROUND(sum(monto-(monto*(descuento/100))),2) FROM items_pedidos WHERE id_pedido=pedidos.id) as totales")
             ->orderBy($orderbycolumpedidos, $orderbyorderpedidos)
             ->limit($limit)

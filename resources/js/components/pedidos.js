@@ -1,6 +1,7 @@
 import {useState} from 'react';
 
 function Pedidos({
+	getPedidoFast,
 orderbycolumpedidos,
 setorderbycolumpedidos,
 orderbyorderpedidos,
@@ -210,8 +211,9 @@ clickSetOrderColumnPedidos,
 											    		<small>Items. {e.items.length}</small>
 											    	</td>
 											    	<td className="cell3">
-															<div className="btn-group-vertical btn-options">
+															<div className="btn-options">
 																<button className="btn btn-outline-danger" data-id={e.id} data-type="getPedidos" onClick={onCLickDelPedido}><i className="fa fa-times"></i></button>
+																<button className="btn btn-outline-success" data-id={e.id} onClick={getPedidoFast}><i className="fa fa-times"></i></button>
 															</div>
 											    	</td>
 								    				
