@@ -219,6 +219,8 @@ class PedidosController extends Controller
 
 
         $tipoestadopedido = $req->tipoestadopedido;
+        $orderbycolumpedidos = $req->orderbycolumpedidos;
+        $orderbyorderpedidos = $req->orderbyorderpedidos;
 
         $subtotal = 0;
         $desctotal = 0;
@@ -251,7 +253,8 @@ class PedidosController extends Controller
             ->where(function($q) use ($busquedaPedido)
             {
                 $q->orWhere("descripcion","LIKE","%$busquedaPedido%")
-                ->orWhere("codigo_proveedor","LIKE","%$busquedaPedido%");
+                ->orWhere("codigo_proveedor","LIKE","%$busquedaPedido%")
+                ->orWhere("codigo_barras","LIKE","%$busquedaPedido%");
                 
             })
             ->whereIn("id",function($q) use ($vendedor,$fecha1pedido,$fecha2pedido,$tipoestadopedido){
@@ -292,35 +295,37 @@ class PedidosController extends Controller
 
 
             // code...
-        }else if ($tipobusquedapedido=="fact") {
-            $orderbycolumpedidos = $req->orderbycolumpedidos;
-            $orderbyorderpedidos = $req->orderbyorderpedidos;
+        }else if ($tipobusquedapedido=="fact"||$tipobusquedapedido=="cliente") {
+           
             $fact = pedidos::with(["pagos"=>function($q){
 
             },"items"=>function($q)
             {
                 
-            },"vendedor","cliente"])->where("id","LIKE","$busquedaPedido%")
-            ->where(function($q) use ( $tipoestadopedido){
-
-                if (!$tipoestadopedido) {
-                    $q->where("estado",false);
-                }
-                if($tipoestadopedido==1){
-                    $q->where("estado",true);
-                }
-
-                if($tipoestadopedido=="todos"){
-
-                    // $q->where("estado",true);
-                }
-            })
+            },"vendedor","cliente"])
             ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"]);
             
+            if ($tipobusquedapedido=="fact") {
+                $fact->where("id","LIKE","$busquedaPedido%");
+            }
+
+            if ($tipobusquedapedido=="cliente") {
+                $fact->whereIn("id_cliente",function($q) use ($busquedaPedido){
+                    $q->from("clientes")->orWhere("nombre","LIKE","%$busquedaPedido%")->orWhere("identificacion","LIKE","%$busquedaPedido%")->select("id");
+
+                });
+            }
             if (count($vendedor)) {
-                # code...
                 $fact->whereIn("id_vendedor",$vendedor);
             }
+            if (!$tipoestadopedido) {
+                $fact->where("estado",false);
+            }
+            if($tipoestadopedido==1){
+                $fact->where("estado",true);
+            }
+
+
             if ($filterMetodoPagoToggle!="todos") {
                 $fact->whereIn("id",function($q) use ($filterMetodoPagoToggle){
                     $q->select('id_pedido')
@@ -356,54 +361,6 @@ class PedidosController extends Controller
                     
             //     }
             // });  
-        }else if($tipobusquedapedido=="cliente"){
-            $fact = pedidos::whereIn("id_cliente",function($q) use ($busquedaPedido)
-            {
-                $q->from("clientes")->orWhere("nombre","LIKE","%$busquedaPedido%")->orWhere("identificacion","LIKE","%$busquedaPedido%")->select("id");
-
-            })
-            ->where(function($q) use ( $tipoestadopedido){
-
-                if (!$tipoestadopedido) {
-                    $q->where("estado",false);
-                }
-                if($tipoestadopedido==1){
-                    $q->where("estado",true);
-                }
-
-                if($tipoestadopedido=="todos"){
-
-                    // $q->where("estado",true);
-                }
-            })
-            ->whereBetween("created_at",["$fecha1pedido 00:00:01","$fecha2pedido 23:59:59"]);
-
-            if (count($vendedor)) {
-                $fact->whereIn("id_vendedor",$vendedor);
-            }
-            $fact = $fact->orderBy("created_at","desc")
-            ->limit($limit)
-            ->get()
-            ->map(function($q) use (&$subtotal, &$desctotal, &$totaltotal,&$porctotal,&$itemstotal,&$totalventas,$filterMetodoPagoToggle){
-                // global ;
-
-                $fun = $this->getPedidoFun($q->id,$filterMetodoPagoToggle);
-                $q->pedido = $fun;
-
-                // $istrue = false; 
-                if ($filterMetodoPagoToggle=="todos"||count($q->pagos->where("tipo",$filterMetodoPagoToggle)->where("monto","<>",0))) {
-                    $totalventas++;
-                    $itemstotal += count($fun->items);
-
-                    $subtotal += $fun->clean_subtotal;
-                    $desctotal += $fun->clean_total_des;
-                    $totaltotal += $fun->clean_total;
-                    $porctotal += $fun->clean_total_porciento;
-                    return $q;
-                }else{
-                    
-                }
-            });
         }
         return [
             "fact"=>$fact, 

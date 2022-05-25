@@ -176,14 +176,14 @@ clickSetOrderColumnPedidos,
 									    	</span>
 								    	</h3>
 											<span className="text-muted text-left">
-									    		{e.vendedor.nombre} 
+									    		{e.vendedor?e.vendedor.nombre:null} 
 									    </span>
 									    <br/>
 									    <small className="text-muted font-size-12">{e.created_at}</small>
 										</div>
 										<div className="cell5 pointer" data-id={e.id} onClick={onClickEditPedido}>
 					    				<div className="d-flex justify-content-center">
-					    					{e.pagos.map(ee=>
+					    					{e.pagos?e.pagos.map(ee=>
 					    						<span className="h4" key={ee.id}>
 						    						{ee.monto!=0&&ee.tipo==1?
 						    							<span className="btn btn-info btn-sm">Trans. {ee.monto}</span>
@@ -209,10 +209,10 @@ clickSetOrderColumnPedidos,
 						    							<span className="btn btn-danger btn-sm">Vuel. {ee.monto}</span>
 						    						:null}
 					    						</span>
-					    					)}
+					    					):null}
 					    				</div>
 					    				<div className="text-center">
-					    					Cliente: <b>{e.cliente.nombre}</b>
+					    					Cliente: <b>{e.cliente?e.cliente.nombre:null}</b>
 					    				</div>
 					    			</div>
 					    			<div className="cell4">
@@ -221,7 +221,7 @@ clickSetOrderColumnPedidos,
 								    			<tr>
 								    				<td className="cell6" data-id={e.id} onClick={onClickEditPedido}><b className="h3 text-success">{moneda(e.totales)}</b></td>
 											    	<td className="text-muted cell1" data-id={e.id} onClick={onClickEditPedido}>
-											    		<small>Items. {e.items.length}</small>
+											    		<small>Items. {e.items?e.items.length:null}</small>
 											    	</td>
 											    	<td className="cell3">
 															<div className="btn-options btn-group">

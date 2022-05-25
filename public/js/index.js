@@ -15059,7 +15059,7 @@ function Pedidos(_ref) {
                   })
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
                   className: "text-muted text-left",
-                  children: e.vendedor.nombre
+                  children: e.vendedor ? e.vendedor.nombre : null
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("br", {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("small", {
                   className: "text-muted font-size-12",
                   children: e.created_at
@@ -15070,7 +15070,7 @@ function Pedidos(_ref) {
                 onClick: onClickEditPedido,
                 children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
                   className: "d-flex justify-content-center",
-                  children: e.pagos.map(function (ee) {
+                  children: e.pagos ? e.pagos.map(function (ee) {
                     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("span", {
                       className: "h4",
                       children: [ee.monto != 0 && ee.tipo == 1 ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("span", {
@@ -15093,11 +15093,11 @@ function Pedidos(_ref) {
                         children: ["Vuel. ", ee.monto]
                       }) : null]
                     }, ee.id);
-                  })
+                  }) : null
                 }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
                   className: "text-center",
                   children: ["Cliente: ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("b", {
-                    children: e.cliente.nombre
+                    children: e.cliente ? e.cliente.nombre : null
                   })]
                 })]
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
@@ -15119,7 +15119,7 @@ function Pedidos(_ref) {
                         "data-id": e.id,
                         onClick: onClickEditPedido,
                         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("small", {
-                          children: ["Items. ", e.items.length]
+                          children: ["Items. ", e.items ? e.items.length : null]
                         })
                       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("td", {
                         className: "cell3",
