@@ -496,6 +496,7 @@ class PedidosController extends Controller
                 "cantidad",
                 "descuento",
                 "monto",
+                "entregado",
             ]);
             $q->with(["producto"=>function($q){
                 $q->select([

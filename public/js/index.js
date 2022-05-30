@@ -7046,6 +7046,19 @@ function Facturar(_ref) {
     }
   };
 
+  var changeEntregado = function changeEntregado(e) {
+    var id = e.currentTarget.attributes["data-id"].value;
+
+    if (confirm("Confirme Entrega de producto")) {
+      _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].changeEntregado({
+        id: id
+      }).then(function (res) {
+        getPedido();
+        notificar(res);
+      });
+    }
+  };
+
   var delRefPago = function delRefPago(e) {
     var id = e.currentTarget.attributes["data-id"].value;
 
@@ -10370,6 +10383,7 @@ function Facturar(_ref) {
       setorderByColumEstaInv: setorderByColumEstaInv,
       dataEstaInven: dataEstaInven
     }) : null, view == "ViewPedidoVendedor" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)((_components_viewPedidoVendedor__WEBPACK_IMPORTED_MODULE_20___default()), {}) : null, view == "pagar" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_21__.jsx)(_components_pagar__WEBPACK_IMPORTED_MODULE_10__["default"], {
+      changeEntregado: changeEntregado,
       setPagoPedido: setPagoPedido,
       viewconfigcredito: viewconfigcredito,
       setviewconfigcredito: setviewconfigcredito,
@@ -13884,7 +13898,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 function Pagar(_ref) {
-  var setPagoPedido = _ref.setPagoPedido,
+  var changeEntregado = _ref.changeEntregado,
+      setPagoPedido = _ref.setPagoPedido,
       viewconfigcredito = _ref.viewconfigcredito,
       setviewconfigcredito = _ref.setviewconfigcredito,
       fechainiciocredito = _ref.fechainiciocredito,
@@ -14264,7 +14279,15 @@ function Pagar(_ref) {
                       children: e.producto.codigo_barras
                     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)("td", {
                       className: "align-middle",
-                      children: [e.producto.descripcion, " ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
+                      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+                        className: "pointer",
+                        onClick: changeEntregado,
+                        "data-id": e.id,
+                        children: e.producto.descripcion
+                      }), " ", e.entregado ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
+                        className: "btn btn-outline-secondary btn-sm-sm",
+                        children: "Entregado"
+                      }) : null, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
                         className: "fst-italic fs-6 text-success",
                         children: e.lotedata ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
                           children: ["Lote. ", e.lotedata ? e.lotedata.lote : null, " - Exp. ", e.lotedata ? e.lotedata.vence : null]
@@ -16596,6 +16619,9 @@ var db = {
   },
   delItemPedido: function delItemPedido(data) {
     return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "delItemPedido", data);
+  },
+  changeEntregado: function changeEntregado(data) {
+    return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "changeEntregado", data);
   },
   setDescuentoUnitario: function setDescuentoUnitario(data) {
     return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "setDescuentoUnitario", data);

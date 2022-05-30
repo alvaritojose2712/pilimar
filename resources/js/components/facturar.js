@@ -745,6 +745,16 @@ useHotkeys("tab",()=>{
 
 
   }
+  const changeEntregado = e => {
+    let id = e.currentTarget.attributes["data-id"].value
+    if(confirm("Confirme Entrega de producto")){
+      db.changeEntregado({id}).then(res=>{
+        getPedido()
+        notificar(res)
+      })
+
+    }
+  }
   const delRefPago = e => {
     let id = e.currentTarget.attributes["data-id"].value
     if(confirm("Confirme eliminación de referencia")){
@@ -3884,6 +3894,7 @@ const auth = permiso => {
         
         />:null}
         {view=="pagar"?<Pagar 
+          changeEntregado={changeEntregado}
           setPagoPedido={setPagoPedido}
           viewconfigcredito={viewconfigcredito}
           setviewconfigcredito={setviewconfigcredito}

@@ -187,6 +187,8 @@ Route::group(['middleware' => ['login']], function () {
 	Route::post('getPedido', [PedidosController::class,"getPedido"]);
 	Route::post('getPedidosFast', [PedidosController::class,"getPedidosFast"]);
 	Route::post('delItemPedido', [ItemsPedidosController::class,"delItemPedido"]);
+	Route::post('changeEntregado', [ItemsPedidosController::class,"changeEntregado"]);
+	
 	Route::post('delpedido', [PedidosController::class,"delpedido"]);
 	Route::post('setCantidad', [ItemsPedidosController::class,"setCantidad"]);
 	Route::post('setpersonacarrito', [PedidosController::class,"setpersonacarrito"]);

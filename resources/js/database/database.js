@@ -23,6 +23,7 @@ const db = {
 
   setMoneda: data=>axios.post(host+"setMoneda",data),
   delItemPedido: data=>axios.post(host+"delItemPedido",data),
+  changeEntregado: data=>axios.post(host+"changeEntregado",data),
 
   setDescuentoUnitario: data=>axios.post(host+"setDescuentoUnitario",data),
   setDescuentoTotal: data=>axios.post(host+"setDescuentoTotal",data),
