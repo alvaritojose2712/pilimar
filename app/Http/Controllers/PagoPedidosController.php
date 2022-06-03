@@ -235,7 +235,7 @@ class PagoPedidosController extends Controller
         $orderbycolumdeudores = $req->orderbycolumdeudores;
         $orderbyorderdeudores = $req->orderbyorderdeudores;
 
-        $data = $this->getDeudoresFun($qDeudores,$orderbycolumdeudores,$orderbyorderdeudores,$today);
+        $data = $this->getDeudoresFun($qDeudores,$orderbycolumdeudores,$orderbyorderdeudores,$today,200);
         
         return view("reportes.creditos",["data" => $data,"sucursal" => $sucursal,"today"=>$today]);
     }

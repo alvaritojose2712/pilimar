@@ -34,7 +34,7 @@ class PedidosController extends Controller
 
     protected $sends = [
         // "arabitoferreteria@gmail.com"           
-        "omarelhenaoui@gmail.com",           
+        "omarelhenaoui@hotmail.com",           
         "yeisersalah2@gmail.com",           
         "amerelhenaoui@outlook.com",           
         "yesers982@hotmail.com",           
@@ -1007,7 +1007,7 @@ class PedidosController extends Controller
         }
 
         $total_inventario = DB::table("inventarios")
-        ->select(DB::raw("sum(precio_base*cantidad) as suma"))->first()->suma;
+        ->select(DB::raw("sum(precio*cantidad) as suma"))->first()->suma;
         $vueltos = pago_pedidos::where("tipo",6)->where("monto","<>",0);
         $vueltos_totales = $vueltos->sum("monto");
         
