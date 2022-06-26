@@ -18,6 +18,8 @@ import Configuracion from '../components/configuracion';
 
 import Pagar from '../components/pagar';
 import Header from '../components/header';
+import Panelcentrodeacopio from '../components/panelcentrodeacopio';
+
 
 
 import Pedidos from '../components/pedidos';
@@ -26,6 +28,7 @@ import Credito from '../components/credito';
 import Vueltos from '../components/vueltos';
 import Clientes from '../components/clientes';
 
+import PedidosCentralComponent from '../components/pedidosCentral';
 
 
 import Cierres from '../components/cierre';
@@ -301,6 +304,9 @@ export default function Facturar({user,notificar,setLoading}) {
   const [fechaventas,setfechaventas] = useState("")
 
   const [pedidosFast,setpedidosFast] = useState([])
+
+  const [sucursaldata, setSucursaldata] = useState("")
+
   
   const [billete1,setbillete1] = useState("") 
   const [billete5,setbillete5] = useState("") 
@@ -308,6 +314,9 @@ export default function Facturar({user,notificar,setLoading}) {
   const [billete20,setbillete20] = useState("") 
   const [billete50,setbillete50] = useState("") 
   const [billete100,setbillete100] = useState("")
+
+  const [pathcentral, setpathcentral] = useState("")
+  const [mastermachines, setmastermachines] = useState([])
 
   const [usuariosData, setusuariosData] = useState([])
   const [usuarioNombre, setusuarioNombre] = useState("")
@@ -346,6 +355,7 @@ export default function Facturar({user,notificar,setLoading}) {
 // 1234123412345612345612345
 // 12341234ARAMCAL
 
+const [socketUrl, setSocketUrl] = useState("");
 
 const [fechaQEstaInve, setfechaQEstaInve] = useState("")
 const [fechaFromEstaInve, setfechaFromEstaInve] = useState("")
@@ -359,6 +369,14 @@ const [montopagoproveedor, setmontopagoproveedor] = useState("");
 const [pagosproveedor, setpagosproveedor] = useState([]);
 
 const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
+
+const [selectSucursalCentral, setselectSucursalCentral] = useState(null)
+const [sucursalesCentral, setsucursalesCentral] = useState([])
+const [inventariSucursalFromCentral, setinventariSucursalFromCentral] = useState([])
+
+const [inventarioModifiedCentralImport, setinventarioModifiedCentralImport] = useState([])
+
+
 
 const [busqAvanzInputs, setbusqAvanzInputs] = useState({
   codigo_barras:"",
@@ -380,8 +398,90 @@ const [subViewConfig, setsubViewConfig] = useState("usuarios")
 ///End Configuracion Component
 
   
+  const getSucursales = () => {
+    db.getSucursales({}).then(res=>{
+      if (res.data) {
+        setsucursalesCentral(res.data)
+      }
+    })
+  }
 
+  const getInventarioSucursalFromCentral = () => {
+    db.getInventarioSucursalFromCentral({ id: selectSucursalCentral }).then(res => {
+      if (res.data) {
+        if (res.data.length) {
+          setinventariSucursalFromCentral(res.data)
+        }else{
+          setinventariSucursalFromCentral([])
+        }
 
+      }
+    })
+  }
+  const getInventarioFromSucursal = () => {
+    setLoading(true)
+    db.getInventarioFromSucursal({}).then(res => {
+      if (res.data) {
+        if(res.data.length){
+          setinventarioModifiedCentralImport(res.data)
+        } else {
+          setinventarioModifiedCentralImport([])
+        }
+      }else{
+        setinventarioModifiedCentralImport([])
+      }
+      setLoading(false)
+    })
+  }
+  const setCambiosInventarioSucursal = () => {
+
+    let checkempty = inventariSucursalFromCentral.filter(e =>
+      e.codigo_barras == "" ||
+      e.descripcion == "" ||
+      e.id_categoria == "" ||
+      e.unidad == "" ||
+      e.id_proveedor == "" ||
+      e.cantidad == "" ||
+      e.precio == "")
+
+    if (inventariSucursalFromCentral.length && !checkempty.length) {
+
+      setLoading(true)
+      db.setCambiosInventarioSucursal({ productos: inventariSucursalFromCentral, sucursal: sucursaldata }).then(res => {
+        notificar(res)
+        setLoading(false)
+        try {
+          if (res.data.estado) {
+            getInventarioSucursalFromCentral()
+          }
+        } catch (err) { }
+      })
+    } else {
+      alert("¡Error con los campos! Algunos pueden estar vacíos " + JSON.stringify(checkempty))
+    }
+  }
+  
+  
+  
+///Sockets
+
+  
+
+ /*  Echo.private("centra")
+  .listen('NuevaTarea', (e) => {
+    console.log("central Channel Private " + e);
+  });
+  
+  Echo.channel("centra")
+  .listen('NuevaTarea', (e) => {
+    console.log("central Channel Public " + e);
+  }); */
+  /* Echo.channel('central')
+    .listen('NuevaTarea', e => {
+      console.log(e);
+    });*/
+
+///End Sockets
 useHotkeys("tab",()=>{
   if(typeof(selectItem)=="number"&&view=="seleccionar"){
       addCarritoRequest("agregar_procesar")
@@ -680,7 +780,11 @@ useHotkeys("tab",()=>{
           }
         }
       }else{
-        facturar_pedido()
+        if (viewconfigcredito) {
+          setPagoPedido()
+        } else {
+          facturar_pedido()
+        }
       }
     } else if (view == "inventario" && subViewInventario == "inventario" && modViewInventario == "list") {
       focusInputSibli(event.target,1)
@@ -908,6 +1012,9 @@ useHotkeys("tab",()=>{
     getMoneda() // ya invoca getProductos()
     getPedidosList()
     getToday()
+    setSocketUrlDB()
+    getSucursalFun()
+
 
     // return () => { isMounted = false }
   },[])
@@ -985,9 +1092,9 @@ useHotkeys("tab",()=>{
         getProductos()
       }else if (subViewInventario=="proveedores") {
         getProveedores()
-      }else if (subViewInventario=="pedidosCentral") {
-        getPedidosCentral()
       }
+    } else if (view =="pedidosCentral"){
+      getmastermachine()
     }
 
     if (view=="seleccionar") {
@@ -1069,6 +1176,13 @@ orderByColumEstaInv])
 
   let total_punto = dolar&&caja_punto?(caja_punto/dolar).toFixed(2):0
 
+const getSucursalFun = () => {
+  db.getSucursal({}).then(res=>{
+    if (res.data.codigo) {
+      setSucursaldata(res.data)
+    }
+  }) 
+}
 const openReporteFalla = (id) => {
   if (id) {
     db.openReporteFalla(id)
@@ -1826,6 +1940,13 @@ const onClickEditPedido = e =>{
   const id = e.currentTarget.attributes["data-id"].value
   getPedido(id,()=>{
     setView("pagar")
+  })
+}
+const setexportpedido = e => {
+  const id = e.currentTarget.attributes["data-id"].value
+  db.setexportpedido({id}).then(res=>{
+    getPedidos()
+    notificar(res)
   })
 }
 const onCLickDelPedido = e => {
@@ -2856,19 +2977,59 @@ const viewReportPedido = () =>{
   db.openNotaentregapedido({ id: pedidoData.id})
   
 }
+
+
+const setInventarioFromSucursal = () => {
+  setLoading(true)
+  db.setInventarioFromSucursal({ path: pathcentral }).then(res=>{
+    console.log(res.data)
+    notificar(res)
+    setLoading(false)
+  })
+}
+const getip = () => {
+  db.getip({}).then(res=>alert(res.data))
+}
+const getmastermachine = () => {
+  setLoading(true)
+  setpathcentral("")
+
+  db.getmastermachine({}).then(res=>{
+    if (res.data) {
+      if (!res.data.length) {
+        setmastermachines([])
+      }else{
+        setmastermachines(res.data)
+      }
+      setLoading(false)
+    }
+  })
+}
+const setSocketUrlDB = () => {
+  db.setSocketUrlDB({}).then(res => setSocketUrl(res.data))
+}
 const getPedidosCentral = () => {
   setLoading(true)
-  db.getPedidosCentral({}).then(res=>{
+  db.reqpedidos({ path: pathcentral }).then(res=>{
     setLoading(false)
+    setpedidoCentral([])
+
     if (res.data) {
       if (res.data.length) {
-        setpedidoCentral(res.data)
+        if (res.data[0]){
+          if (res.data[0].id) {
+            setpedidoCentral(res.data)
+          }
+        }
       }else{
         setpedidoCentral([])
       }
+
       if (res.data.msj) {
         notificar(res)
       }
+    }else{
+      setpedidoCentral([])
     }
   })
 }
@@ -3053,7 +3214,7 @@ const checkPedidosCentral = () => {
   if (indexPedidoCentral!==null&&pedidosCentral) {
     if (pedidosCentral[indexPedidoCentral]) {
       setLoading(true)
-      db.checkPedidosCentral({pedido:pedidosCentral[indexPedidoCentral]}).then(res=>{
+      db.checkPedidosCentral({pathcentral,pedido:pedidosCentral[indexPedidoCentral]}).then(res=>{
         setLoading(false)
         
         notificar(res)
@@ -3192,7 +3353,9 @@ const changeModLote = (val, i, id, type, name = null) => {
 const reporteInventario = () => {
   db.openReporteInventario()
 }
-const guardarNuevoProductoLote = () => {
+
+const guardarNuevoProductoLote = e => {
+  // e.preventDefault()
   let id_factura = null
 
   if (factSelectIndex != null) {
@@ -3228,7 +3391,7 @@ const guardarNuevoProductoLote = () => {
       }catch(err){}
     })
   }else{
-    alert("¡Error con los campos! Algunos pueden estar vacíos"+JSON.stringify(checkempty))
+    alert("¡Error con los campos! Algunos pueden estar vacíos "+JSON.stringify(checkempty))
   }
 
 }
@@ -3347,6 +3510,63 @@ const changeInventario = (val, i, id, type, name = null) => {
   }
   setProductosInventario(obj)
 }
+const changeInventarioFromSucursalCentral = (val, i, id, type, name = null) => {
+  let obj = cloneDeep(inventariSucursalFromCentral)
+
+  switch (type) {
+    case "update":
+      if (obj[i].type != "new") {
+        obj[i].type = "update"
+      }
+      break;
+    case "delModeUpdateDelete":
+      delete obj[i].type
+      break;
+    case "delNew":
+      obj = obj.filter((e, ii) => ii !== i)
+      break;
+    case "changeInput":
+      obj[i][name] = val
+      break;
+    case "add":
+      let pro = ""
+
+      if (facturas[factSelectIndex]) {
+        pro = facturas[factSelectIndex].proveedor.id
+      } else {
+        pro = sameProValue
+      }
+
+
+      let newObj = [{
+        id: null,
+        codigo_proveedor: "",
+        codigo_barras: "",
+        descripcion: "",
+        id_categoria: sameCatValue,
+        id_marca: "",
+        unidad: "UND",
+        id_proveedor: pro,
+        cantidad: "",
+        precio_base: "",
+        precio: "",
+        iva: "0",
+        type: "new",
+
+      }]
+
+      obj = newObj.concat(obj)
+      break;
+
+    case "delMode":
+      obj[i].type = "delete"
+      let id_replace = 0
+      obj[i].id_replace = id_replace
+      break;
+  }
+  setinventariSucursalFromCentral(obj)
+}
+  
 const printPrecios = type => {
   if (productosInventario.length) {
     db.printPrecios({type,ids:productosInventario.map(e=>e.id)}).then(res=>{
@@ -3384,7 +3604,8 @@ const auth = permiso => {
   return (
     <>
       
-        <Header 
+        <Header
+        getip={getip}
         auth={auth}
         logout={logout}
         user={user}
@@ -3405,7 +3626,8 @@ const auth = permiso => {
         view=="seleccionar"?
         <div className="container p-0">
           
-            {typeof(selectItem)=="number"?productos[selectItem]?<ModalAddCarrito 
+            {typeof(selectItem)=="number"?productos[selectItem]?<ModalAddCarrito
+              dolar={dolar} 
               producto={productos[selectItem]} 
               setSelectItem={setSelectItem}
               cantidad={cantidad}
@@ -3508,6 +3730,36 @@ const auth = permiso => {
         </div>
         :null
         }
+        {view == "pedidosCentral" ?
+        <PedidosCentralComponent
+          socketUrl={socketUrl}
+          setSocketUrl={setSocketUrl}
+          mastermachines={mastermachines}
+          getmastermachine={getmastermachine}
+          setInventarioFromSucursal={setInventarioFromSucursal}
+          getInventarioFromSucursal={getInventarioFromSucursal}
+          pathcentral={pathcentral}
+          setpathcentral={setpathcentral}
+          getPedidosCentral={getPedidosCentral}
+          selectPedidosCentral={selectPedidosCentral}
+          checkPedidosCentral={checkPedidosCentral}
+          setinventarioModifiedCentralImport={setinventarioModifiedCentralImport}
+          inventarioModifiedCentralImport={inventarioModifiedCentralImport}
+
+          pedidosCentral={pedidosCentral}
+          setIndexPedidoCentral={setIndexPedidoCentral}
+          indexPedidoCentral={indexPedidoCentral}
+          moneda={moneda}
+
+          showaddpedidocentral={showaddpedidocentral}
+          setshowaddpedidocentral={setshowaddpedidocentral}
+          valheaderpedidocentral={valheaderpedidocentral}
+          setvalheaderpedidocentral={setvalheaderpedidocentral}
+          valbodypedidocentral={valbodypedidocentral}
+          setvalbodypedidocentral={setvalbodypedidocentral}
+          procesarImportPedidoCentral={procesarImportPedidoCentral}
+        />
+        : null}
         {view=="ventas"?<Ventas
           ventasData={ventasData}
           getVentasClick={getVentasClick}
@@ -3647,6 +3899,7 @@ const auth = permiso => {
           peso={peso} 
         />:null}
         {view=="pedidos"?<Pedidos
+          setexportpedido={setexportpedido}
           pedidoData={pedidoData}
           showModalPedidoFast={showModalPedidoFast}
           setshowModalPedidoFast={setshowModalPedidoFast}
@@ -4008,6 +4261,22 @@ const auth = permiso => {
           getCredito={getCredito}
           getTransferencia={getTransferencia}
           getEfectivo={getEfectivo}
+          />
+        :null}
+        {view =="panelcentrodeacopio"?
+          <Panelcentrodeacopio
+            getSucursales={getSucursales}
+            sucursalesCentral={sucursalesCentral}
+            setselectSucursalCentral={setselectSucursalCentral}
+            selectSucursalCentral={selectSucursalCentral}
+            getInventarioSucursalFromCentral={getInventarioSucursalFromCentral}
+            inventariSucursalFromCentral={inventariSucursalFromCentral}
+            categorias={categorias}
+            proveedoresList={proveedoresList}
+            changeInventarioFromSucursalCentral={changeInventarioFromSucursalCentral}
+            setCambiosInventarioSucursal={setCambiosInventarioSucursal}
+            number={number}
+            
           />
         :null}
         {view=="credito"?<Credito

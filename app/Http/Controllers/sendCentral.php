@@ -9,16 +9,43 @@ use App\Models\sucursal;
 use App\Models\moneda;
 use App\Models\factura;
 
+use App\Models\inventario;
+use App\Models\categorias;
+use App\Models\proveedores;
+use App\Models\pedidos;
+
+
 use Http;
 use Response;
 
 ini_set('max_execution_time', 300);
 class sendCentral extends Controller
 {
-    // public $path = "sinapsisnline.com";
-    public $path = "192.168.0.113";
-    // public $path = "http://127.0.0.1:3000";
+    
+    public function path()
+    {
+        return "http://127.0.0.1:8001";
+        //return "https://arabitonline.com";
+    }
+    public function setSocketUrlDB(Request $req)
+    {
+        return "127.0.0.1";
+    }
+    
 
+    public function setNuevaTareaCentral(Request $req)
+    {
+        $type = $req->type;
+        $response = Http::post($this->path()."/setNuevaTareaCentral",["type"=>$type]);
+
+        if ($response->ok()) {
+            $res = $response->json();
+            return $res;
+        }else{
+            return "Error: ".$response->body();
+
+        }
+    }
     public function index()
     {
         return view("central.index");
@@ -45,6 +72,188 @@ class sendCentral extends Controller
 
     //     }
     // }
+
+
+    //req
+    public function setPedidoInCentralFromMaster($id)
+    {
+        $response = Http::post($this->path()."/setPedidoInCentralFromMasters",["pedidos"=>$this->pedidosExportadosFun($id)]);
+
+        return $response->body();
+
+    }
+    public function getip()
+    {
+        return getHostByName(getHostName());
+    }
+    public function getmastermachine()
+    {
+        return ["192.168.0.103:8001","192.168.0.102:8001","127.0.0.1:8001"];
+    }
+    public function changeExportStatus($pathcentral,$id)
+    {
+        $response = Http::post($this->path()."/changeExtraidoEstadoPed",["id"=>$id]);
+    }
+    public function getInventarioSucursalFromCentral(Request $req)
+    {
+        $id = $req->id;
+        $response = Http::post($this->path()."/getInventarioSucursalFromCentral",["id"=>$id]);
+        if ($response->ok()) {
+            $res = $response->json();
+            return $res;
+        }else{
+            return "Error: ".$response->body();
+        }
+    }
+    public function getSucursales()
+    {
+        $response = Http::get($this->path()."/getSucursales");
+        if ($response->ok()) {
+            $res = $response->json();
+            return $res;
+        }else{
+            return "Error: ".$response->body();
+        } 
+
+    }
+    public function setInventarioFromSucursal(Request $req)
+    {
+        $categorias = categorias::all();  
+        $proveedores = proveedores::all();
+        $inventario = inventario::all();
+        $sucursal = sucursal::all()->first();
+
+
+        $response = Http::post($this->path()."/setInventarioFromSucursal",[
+            "categorias"=>$categorias,
+            "proveedores"=>$proveedores,
+            "inventario"=>$inventario,
+            "sucursal"=>$sucursal,
+        ]);
+        
+        if ($response->ok()) {
+            $res = $response->json();
+            return $res;
+            
+            
+        }else{
+            
+            return "Error: ".$response->body();
+        }   
+    }
+    public function getInventarioFromSucursal(Request $req)
+    {
+        $sucursal = sucursal::all()->first();
+        $response = Http::post($this->path()."/getInventarioFromSucursal",[
+            "sucursal"=>$sucursal,
+        ]);
+        
+        if ($response->ok()) {
+            if ($response->json()) {
+                
+                return $response->json();
+            }else{
+                return $response;
+            }
+        }else{
+            
+            return "Error de Local Centro de Acopio: ".$response->body();
+        } 
+
+    }
+    public function setCambiosInventarioSucursal(Request $req)
+    {
+         $response = Http::post($this->path()."/setCambiosInventarioSucursal",[
+            "productos"=>$req->productos,
+            "sucursal"=>$req->sucursal,
+        ]);
+        
+        if ($response->ok()) {
+            if ($response->json()) {
+                
+                return $response->json();
+            }else{
+                return $response;
+            }
+        }else{
+            
+            return "Error de Local Centro de Acopio: ".$response->body();
+        } 
+    }
+    public function reqpedidos(Request $req)
+    {   
+        try {
+            $sucursal = sucursal::all()->first();
+
+            $response = Http::post($this->path().'/respedidos',["codigo"=>$sucursal->codigo]);
+
+            if ($response->ok()) {
+                $res = $response->json();
+                if ($res["pedido"]) {
+                    return $res["pedido"];
+                }else{
+                    return "Not [pedido] ".var_dump($res);
+                }
+            }else{
+                return "Error: ".$response->body();
+
+            }
+            
+        } catch (\Exception $e) {
+            return Response::json(["estado"=>false,"msj"=>"Error de sucursal: ".$e->getMessage()]);
+        }
+    }
+
+    //res
+    public function pedidosExportadosFun($id)
+    {
+        return pedidos::with(["cliente","items"=>function($q){
+            $q->with(["producto"=>function($q){
+                $q->with(["proveedor","categoria"]);
+            }]);
+        }])
+        ->where("id",$id)
+        ->orderBy("id","desc")
+        ->get()
+        ->map(function($q){
+            $q->base = $q->items->map(function($q){
+                return $q->producto->precio_base*$q->cantidad;
+            })->sum();
+            $q->venta = $q->items->sum("monto");
+            return $q;
+
+        });
+    }
+    /* public function respedidos(Request $req)
+    {
+        
+
+        if ($ped) {
+            return Response::json([
+                "msj"=>"Tenemos algo :D",
+                "pedido"=>$ped,
+                "estado"=>true
+            ]);
+        }else{
+            return Response::json([
+                "msj"=>"No hay pedidos pendientes :(",
+                "estado"=>false
+            ]);
+        }
+    } */
+    public function resinventario(Request $req)
+    {
+        //return "exportinventario";
+        return [
+            "inventario"=>inventario::all(),
+            "categorias" => categorias::all(),
+            "proveedores" => proveedores::all(), 
+        ];
+    }
+
+
+    
+
     public function updateApp()
     {   
         try {
@@ -247,29 +456,7 @@ class sendCentral extends Controller
         }
 
     }
-    public function getPedidosCentral()
-    {   
-        try {
-            $sucursal = sucursal::all()->first();
-
-            $response = Http::post($this->path.'/getPedidoPendSucursal', [
-                "sucursal_code"=>$sucursal->codigo,
-            ]);
-
-            if ($response->ok()) {
-                $res = $response->json();
-                if ($res["pedido"]) {
-                    return $res["pedido"];
-                }
-            }else{
-                return $response->body();
-
-            }
-            
-        } catch (\Exception $e) {
-            return Response::json(["estado"=>false,"msj"=>"Error de sucursal: ".$e->getMessage()]);
-        }
-    }
+   
 
     public function getMonedaCentral()
     {   

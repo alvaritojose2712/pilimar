@@ -310,6 +310,8 @@ class InventarioController extends Controller
     public function checkPedidosCentral(Request $req)
     {   
         $pedido = $req->pedido;
+        $pathcentral = $req->pathcentral;
+        
         try {
             //Check Items
             foreach ($pedido["items"] as $i => $item) {
@@ -324,13 +326,11 @@ class InventarioController extends Controller
                 }
             }
             //Check Proveedor
-            $proveedor_name = "21628222-8";
-            $proveedor = proveedores::where("rif",$proveedor_name)->first();
-
-
-            if ($proveedor) {
+            
+            
+          
                 $id = $pedido["id"];
-                $factInpid_proveedor = $proveedor->id;
+                
                 $factInpnumfact = $pedido["id"];
                 $factInpdescripcion = "De centro de acopio ".$pedido["created_at"];
                 $factInpmonto = $pedido["venta"];
@@ -342,7 +342,7 @@ class InventarioController extends Controller
                 if (!$checkIfExitsFact) {
                     $fact = new factura;
                     $fact->id = $id;
-                    $fact->id_proveedor = $factInpid_proveedor;
+                    $fact->id_proveedor = 1;
                     $fact->numfact = $factInpnumfact;
                     $fact->descripcion = $factInpdescripcion;
                     $fact->monto = $factInpmonto;
@@ -362,6 +362,8 @@ class InventarioController extends Controller
                             $codigo_barras = $item["producto"]["codigo_barras"];
                             $descripcion = $item["producto"]["descripcion"];
 
+                            
+
 
                             if (isset($item["ct_real"])) {
                                 $ctNew = $item["ct_real"];
@@ -369,17 +371,29 @@ class InventarioController extends Controller
 
                             
                             $insertOrUpdateInv = inventario::find($id_pro);
-                            
-                            $insertOrUpdateInv->cantidad = $insertOrUpdateInv->cantidad + $ctNew;
-                            $insertOrUpdateInv->precio_base = $precio_base;
-                            $insertOrUpdateInv->precio = $precio;
-                            
-                            $insertOrUpdateInv->codigo_proveedor = $codigo_proveedor;
-                            $insertOrUpdateInv->codigo_barras = $codigo_barras;
-                            $insertOrUpdateInv->descripcion = $descripcion;
-
-                            
-                            if ($insertOrUpdateInv->save()) {
+                            $match_ct = 0;
+                            if ($insertOrUpdateInv) {
+                                 $match_ct = $insertOrUpdateInv->cantidad;
+                            }
+                            $insertOrUpdateInv = inventario::updateOrCreate([
+                                "id" => $id_pro
+                            ],[
+                                "codigo_barras" => $codigo_barras,
+                                "cantidad" => $match_ct + $ctNew,
+                                "codigo_proveedor" => $codigo_proveedor,
+                                "unidad" => $item["producto"]["unidad"],
+                                "id_categoria" =>  $item["producto"]["id_categoria"],
+                                "descripcion" => $descripcion,
+                                "precio_base" => $precio_base,
+                                "precio" => $precio,
+                                "iva" => $item["producto"]["iva"],
+                                "id_proveedor" => $item["producto"]["id_proveedor"],
+                                "id_marca" => $item["producto"]["id_marca"],
+                                "id_deposito" => $item["producto"]["id_deposito"],
+                                "porcentaje_ganancia" => $item["producto"]["porcentaje_ganancia"]
+                            ]);
+                            if ($insertOrUpdateInv) 
+                            {
                                 $this->checkFalla($id_pro,$ctNew);
                                 items_factura::updateOrCreate([
                                     "id_factura" => $id,
@@ -391,17 +405,16 @@ class InventarioController extends Controller
                                 $num++;
                             }
                         }
+                        
                         (new sendCentral)->setFacturasCentral();
+                        (new sendCentral)->changeExportStatus($pathcentral,$id);
                         return Response::json(["msj"=>"¡Éxito.".$num." productos procesados!","estado"=>true]);
+
                     }
                 }else{
                     throw new \Exception("¡Factura ya existe!", 1);
-
                 }
-            }else{
-                throw new \Exception("¡No existe proveedor ".$proveedor_name."!", 1);
-
-            }
+            
             
 
             
@@ -867,7 +880,12 @@ class InventarioController extends Controller
 
             return true;   
         } catch (\Exception $e) {
-            throw new \Exception("Error: ".$e->getMessage(), 1);
+            if ($e->errorInfo[1]=="1062") {
+                throw new \Exception("Código Duplicado. ".$e->errorInfo[2], 1);
+            }else{
+                throw new \Exception("Error: ".$e->getMessage(), 1);
+
+            }
         }
     }
     public function insertItemFact($id_factura,$insertOrUpdateInv,$ctInsert,$beforecantidad,$ctNew,$tipo)

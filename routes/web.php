@@ -29,6 +29,7 @@ use App\Http\Controllers\PagosReferenciasController;
 use App\Http\Controllers\GastosController;
 
 
+Route::get('getip', [sendCentral::class,"getip"]);
 Route::get('/backup', function () {
 
     \Illuminate\Support\Facades\Artisan::call('backup:run');
@@ -196,7 +197,7 @@ Route::group(['middleware' => ['login']], function () {
 	Route::post('setPrecioAlternoCarrito', [ItemsPedidosController::class,"setPrecioAlternoCarrito"]);
 	Route::post('setCtxBultoCarrito', [ItemsPedidosController::class,"setCtxBultoCarrito"]);
 	
-
+	
 	
 	
 	
@@ -217,11 +218,39 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('setCentralData', [sendCentral::class,"setCentralData"]);
 		Route::get('central', [sendCentral::class,"index"]);
 		Route::get('getMonedaCentral', [sendCentral::class,"getMonedaCentral"]);
-		Route::post('getPedidosCentral', [sendCentral::class,"getPedidosCentral"]);
+		
 		Route::get('setFacturasCentral', [sendCentral::class,"setFacturasCentral"]);
-	
-});
+		
+		Route::post('getmastermachine', [sendCentral::class,"getmastermachine"]);
 
+		
+		
+		
+		
+});
+//req
+	
+	Route::get('setNuevaTareaCentral', [sendCentral::class,"setNuevaTareaCentral"]);
+
+	Route::get('setSocketUrlDB', [sendCentral::class,"setSocketUrlDB"]);
+	
+	Route::post('reqpedidos', [sendCentral::class,"reqpedidos"]);
+	Route::post('setInventarioFromSucursal', [sendCentral::class,"setInventarioFromSucursal"]);
+	Route::post('getSucursales', [sendCentral::class,"getSucursales"]);
+	Route::post('getInventarioSucursalFromCentral', [sendCentral::class,"getInventarioSucursalFromCentral"]);
+	Route::post('getInventarioFromSucursal', [sendCentral::class,"getInventarioFromSucursal"]);
+	
+	Route::post('setCambiosInventarioSucursal', [sendCentral::class,"setCambiosInventarioSucursal"]);
+	
+	
+	
+	//res
+	Route::post('resinventario', [sendCentral::class,"resinventario"]);
+	Route::post('respedidos', [sendCentral::class,"respedidos"]);
+
+	Route::post('setexportpedido', [PedidosController::class,"setexportpedido"]);
+	
+	
 	
 	
 	

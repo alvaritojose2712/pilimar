@@ -51,6 +51,7 @@ const db = {
   getPedidosFast: data=>axios.post(host+"getPedidosFast",data),
   
   
+  getip: data=>axios.get(host+"getip",{params:data}),
   setPagoCredito: data=>axios.post(host+"setPagoCredito",data),
 
   getDeudores: data=>axios.post(host+"getDeudores",data),
@@ -105,7 +106,11 @@ const db = {
 
   saveMontoFactura: data=>axios.post(host+"saveMontoFactura",data),
 
-  getPedidosCentral: data=>axios.post(host+"getPedidosCentral",data),
+  reqpedidos: data => axios.post(host + "reqpedidos", data),
+  setexportpedido: data => axios.post(host + "setexportpedido", data),
+  
+  getmastermachine: data=>axios.post(host+"getmastermachine",data),
+  
 
   getSucursal: data=>axios.get(host+"getSucursal",{params:data}),
   
@@ -113,17 +118,17 @@ const db = {
   delCategoria: data=>axios.post(host+"delCategoria",data),
   setCategorias: data=>axios.post(host+"setCategorias",data),
   
-
+  
 
 
   getProductosSerial: data=>axios.get(host+"getProductosSerial",{params:data}),
   checkPedidosCentral: data=>axios.post(host+"checkPedidosCentral",data),
-
+  
   setUsuario: data=>axios.post(host+"setUsuario",data),
   delUsuario: data => axios.post(host + "delUsuario", data),
   getUsuarios: data => axios.get(host + "getUsuarios", { params: data }),
   getCierres: data=>axios.get(host+"getCierres",{params:data}),
-  sendCuentasporCobrar: data=>axios.get(host+"sendCuentasporCobrar",{params:data}),
+  sendCuentasporCobrar: data => axios.get(host + "sendCuentasporCobrar", { params: data }),
   
   
   removeLote: data=>axios.post(host+"removeLote",data),
@@ -142,9 +147,17 @@ const db = {
   setCtxBulto: data=>axios.post(host+"setCtxBulto",data),
   setPrecioAlterno: data=>axios.post(host+"setPrecioAlterno",data),
   printPrecios: data=>axios.post(host+"printPrecios",data),
-
+  
   setconfigcredito: data=>axios.post(host+"setconfigcredito",data),
   
+  setSocketUrlDB: data => axios.get(host + "setSocketUrlDB", { params: data }),
+  
+  setNuevaTareaCentral: data =>axios.get(host+"setNuevaTareaCentral",{params:data}),
+  setInventarioFromSucursal: data => axios.post(host + "setInventarioFromSucursal", data),
+  getSucursales: data => axios.post(host + "getSucursales", data),
+  getInventarioSucursalFromCentral: data => axios.post(host + "getInventarioSucursalFromCentral", data),
+  setCambiosInventarioSucursal: data => axios.post(host + "setCambiosInventarioSucursal", data),
+  getInventarioFromSucursal: data => axios.post(host + "getInventarioFromSucursal", data),
   
   
   
@@ -157,13 +170,13 @@ const db = {
   openReporteFalla: (id) => window.open(host + "reporteFalla?id=" + id, "targed=blank"),
   
   
-
-
+  
+  
 
   
   
   
-
+  
   // getProveedores: ()=>axios.post(host+"getProveedores.php"),
   // getusuarios: ()=>axios.post(host+"getusuarios.php"),
   // setPedidos: (data)=>{

@@ -1,7 +1,7 @@
 import logo from "../../images/logo.png"
 import carrito from "../../images/carrito1.png"
 function Header({
-  user, logout,
+  user, logout, getip,
   settoggleClientesBtn,toggleClientesBtn,getVentasClick,dolar,peso,view,setView,setMoneda,getPedidos,setViewCaja,viewCaja,setShowModalMovimientos,showModalMovimientos,auth}) {
   
     return (
@@ -27,7 +27,7 @@ function Header({
           <div className="col-5 d-flex header-justify-content-end align-items-center">
             {auth(1)?<span className={"btn m-1 text-success"} onClick={() => setView("configuracion")}><i className="fa fa-cogs"></i></span>:null}
             
-            <div>
+            <div onClick={getip}>
               <span className="fw-bold">{user.nombre}</span><br/>
               <span className="fst-italic">{user.role}</span>
             </div>
@@ -61,6 +61,7 @@ function Header({
               </ul>
             </div>:null}
 
+
               {auth(2)?<span className={(view=="cierres"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("cierres")}>Cierre</span>:null}
             
             {auth(2)?
@@ -79,11 +80,22 @@ function Header({
                 <>
                   <span className={(viewCaja?"btn btn-sinapsis":null)+(" p-3 pointer")} onClick={()=>setViewCaja(!viewCaja)}>Caja</span>
                   <span className={(showModalMovimientos?"btn btn-sinapsis":null)+(" p-3 pointer")} onClick={()=>setShowModalMovimientos(!showModalMovimientos)}>Movimientos</span>
+
                 </>:null
               :null
             }
+              {
+                !auth(1) ?
+                  view == "seleccionar" ?
+                    <>
+                      <span className={(view == "pedidosCentral" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("pedidosCentral")}>Central</span>
 
-            {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Administración</span>:null}
+                    </> : null
+                  : null
+              }
+              
+              {auth(1) ? <span className={(view == "panelcentrodeacopio" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("panelcentrodeacopio")}>Centro de acopio</span> : null}
+              {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Administración</span>:null}
           </div>
         </div>
       </div>

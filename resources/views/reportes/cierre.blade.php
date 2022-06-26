@@ -133,7 +133,7 @@
 					<th class="right">
 						VENTAS DEL DÍA
 					</th>
-					<td class=""><span class="fs-3">{{($facturado["numventas"])}}</span></td>
+					<td class=""><span class="text-success-only fs-3">{{($facturado["numventas"])}}</span></td>
 					<th class="right">
 						INVENTARIO
 					</th>
@@ -260,6 +260,49 @@
 					
 				</tr>
 				<tr>
+					<td colspan="5"><b>CRÉDITO POR COBRAR TOTAL</b> <br> <span class="h2">{{number_format($cred_total,2)}}</span></td>
+				</tr>
+				<tr>
+					<td colspan="5"><b>ABONOS DEL DÍA</b> </td>
+				</tr>
+				@foreach ($pedidos_abonos as $e)
+					<tr>
+						<td>
+							Abono. #{{$e->id}}
+						</td>
+						<td colspan="3">
+							Cliente: {{$e->cliente->nombre}}. {{$e->cliente->identificacion}}
+						</td>
+						<td>
+							@foreach ($e->pagos as $ee)
+								
+								<span> @switch($ee->tipo)
+									@case(1)
+									Transferencia
+										@break
+									@case(2)
+									Debito
+										@break
+
+									@case(3)
+									Efectivo
+										@break
+									@case(4)
+									Credito
+										@break
+									@case(5)
+									Otros
+										@break
+									@case(6)
+									Vuelto
+										@break
+								@endswitch - {{$ee->monto}}</span><br>
+									
+							@endforeach
+						</td>
+					</tr>
+				@endforeach
+				<tr>
 					<th colspan="5">MOVIMIENTOS DE CAJA</th>
 				
 				</tr>
@@ -304,6 +347,7 @@
 			</tbody>
 		</table>
 		<hr/>
+		
 		<table class="table">
 			<tbody>
 				<tr>

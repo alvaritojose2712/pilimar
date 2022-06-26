@@ -16,20 +16,20 @@ class CreateCierresTable extends Migration
         Schema::create('cierres', function (Blueprint $table) {
             $table->increments('id');
             
-            $table->decimal("debito",8,2); 
-            $table->decimal("efectivo",8,2); 
-            $table->decimal("transferencia",8,2); 
+            $table->decimal("debito",10,2); 
+            $table->decimal("efectivo",10,2); 
+            $table->decimal("transferencia",10,2); 
 
-            $table->decimal("dejar_dolar",8,2); 
-            $table->decimal("dejar_peso",8,2); 
-            $table->decimal("dejar_bss",8,2);
+            $table->decimal("dejar_dolar",10,2); 
+            $table->decimal("dejar_peso",10,2); 
+            $table->decimal("dejar_bss",10,2);
 
 
-            $table->decimal("efectivo_guardado",8,2);
-            $table->decimal("efectivo_guardado_cop",8,2);
-            $table->decimal("efectivo_guardado_bs",8,2);
+            $table->decimal("efectivo_guardado",10,2);
+            $table->decimal("efectivo_guardado_cop",10,2);
+            $table->decimal("efectivo_guardado_bs",10,2);
 
-            $table->decimal("tasa",8,2); 
+            $table->decimal("tasa",10,2); 
             
             $table->text("nota")->nullable();
             
@@ -41,11 +41,11 @@ class CreateCierresTable extends Migration
             
             $table->integer("numventas")->default(0); 
 
-            $table->decimal("precio",8,2)->default(0);
-            $table->decimal("precio_base",8,2)->default(0);
-            $table->decimal("ganancia",8,2)->default(0);
-            $table->decimal("porcentaje",8,2)->default(0);
-            $table->decimal("desc_total",8,2)->default(0);
+            $table->decimal("precio",10,2)->default(0);
+            $table->decimal("precio_base",10,2)->default(0);
+            $table->decimal("ganancia",10,2)->default(0);
+            $table->decimal("porcentaje",10,2)->default(0);
+            $table->decimal("desc_total",10,2)->default(0);
             
             $table->boolean("push")->default(0);
             $table->timestamps();

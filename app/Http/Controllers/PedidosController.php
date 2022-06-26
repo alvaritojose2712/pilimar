@@ -34,10 +34,10 @@ class PedidosController extends Controller
 
     protected $sends = [
         // "arabitoferreteria@gmail.com"           
-        "omarelhenaoui@hotmail.com",           
+        /* "omarelhenaoui@hotmail.com",           
         "yeisersalah2@gmail.com",           
         "amerelhenaoui@outlook.com",           
-        "yesers982@hotmail.com",           
+        "yesers982@hotmail.com",  */          
     ];
     protected  $letras = [
                 1=>"L",
@@ -51,6 +51,22 @@ class PedidosController extends Controller
                 9=>"P",
                 0=>"X",
             ];
+
+    public function setexportpedido(Request $req)
+    {
+        $p = pedidos::find($req->id);
+        $central = null;
+        if ($p) {
+            if ($p->export) {
+                $p->export = 0;
+            }else {
+                $p->export = 1;
+                $central = (new sendCentral)->setPedidoInCentralFromMaster($req->id);
+            }
+            $p->save();
+            return $central;
+        }
+    }
     public function getPedidosFast(Request $req)
     {
         $fecha = $req->fecha1pedido;
@@ -1109,15 +1125,36 @@ class PedidosController extends Controller
             $arr_send["facturado"]["4"] = toLetras($arr_send["facturado"]["4"]);
             $arr_send["facturado"]["5"] = toLetras($arr_send["facturado"]["5"]);
             $arr_send["facturado"]["6"] = toLetras($arr_send["facturado"]["6"]);
-        //}
+            //}
+            
 
+            $cred_total = clientes::selectRaw("*,@credito := (SELECT COALESCE(sum(monto),0) FROM pago_pedidos WHERE id_pedido IN (SELECT id FROM pedidos WHERE id_cliente=clientes.id) AND tipo=4) as credito, @abono := (SELECT COALESCE(sum(monto),0) FROM pago_pedidos WHERE id_pedido IN (SELECT id FROM pedidos WHERE id_cliente=clientes.id) AND cuenta=0) as abono, (@abono-@credito) as saldo, @vence := (SELECT fecha_vence FROM pedidos WHERE id_cliente=clientes.id AND fecha_vence > ".$req->fecha." ORDER BY pedidos.fecha_vence ASC LIMIT 1) as vence , (COALESCE(DATEDIFF(@vence,'".$req->fecha." 00:00:00'),0)) as dias")
+            ->get(["saldo"])->sum("saldo");
+            
+            $arr_send["cred_total"] = $cred_total;
+            
+            
+            
+            $pedidos_abonos = pedidos::with(["pagos","cliente"])
+            ->where(function($q){
+                
+                $q->whereIn("id",pago_pedidos::orWhere(function($q){
+                    $q->orWhere("cuenta",0); //Abono
+                })->where("monto","<>",0)->select("id_pedido"));
+                
+            })
+            ->where("created_at","LIKE",$req->fecha."%")
+            ->get()
+            ->map(function($q){
+                
+                $q->saldoDebe = $q->pagos->where("tipo",4)->sum("monto");
+                $q->saldoAbono = $q->pagos->where("cuenta",0)->sum("monto");
 
+                return $q;
+            });
+            $arr_send["pedidos_abonos"] = $pedidos_abonos;
 
-        
-
-
-
-        
+            
         
 
         if ($type=="ver") {

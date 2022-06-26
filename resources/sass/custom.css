@@ -4,15 +4,15 @@
   --sinapsis-color-select : #f9bcfb;*/
 
   
-    /*Sinapsis Azul*/
-    /* --sinapsis-color : #118bec;
+    /*Sinapsis Azul
+     --sinapsis-color : #118bec;
     --sinapsis-color-light : #deedfd;
     --sinapsis-color-select : #84bcf3;*/
     
-  /*Naranja*/
+    /*Naranja*/
   --sinapsis-color : rgba(242,109,10);
   --sinapsis-color-light : rgba(255,177,113,0.75);
-  --sinapsis-color-select : rgba(221,143,79,0.75);
+  --sinapsis-color-select : rgba(221,143,79,0.75); 
 
   /*Verde
   --sinapsis-color : #216234;
@@ -21,12 +21,8 @@
 
   
 }
-
-.bg-success-super{
-  background-color: #d0f9c5 !important;
-}
-.bg-danger-super{
-  background-color: #f79292 !important;
+.invalid{
+  border-color: #dc3545 !important;
 }
 body *::-webkit-scrollbar {
     width: 1em;
@@ -433,6 +429,10 @@ body{
 }
 .bg-success-light{
   background-color: #e0fdde !important;
+  text-shadow: 0 0 black;
+}
+.bg-danger-light {
+  background-color: #ffd3d3 !important;
   text-shadow: 0 0 black;
 }
     
