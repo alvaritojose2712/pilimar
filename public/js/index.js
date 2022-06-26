@@ -7918,18 +7918,20 @@ function Facturar(_ref) {
   };
 
   var toggleImprimirTicket = function toggleImprimirTicket() {
+    var id_fake = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
     if (pedidoData) {
       var _moneda = window.prompt("Moneda: $ | bs | cop", "bs");
 
-      var identificacion = window.prompt("Identificación", pedidoData.cliente.identificacion);
+      var identificacion = window.prompt("Identificación", pedidoData.cliente ? pedidoData.cliente.identificacion : "");
 
       if (identificacion) {
-        var nombres = window.prompt("Nombre y Apellido", pedidoData.cliente.nombre);
+        var nombres = window.prompt("Nombre y Apellido", pedidoData.cliente ? pedidoData.cliente.nombre : "");
 
         if (nombres) {
           console.log("Imprimiendo...");
           _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].imprimirTicked({
-            id: pedidoData.id,
+            id: id_fake ? id_fake : pedidoData.id,
             identificacion: identificacion,
             nombres: nombres,
             moneda: _moneda
@@ -10463,6 +10465,7 @@ function Facturar(_ref) {
       dolar: dolar,
       peso: peso
     }) : null, view == "pedidos" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_components_pedidos__WEBPACK_IMPORTED_MODULE_13__["default"], {
+      toggleImprimirTicket: toggleImprimirTicket,
       setexportpedido: setexportpedido,
       pedidoData: pedidoData,
       showModalPedidoFast: showModalPedidoFast,
@@ -15562,7 +15565,8 @@ function Pedidos(_ref) {
       setTipoestadopedido = _ref.setTipoestadopedido,
       filterMetodoPago = _ref.filterMetodoPago,
       filterMetodoPagoToggle = _ref.filterMetodoPagoToggle,
-      clickSetOrderColumnPedidos = _ref.clickSetOrderColumnPedidos;
+      clickSetOrderColumnPedidos = _ref.clickSetOrderColumnPedidos,
+      toggleImprimirTicket = _ref.toggleImprimirTicket;
 
   try {
     return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
@@ -15883,21 +15887,29 @@ function Pedidos(_ref) {
                         children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
                           className: "btn-options btn-group",
                           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
-                            className: "btn btn-outline-success",
+                            className: "btn btn-outline-success btn-sm",
                             "data-id": e.id,
                             onClick: getPedidoFast,
                             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("i", {
                               className: "fa fa-eye"
                             })
                           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
-                            className: "btn btn-outline-secondary",
+                            className: "btn btn-outline-sinapsis btn-sm",
+                            onClick: function onClick() {
+                              return toggleImprimirTicket(e.id);
+                            },
+                            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("i", {
+                              className: "fa fa-print"
+                            })
+                          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+                            className: "btn btn-outline-secondary btn-sm",
                             "data-id": e.id,
                             onClick: setexportpedido,
                             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("i", {
                               className: "fa fa-paper-plane"
                             })
                           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
-                            className: "btn btn-outline-danger",
+                            className: "btn btn-outline-danger btn-sm",
                             "data-id": e.id,
                             "data-type": "getPedidos",
                             onClick: onCLickDelPedido,

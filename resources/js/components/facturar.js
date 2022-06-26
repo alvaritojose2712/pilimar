@@ -1554,19 +1554,19 @@ const toggleModalProductos = (prop,callback=null) => {
   }
   if (callback) {callback()}
 }
-const toggleImprimirTicket = () => {
+const toggleImprimirTicket = (id_fake=null) => {
   if (pedidoData) {
     let moneda = window.prompt("Moneda: $ | bs | cop","bs")
-    let identificacion = window.prompt("Identificación", pedidoData.cliente.identificacion)
+    let identificacion = window.prompt("Identificación", pedidoData.cliente?pedidoData.cliente.identificacion:"")
 
     if (identificacion) {
-      let nombres = window.prompt("Nombre y Apellido",pedidoData.cliente.nombre)
+      let nombres = window.prompt("Nombre y Apellido",pedidoData.cliente?pedidoData.cliente.nombre:"")
       if (nombres) {
 
         console.log("Imprimiendo...")
 
         db.imprimirTicked({
-          id: pedidoData.id,
+          id: id_fake ?id_fake:pedidoData.id,
           identificacion,
           nombres,
           moneda,
@@ -3899,6 +3899,7 @@ const auth = permiso => {
           peso={peso} 
         />:null}
         {view=="pedidos"?<Pedidos
+          toggleImprimirTicket={toggleImprimirTicket}
           setexportpedido={setexportpedido}
           pedidoData={pedidoData}
           showModalPedidoFast={showModalPedidoFast}
