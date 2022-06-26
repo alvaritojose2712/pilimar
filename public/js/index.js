@@ -11636,7 +11636,7 @@ function Historicocierre(_ref) {
               children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
                 className: "btn btn-outline-success",
                 onClick: function onClick() {
-                  return verCierreReq(e.fecha);
+                  return verCierreReq(e.fecha, "ver");
                 },
                 type: "button",
                 children: "Ver"

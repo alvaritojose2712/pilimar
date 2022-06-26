@@ -48,7 +48,7 @@ export default function Historicocierre({
 							<td>{e.tasa}</td>
 							<th>{e.fecha}</th>
 							<td>
-								<button className="btn btn-outline-success" onClick={()=>verCierreReq(e.fecha)} type="button">Ver</button>
+								<button className="btn btn-outline-success" onClick={()=>verCierreReq(e.fecha,"ver")} type="button">Ver</button>
 								<button className="btn btn-outline-success" onClick={()=>verCierreReq(e.fecha,"enviar")} type="button"><i className="fa fa-send"></i></button>
 							</td>
 						</tr>
