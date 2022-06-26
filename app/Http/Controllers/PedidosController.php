@@ -34,10 +34,10 @@ class PedidosController extends Controller
 
     protected $sends = [
         // "arabitoferreteria@gmail.com"           
-        /* "omarelhenaoui@hotmail.com",           
+        "omarelhenaoui@hotmail.com",           
         "yeisersalah2@gmail.com",           
         "amerelhenaoui@outlook.com",           
-        "yesers982@hotmail.com",  */          
+        "yesers982@hotmail.com",          
     ];
     protected  $letras = [
                 1=>"L",
