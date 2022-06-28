@@ -212,6 +212,8 @@ Route::group(['middleware' => ['login']], function () {
 	
 	//Central
 		Route::post('checkPedidosCentral', [InventarioController::class,"checkPedidosCentral"]);
+		Route::post('saveChangeInvInSucurFromCentral', [InventarioController::class,"saveChangeInvInSucurFromCentral"]);
+		
 		
 		Route::get('setVentas', [sendCentral::class,"setVentas"]);
 		Route::get('setGastos', [sendCentral::class,"setGastos"]);

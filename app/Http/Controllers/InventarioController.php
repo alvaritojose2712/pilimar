@@ -30,6 +30,41 @@ use Response;
 
 class InventarioController extends Controller
 {
+    public function saveChangeInvInSucurFromCentral(Request $req)
+    {
+        $inv = $req->inventarioModifiedCentralImport;
+        $count = 0;
+        $ids_true = [];
+        $id_sucursal = null;
+        foreach ($inv as $i => $e) {
+            $obj = inventario::find($e["id_pro_sucursal_fixed"]);
+            if ($obj) {
+                $obj->id = $e["id_pro_sucursal"];
+                $obj->codigo_barras = $e["codigo_barras"];
+                $obj->codigo_proveedor = $e["codigo_proveedor"];
+                $obj->id_proveedor = $e["id_proveedor"];
+                $obj->id_categoria = $e["id_categoria"];
+                $obj->id_marca = $e["id_marca"];
+                $obj->unidad = $e["unidad"];
+                $obj->id_deposito = $e["id_deposito"];
+                $obj->descripcion = $e["descripcion"];
+                $obj->iva = $e["iva"];
+                $obj->porcentaje_ganancia = $e["porcentaje_ganancia"];
+                $obj->precio_base = $e["precio_base"];
+                $obj->precio = $e["precio"];
+                /*  $obj->cantidad = $e["cantidad"];*/
+
+                if ($obj->save()) {
+                    $count++;
+                    array_push($ids_true,$e["id"]);
+                }
+
+                $id_sucursal = $e["id_sucursal"];
+            }
+        }
+        $changeEstatus = (new sendcentral)->changeEstatusProductoProceced($ids_true,$id_sucursal);
+        return ["estado"=>true,"msj"=>"Éxito. $count productos modificados. "];
+    }
     public function setCtxBulto(Request $req)
     {
 
@@ -918,6 +953,7 @@ class InventarioController extends Controller
 
         }
     }
+
     public function getFallas(Request $req)
     {
 

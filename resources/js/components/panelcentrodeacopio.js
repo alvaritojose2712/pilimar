@@ -27,7 +27,7 @@ export default function Panelcentrodeacopio({
                         {sucursalesCentral ? sucursalesCentral.length?
                             sucursalesCentral.map(e=>
                                 <li onClick={()=>setselectSucursalCentral(e.id)} 
-                                className={(e.id == selectSucursalCentral?"active":null)+(" list-group-item")} 
+                                className={(e.id == selectSucursalCentral?"active":null)+(" list-group-item pointer")} 
                                     key={e.id}>{e.codigo} - {e.nombre}</li>
                             )
                         :null:null}
@@ -36,8 +36,14 @@ export default function Panelcentrodeacopio({
                 <div className="col">
                     {selectSucursalCentral!==null?
                         <>
-                            <button className="btn btn-outline-success mb-1" onClick={getInventarioSucursalFromCentral}>Traer Inventario</button>
-                            <button className="btn btn-outline-success mb-1" onClick={setCambiosInventarioSucursal}>Exportar Inventario</button>
+                            <button className="btn btn-outline-success mb-1" onClick={getInventarioSucursalFromCentral}>Inventario</button>
+                            <button className="btn btn-outline-success mb-1">Fallas</button>
+                            <button className="btn btn-outline-success mb-1">Estadísticas</button>
+                            <button className="btn btn-outline-success mb-1">Gastos</button>
+                            <button className="btn btn-outline-success mb-1">Cierres</button>
+                            <button className="btn btn-outline-success mb-1">Tasa de Venta</button>
+
+                            
                             
 
                             <form onSubmit={e => e.preventDefault()}>
@@ -73,11 +79,11 @@ export default function Panelcentrodeacopio({
                                     <tbody>
                                         {inventariSucursalFromCentral.length ? inventariSucursalFromCentral.map((e, i) =>
                                             <tr key={i} className={(e.check?"bg-success-light":"bg-danger-light")+(" pointer")} onDoubleClick={() => changeInventarioFromSucursalCentral(null, i, e.id, "update")}>
-                                                <td className="cell05">
-                                                    {e.id} / {e.id_pro_sucursal}
-                                                </td>
                                                 {type(e.type) ?
                                                     <>
+                                                        <td className="cell05">
+                                                            {e.id} / {e.id_pro_sucursal}
+                                                        </td>
                                                         <td className="cell1">{e.codigo_proveedor}</td>
                                                         <td className="cell1">{e.codigo_barras}</td>
                                                         <td className="cell05">{e.unidad}</td>
@@ -95,6 +101,14 @@ export default function Panelcentrodeacopio({
 
                                                     :
                                                     <>
+                                                        <td className="cell1">
+                                                            <input type="text"
+                                                                disabled={type(e.type)} className="form-control form-control-sm"
+                                                                value={!e.id_pro_sucursal ? "" : e.id_pro_sucursal}
+                                                                onChange={e => changeInventarioFromSucursalCentral((e.target.value), i, e.id, "changeInput", "id_pro_sucursal")}
+                                                                placeholder="id_pro_sucursal..." />
+
+                                                        </td>
                                                         <td className="cell1">
                                                             <input type="text"
                                                                 disabled={type(e.type)} className="form-control form-control-sm"
@@ -235,6 +249,9 @@ export default function Panelcentrodeacopio({
                                         </tr>}
                                     </tbody>
                                 </table>
+                                {inventariSucursalFromCentral.length?
+                                    <button className="btn btn-outline-success mb-1 w-100" onClick={setCambiosInventarioSucursal}>Exportar Inventario</button>
+                                :null}
                             </form>
                         </>
                     :null}            

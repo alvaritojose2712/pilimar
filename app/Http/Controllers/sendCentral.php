@@ -75,9 +75,9 @@ class sendCentral extends Controller
 
 
     //req
-    public function setPedidoInCentralFromMaster($id)
+    public function setPedidoInCentralFromMaster($id,$type="add")
     {
-        $response = Http::post($this->path()."/setPedidoInCentralFromMasters",["pedidos"=>$this->pedidosExportadosFun($id)]);
+        $response = Http::post($this->path()."/setPedidoInCentralFromMasters",["type"=>$type,"pedidos"=>$this->pedidosExportadosFun($id)]);
 
         return $response->body();
 
@@ -149,6 +149,41 @@ class sendCentral extends Controller
         ]);
         
         if ($response->ok()) {
+            $res = $response->json();
+            if ($res) {
+                if (isset($res["estado"])) {
+                    return $res;
+                }else{
+                    $arr_convert = [];
+                    foreach ($res as $key => $e) {
+                        $find = inventario::with(["categoria","proveedor"])->where("id",$e["id_pro_sucursal_fixed"])->first();
+                        if ($find) {
+                            $find["type"] = "original";
+                            array_push($arr_convert,$find);
+    
+                        }
+                        $e["type"] = "replace";
+                        array_push($arr_convert,$e);
+                    }
+                    return $arr_convert;
+                }
+            }else{
+                return $response;
+            }
+        }else{
+            
+            return "Error de Local Centro de Acopio: ".$response->body();
+        } 
+
+    }
+    public function changeEstatusProductoProceced($ids,$id_sucursal)
+    {
+        $response = Http::post($this->path()."/changeEstatusProductoProceced",[
+            "ids"=>$ids,
+            "id_sucursal"=>$id_sucursal,
+        ]);
+        
+        if ($response->ok()) {
             if ($response->json()) {
                 
                 return $response->json();
@@ -159,7 +194,6 @@ class sendCentral extends Controller
             
             return "Error de Local Centro de Acopio: ".$response->body();
         } 
-
     }
     public function setCambiosInventarioSucursal(Request $req)
     {

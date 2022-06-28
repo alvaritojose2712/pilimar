@@ -59,6 +59,7 @@ class PedidosController extends Controller
         if ($p) {
             if ($p->export) {
                 $p->export = 0;
+                $central = (new sendCentral)->setPedidoInCentralFromMaster($req->id,"delete");
             }else {
                 $p->export = 1;
                 $central = (new sendCentral)->setPedidoInCentralFromMaster($req->id);

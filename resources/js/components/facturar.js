@@ -418,17 +418,33 @@ const [subViewConfig, setsubViewConfig] = useState("usuarios")
       }
     })
   }
+  const saveChangeInvInSucurFromCentral = () => {
+    setLoading(true)
+    db.saveChangeInvInSucurFromCentral({ inventarioModifiedCentralImport: inventarioModifiedCentralImport.filter(e=>e.type==="replace") }).then(res=>{
+      notificar(res)
+      getInventarioFromSucursal()
+      setLoading(false)
+    })
+  }
   const getInventarioFromSucursal = () => {
     setLoading(true)
     db.getInventarioFromSucursal({}).then(res => {
       if (res.data) {
         if(res.data.length){
-          setinventarioModifiedCentralImport(res.data)
+          if (typeof res.data[Symbol.iterator] === 'function'){
+            if(!res.data.estado===false){
+              setinventarioModifiedCentralImport([])
+            }else{
+              setinventarioModifiedCentralImport(res.data)
+            }
+          }
         } else {
           setinventarioModifiedCentralImport([])
         }
-      }else{
-        setinventarioModifiedCentralImport([])
+      }
+
+      if(res.data.estado===false){
+        notificar(res)
       }
       setLoading(false)
     })
@@ -3540,6 +3556,7 @@ const changeInventarioFromSucursalCentral = (val, i, id, type, name = null) => {
 
       let newObj = [{
         id: null,
+        id_pro_sucursal: null,
         codigo_proveedor: "",
         codigo_barras: "",
         descripcion: "",
@@ -3732,6 +3749,7 @@ const auth = permiso => {
         }
         {view == "pedidosCentral" ?
         <PedidosCentralComponent
+          saveChangeInvInSucurFromCentral={saveChangeInvInSucurFromCentral}
           socketUrl={socketUrl}
           setSocketUrl={setSocketUrl}
           mastermachines={mastermachines}

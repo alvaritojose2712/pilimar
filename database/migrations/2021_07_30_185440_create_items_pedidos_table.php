@@ -19,8 +19,10 @@ class CreateItemsPedidosTable extends Migration
 
             $table->integer("lote")->nullable()->default(null);
             $table->integer("id_producto")->unsigned()->nullable(true);
-            $table->foreign('id_producto')->references('id')->on('inventarios');
+
+            $table->foreign('id_producto')->references('id')->on('inventarios')->onUpdate("cascade");
             $table->integer("id_pedido")->unsigned();
+
             $table->foreign('id_pedido')->references('id')->on('pedidos')
             ->onDelete('cascade')
             ->onUpdate('cascade');
