@@ -78,7 +78,7 @@ export default function Panelcentrodeacopio({
                                     </thead>
                                     <tbody>
                                         {inventariSucursalFromCentral.length ? inventariSucursalFromCentral.map((e, i) =>
-                                            <tr key={i} className={(e.check?"bg-success-light":"bg-danger-light")+(" pointer")} onDoubleClick={() => changeInventarioFromSucursalCentral(null, i, e.id, "update")}>
+                                            <tr key={i} className={(e.check==1?"bg-success-light":"bg-danger-light")+(" pointer")} onDoubleClick={() => changeInventarioFromSucursalCentral(null, i, e.id, "update")}>
                                                 {type(e.type) ?
                                                     <>
                                                         <td className="cell05">

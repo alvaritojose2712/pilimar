@@ -6772,9 +6772,12 @@ function Facturar(_ref) {
   };
 
   var getInventarioSucursalFromCentral = function getInventarioSucursalFromCentral() {
+    setLoading(true);
     _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].getInventarioSucursalFromCentral({
       id: selectSucursalCentral
     }).then(function (res) {
+      setLoading(false);
+
       if (res.data) {
         if (res.data.length) {
           setinventariSucursalFromCentral(res.data);
@@ -15269,7 +15272,7 @@ function Panelcentrodeacopio(_ref) {
               }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
                 children: inventariSucursalFromCentral.length ? inventariSucursalFromCentral.map(function (e, i) {
                   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
-                    className: (e.check ? "bg-success-light" : "bg-danger-light") + " pointer",
+                    className: (e.check == 1 ? "bg-success-light" : "bg-danger-light") + " pointer",
                     onDoubleClick: function onDoubleClick() {
                       return changeInventarioFromSucursalCentral(null, i, e.id, "update");
                     },

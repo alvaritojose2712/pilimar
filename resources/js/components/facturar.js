@@ -407,7 +407,9 @@ const [subViewConfig, setsubViewConfig] = useState("usuarios")
   }
 
   const getInventarioSucursalFromCentral = () => {
+    setLoading(true)
     db.getInventarioSucursalFromCentral({ id: selectSucursalCentral }).then(res => {
+      setLoading(false)
       if (res.data) {
         if (res.data.length) {
           setinventariSucursalFromCentral(res.data)
