@@ -82,6 +82,7 @@ export default function Facturar({user,notificar,setLoading}) {
   const [qBuscarInventario,setQBuscarInventario] = useState("")
   const [indexSelectInventario,setIndexSelectInventario] = useState(null)
 
+  
 
   const [inpInvbarras,setinpInvbarras] = useState("")
   const [inpInvcantidad,setinpInvcantidad] = useState("")
@@ -372,10 +373,18 @@ const [busquedaAvanazadaInv, setbusquedaAvanazadaInv] = useState(false);
 
 const [selectSucursalCentral, setselectSucursalCentral] = useState(null)
 const [sucursalesCentral, setsucursalesCentral] = useState([])
-const [inventariSucursalFromCentral, setinventariSucursalFromCentral] = useState([])
-
 const [inventarioModifiedCentralImport, setinventarioModifiedCentralImport] = useState([])
 
+
+
+const [subviewpanelcentroacopio, setsubviewpanelcentroacopio] = useState("")
+const [inventariSucursalFromCentral, setinventariSucursalFromCentral] = useState([])
+const [fallaspanelcentroacopio, setfallaspanelcentroacopio] = useState([])
+const [estadisticaspanelcentroacopio, setestadisticaspanelcentroacopio] = useState([])
+const [gastospanelcentroacopio, setgastospanelcentroacopio] = useState([])
+const [cierrespanelcentroacopio, setcierrespanelcentroacopio] = useState([])
+const [diadeventapanelcentroacopio, setdiadeventapanelcentroacopio] = useState([])
+const [tasaventapanelcentroacopio, settasaventapanelcentroacopio] = useState([])
 
 
 const [busqAvanzInputs, setbusqAvanzInputs] = useState({
@@ -406,20 +415,42 @@ const [subViewConfig, setsubViewConfig] = useState("usuarios")
     })
   }
 
-  const getInventarioSucursalFromCentral = () => {
+  const getInventarioSucursalFromCentral = (type_force = null) => {
     setLoading(true)
-    db.getInventarioSucursalFromCentral({ id: selectSucursalCentral }).then(res => {
+    db.getInventarioSucursalFromCentral({
+      id: selectSucursalCentral,
+      type: type_force ? type_force : subviewpanelcentroacopio
+    }).then(res => {
       setLoading(false)
       if (res.data) {
-        if (res.data.length) {
-          setinventariSucursalFromCentral(res.data)
-        }else{
-          setinventariSucursalFromCentral([])
+        switch (subviewpanelcentroacopio) {
+          case "inventariSucursalFromCentral":
+            setinventariSucursalFromCentral(res.data)
+            break;
+          case "fallaspanelcentroacopio":
+            setfallaspanelcentroacopio(res.data)
+            break;
+          case "estadisticaspanelcentroacopio":
+            setestadisticaspanelcentroacopio(res.data)
+            break;
+          case "gastospanelcentroacopio":
+            setgastospanelcentroacopio(res.data)
+            break;
+          case "cierrespanelcentroacopio":
+            setcierrespanelcentroacopio(res.data)
+            break;
+          case "diadeventapanelcentroacopio":
+            setdiadeventapanelcentroacopio(res.data)
+            break;
+          case "tasaventapanelcentroacopio":
+            settasaventapanelcentroacopio(res.data)
+            break;
         }
-
       }
     })
   }
+
+  
   const saveChangeInvInSucurFromCentral = () => {
     setLoading(true)
     db.saveChangeInvInSucurFromCentral({ inventarioModifiedCentralImport: inventarioModifiedCentralImport.filter(e=>e.type==="replace") }).then(res=>{
@@ -470,7 +501,7 @@ const [subViewConfig, setsubViewConfig] = useState("usuarios")
         setLoading(false)
         try {
           if (res.data.estado) {
-            getInventarioSucursalFromCentral()
+            getInventarioSucursalFromCentral(subviewpanelcentroacopio)
           }
         } catch (err) { }
       })
@@ -1182,6 +1213,10 @@ orderByColumEstaInv])
   useEffect(()=>{
     getPedidos()
   },[showMisPedido])
+
+  useEffect(() => {
+    getInventarioSucursalFromCentral(subviewpanelcentroacopio)
+  }, [subviewpanelcentroacopio])
 
   
 
@@ -4291,6 +4326,16 @@ const auth = permiso => {
             setselectSucursalCentral={setselectSucursalCentral}
             selectSucursalCentral={selectSucursalCentral}
             getInventarioSucursalFromCentral={getInventarioSucursalFromCentral}
+
+            subviewpanelcentroacopio={subviewpanelcentroacopio}
+            setsubviewpanelcentroacopio={setsubviewpanelcentroacopio}
+            fallaspanelcentroacopio={fallaspanelcentroacopio}
+            estadisticaspanelcentroacopio={estadisticaspanelcentroacopio}
+            gastospanelcentroacopio={gastospanelcentroacopio}
+            cierrespanelcentroacopio={cierrespanelcentroacopio}
+            diadeventapanelcentroacopio={diadeventapanelcentroacopio}
+            tasaventapanelcentroacopio={tasaventapanelcentroacopio}
+
             inventariSucursalFromCentral={inventariSucursalFromCentral}
             categorias={categorias}
             proveedoresList={proveedoresList}

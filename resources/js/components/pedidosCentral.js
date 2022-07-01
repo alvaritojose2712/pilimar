@@ -250,9 +250,9 @@ export default function PedidosCentralComponent({
 							<tbody>
 								{inventarioModifiedCentralImport.length ? inventarioModifiedCentralImport.map((e, i) =>
 									<tr key={i} className={(e.type == "replace" ? "bg-success-light" : "text-muted") + (" pointer")} >
-										<td className="cell05">
+										<td className="cell05" title={e.id_pro_sucursal_fixed ? (" FIXED "+e.id_pro_sucursal_fixed):null}>
 											{e.id_pro_sucursal ? e.id_pro_sucursal : e.id}
-											FIXED {e.id_pro_sucursal_fixed ? (" "+e.id_pro_sucursal_fixed):null}
+											 
 										</td>
 
 										<td className="cell1">{e.codigo_proveedor}</td>

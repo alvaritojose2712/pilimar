@@ -181,10 +181,8 @@ class PedidosController extends Controller
         ]);
 
     }
-    public function getVentas(Request $req)
+    public function getDiaVentaFun($fechaventas)
     {
-        $fechaventas = $req->fechaventas;
-
         $arr = $this->cerrarFun($fechaventas,0,0,[],true);
 
         if ($fechaventas) {
@@ -214,6 +212,12 @@ class PedidosController extends Controller
         
 
         return $arr;
+    }
+    public function getVentas(Request $req)
+    {
+        $fechaventas = $req->fechaventas;
+        return $this->getDiaVentaFun($fechaventas);
+        
     }
     public function getPedidos(Request $req)
     {   

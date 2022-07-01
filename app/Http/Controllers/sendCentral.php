@@ -24,14 +24,61 @@ class sendCentral extends Controller
     
     public function path()
     {
-        //return "http://127.0.0.1:8001";
-        return "https://arabitonline.com";
+        return "http://127.0.0.1:8001";
+        //return "https://arabitonline.com";
     }
     public function setSocketUrlDB(Request $req)
     {
         return "127.0.0.1";
     }
+    public function getDataEspecifica($type,$url)
+    {
+        $sucursal = sucursal::all()->first();
+        $arr = [];
+        switch ($type) {
+            case 'inventariSucursalFromCentral':
+                
+                $arr = [
+                    "categorias" => categorias::all(),
+                    "proveedores" => proveedores::all(),
+                    "inventario" => inventario::all(),
+                ];
+
+                break;
+            case 'fallaspanelcentroacopio':
+                $arr = ["fallas"=> fallas::all()];
+                
+                break;
+            case 'estadisticaspanelcentroacopio':
+                $arr = [];
+                break;
+            case 'gastospanelcentroacopio':
+                $arr = [];
+                break;
+            case 'cierrespanelcentroacopio':
+                $arr = [];
+                break;
+            case 'diadeventapanelcentroacopio':
+                $arr = (new PedidosController)->getDiaVentaFun((new PedidosController)->today());
+                break;
+        }
+        $arr["sucursal"] = $sucursal;
+
+
+        $response = Http::post($this->path()."/".$url, $arr);
     
+        if ($response->ok()) {
+            $res = $response->json();
+            return $res;        
+        }else{
+            return "Error: ".$response->body();
+        } 
+        return $arr;
+    }
+    public function setInventarioFromSucursal()
+    {
+        return $this->getDataEspecifica("inventariSucursalFromCentral","setInventarioFromSucursal");
+    }
 
     public function setNuevaTareaCentral(Request $req)
     {
@@ -51,7 +98,7 @@ class sendCentral extends Controller
         return view("central.index");
     }
     // public function update($new_version)
-    // {
+    // {}
     //     $runproduction = "npm run production";        
     //     // $phpArtisan = "php artisan key:generate && php artisan view:cache && php artisan route:cache && php artisan config:cache";
 
@@ -97,7 +144,11 @@ class sendCentral extends Controller
     public function getInventarioSucursalFromCentral(Request $req)
     {
         $id = $req->id;
-        $response = Http::post($this->path()."/getInventarioSucursalFromCentral",["id"=>$id]);
+        $type = $req->type;
+        $response = Http::post($this->path()."/getInventarioSucursalFromCentral",[
+            "id"=>$id,
+            "type"=>$type,
+        ]);
         if ($response->ok()) {
             $res = $response->json();
             return $res;
@@ -115,31 +166,6 @@ class sendCentral extends Controller
             return "Error: ".$response->body();
         } 
 
-    }
-    public function setInventarioFromSucursal(Request $req)
-    {
-        $categorias = categorias::all();  
-        $proveedores = proveedores::all();
-        $inventario = inventario::all();
-        $sucursal = sucursal::all()->first();
-
-
-        $response = Http::post($this->path()."/setInventarioFromSucursal",[
-            "categorias"=>$categorias,
-            "proveedores"=>$proveedores,
-            "inventario"=>$inventario,
-            "sucursal"=>$sucursal,
-        ]);
-        
-        if ($response->ok()) {
-            $res = $response->json();
-            return $res;
-            
-            
-        }else{
-            
-            return "Error: ".$response->body();
-        }   
     }
     public function getInventarioFromSucursal(Request $req)
     {
@@ -492,37 +518,7 @@ class sendCentral extends Controller
     }
    
 
-    public function getMonedaCentral()
-    {   
-
-        try {
-            $res = Http::get($this->path."/getMoneda");
-
-            if ($res->ok()) {
-                $moneda_get = $res->json();
-                
-                $cop = moneda::where("tipo",2)->orderBy("id","desc")->first();
-                $bs = moneda::where("tipo",1)->orderBy("id","desc")->first();
-                
-                if ($moneda_get["bs"]) {
-                    if ($moneda_get["bs"]!=$bs["valor"]) {
-                        moneda::updateOrCreate(["tipo"=>1],["valor"=>$moneda_get["bs"]]);
-                        // code...
-                    }
-                }
-                if ($moneda_get["cop"]) {
-                    if ($moneda_get["cop"]!=$cop["valor"]) {
-                        moneda::updateOrCreate(["tipo"=>2],["valor"=>$moneda_get["cop"]]);
-                    }
-                }
-            }else{
-
-            }
-            
-        } catch (\Exception $e) {
-            return Response::json(["estado"=>false,"msj"=>"Error de sucursal: Conexión rechazada"]);
-        }
-    }
+   
 
     public function sendInventario()
     {
