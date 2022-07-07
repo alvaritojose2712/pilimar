@@ -6849,6 +6849,34 @@ function Facturar(_ref) {
     });
   };
 
+  var updatetasasfromCentral = function updatetasasfromCentral() {
+    setLoading(true);
+    _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].updatetasasfromCentral({}).then(function (res) {
+      getMoneda();
+      setLoading(false);
+    });
+  };
+
+  var setchangetasasucursal = function setchangetasasucursal(e) {
+    var tipo = e.currentTarget.attributes["data-type"].value;
+    var valor = window.prompt("Nueva tasa");
+
+    if (valor) {
+      if ((0,_assets__WEBPACK_IMPORTED_MODULE_5__.number)(valor)) {
+        setLoading(true);
+        _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].setnewtasainsucursal({
+          tipo: tipo,
+          valor: valor,
+          id_sucursal: selectSucursalCentral
+        }).then(function (res) {
+          notificar(res);
+          getInventarioSucursalFromCentral("tasaventapanelcentroacopio");
+          setLoading(false);
+        });
+      }
+    }
+  };
+
   var saveChangeInvInSucurFromCentral = function saveChangeInvInSucurFromCentral() {
     setLoading(true);
     _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].saveChangeInvInSucurFromCentral({
@@ -10275,6 +10303,7 @@ function Facturar(_ref) {
 
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_components_header__WEBPACK_IMPORTED_MODULE_11__["default"], {
+      updatetasasfromCentral: updatetasasfromCentral,
       getip: getip,
       auth: auth,
       logout: logout,
@@ -10873,6 +10902,7 @@ function Facturar(_ref) {
       cierrespanelcentroacopio: cierrespanelcentroacopio,
       diadeventapanelcentroacopio: diadeventapanelcentroacopio,
       tasaventapanelcentroacopio: tasaventapanelcentroacopio,
+      setchangetasasucursal: setchangetasasucursal,
       inventariSucursalFromCentral: inventariSucursalFromCentral,
       categorias: categorias,
       proveedoresList: proveedoresList,
@@ -11427,7 +11457,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Header(_ref) {
-  var user = _ref.user,
+  var updatetasasfromCentral = _ref.updatetasasfromCentral,
+      user = _ref.user,
       logout = _ref.logout,
       getip = _ref.getip,
       settoggleClientesBtn = _ref.settoggleClientesBtn,
@@ -11579,6 +11610,12 @@ function Header(_ref) {
               onClick: setMoneda,
               "data-type": "2",
               children: ["COP ", peso, " "]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("small", {
+              className: "p-3 monto-header",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("i", {
+                className: "fa fa-refresh",
+                onClick: updatetasasfromCentral
+              }), " "]
             })]
           }) : null]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
@@ -11606,17 +11643,17 @@ function Header(_ref) {
               children: "Central"
             })
           }) : null : null, auth(1) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
-            className: (view == "panelcentrodeacopio" ? "btn btn-dark" : null) + " p-3 pointer",
-            onClick: function onClick() {
-              return setView("panelcentrodeacopio");
-            },
-            children: "Centro de acopio"
-          }) : null, auth(1) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
             className: (view == "inventario" ? "btn btn-dark" : null) + " p-3 pointer",
             onClick: function onClick() {
               return setView("inventario");
             },
             children: "Administraci\xF3n"
+          }) : null, auth(1) ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+            className: (view == "panelcentrodeacopio" ? "btn btn-dark" : null) + " p-3 pointer",
+            onClick: function onClick() {
+              return setView("panelcentrodeacopio");
+            },
+            children: "Centro de acopio"
           }) : null]
         })]
       })
@@ -15235,12 +15272,14 @@ function Panelcentrodeacopio(_ref) {
       gastospanelcentroacopio = _ref.gastospanelcentroacopio,
       cierrespanelcentroacopio = _ref.cierrespanelcentroacopio,
       diadeventapanelcentroacopio = _ref.diadeventapanelcentroacopio,
-      tasaventapanelcentroacopio = _ref.tasaventapanelcentroacopio;
+      tasaventapanelcentroacopio = _ref.tasaventapanelcentroacopio,
+      setchangetasasucursal = _ref.setchangetasasucursal;
 
   var type = function type(_type) {
     return !_type || _type === "delete" ? true : false;
   };
 
+  console.log(tasaventapanelcentroacopio);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
     className: "container",
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("div", {
@@ -15673,29 +15712,93 @@ function Panelcentrodeacopio(_ref) {
               }) : null]
             })]
           }) : null, subviewpanelcentroacopio == "fallaspanelcentroacopio" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", {
-              children: "Fallas"
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+              children: ["Fallas ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                className: "btn btn-outline-success btn-sm",
+                onClick: function onClick() {
+                  return getInventarioSucursalFromCentral("fallaspanelcentroacopio");
+                },
+                children: "Actualizar"
+              })]
             })
           }) : null, subviewpanelcentroacopio == "estadisticaspanelcentroacopio" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", {
-              children: "Estad\xEDsticas"
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+              children: ["Estad\xEDsticas ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                className: "btn btn-outline-success btn-sm",
+                onClick: function onClick() {
+                  return getInventarioSucursalFromCentral("estadisticaspanelcentroacopio");
+                },
+                children: "Actualizar"
+              })]
             })
           }) : null, subviewpanelcentroacopio == "gastospanelcentroacopio" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", {
-              children: "Gastos"
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+              children: ["Gastos ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                className: "btn btn-outline-success btn-sm",
+                onClick: function onClick() {
+                  return getInventarioSucursalFromCentral("gastospanelcentroacopio");
+                },
+                children: "Actualizar"
+              })]
             })
           }) : null, subviewpanelcentroacopio == "cierrespanelcentroacopio" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", {
-              children: "Cierres"
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+              children: ["Cierres ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                className: "btn btn-outline-success btn-sm",
+                onClick: function onClick() {
+                  return getInventarioSucursalFromCentral("cierrespanelcentroacopio");
+                },
+                children: "Actualizar"
+              })]
             })
           }) : null, subviewpanelcentroacopio == "diadeventapanelcentroacopio" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", {
-              children: "D\xEDa de Venta"
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+              children: ["D\xEDa de Venta ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                className: "btn btn-outline-success btn-sm",
+                onClick: function onClick() {
+                  return getInventarioSucursalFromCentral("diadeventapanelcentroacopio");
+                },
+                children: "Actualizar"
+              })]
             })
-          }) : null, subviewpanelcentroacopio == "tasaventapanelcentroacopio" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("h1", {
-              children: "Tasas de Venta"
-            })
+          }) : null, subviewpanelcentroacopio == "tasaventapanelcentroacopio" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("h1", {
+              children: ["Tasas de Venta ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("button", {
+                className: "btn btn-outline-success btn-sm",
+                onClick: function onClick() {
+                  return getInventarioSucursalFromCentral("tasaventapanelcentroacopio");
+                },
+                children: "Actualizar"
+              })]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("table", {
+              className: "table",
+              children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("thead", {
+                children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
+                  children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+                    children: "ID"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+                    children: "Tipo"
+                  }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+                    children: "Valor"
+                  })]
+                })
+              }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("tbody", {
+                children: tasaventapanelcentroacopio.length ? tasaventapanelcentroacopio.map(function (e) {
+                  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("tr", {
+                    className: "pointer",
+                    onClick: setchangetasasucursal,
+                    "data-type": e.tipo,
+                    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+                      children: e.id
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+                      children: e.tipo == 1 ? "Bolivares" : "Pesos Colombianos"
+                    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("th", {
+                      children: e.valor
+                    })]
+                  }, e.id);
+                }) : null
+              })]
+            })]
           }) : null]
         }) : null
       })]
@@ -18002,6 +18105,12 @@ var db = {
   },
   saveChangeInvInSucurFromCentral: function saveChangeInvInSucurFromCentral(data) {
     return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "saveChangeInvInSucurFromCentral", data);
+  },
+  setnewtasainsucursal: function setnewtasainsucursal(data) {
+    return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "setnewtasainsucursal", data);
+  },
+  updatetasasfromCentral: function updatetasasfromCentral(data) {
+    return axios__WEBPACK_IMPORTED_MODULE_1___default().post(host + "updatetasasfromCentral", data);
   },
   openPrintCreditos: function openPrintCreditos(param) {
     return window.open(host + "verCreditos?" + param, "targed=blank");

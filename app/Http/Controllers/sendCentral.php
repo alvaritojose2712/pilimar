@@ -14,6 +14,7 @@ use App\Models\categorias;
 use App\Models\proveedores;
 use App\Models\pedidos;
 
+use Illuminate\Support\Facades\Cache;
 
 use Http;
 use Response;
@@ -39,8 +40,8 @@ class sendCentral extends Controller
             case 'inventariSucursalFromCentral':
                 
                 $arr = [
-                    "categorias" => categorias::all(),
-                    "proveedores" => proveedores::all(),
+                    //"categorias" => categorias::all(),
+                    //"proveedores" => proveedores::all(),
                     "inventario" => inventario::all(),
                 ];
 
@@ -140,6 +141,26 @@ class sendCentral extends Controller
     public function changeExportStatus($pathcentral,$id)
     {
         $response = Http::post($this->path()."/changeExtraidoEstadoPed",["id"=>$id]);
+    }
+    public function setnewtasainsucursal(Request $req)
+    {
+        $tipo = $req->tipo;
+        $valor = $req->valor;
+        $id_sucursal = $req->id_sucursal;
+        
+        
+        
+        $response = Http::post($this->path()."/setnewtasainsucursal",[
+            "tipo"=>$tipo,
+            "valor"=>$valor,
+            "id_sucursal"=>$id_sucursal,
+        ]);
+        if ($response->ok()) {
+            $res = $response->json();
+            return $res;
+        }else{
+            return "Error: ".$response->body();
+        }
     }
     public function getInventarioSucursalFromCentral(Request $req)
     {
@@ -545,6 +566,34 @@ class sendCentral extends Controller
         } catch (\Exception $e) {
             return Response::json(["estado"=>false,"msj"=>"Error de sucursal: ".$e->getMessage()]);
             
+        }
+    }
+    public function updatetasasfromCentral()
+    {
+        try {
+            $sucursal = sucursal::all()->first();
+
+            $response = Http::post($this->path().'/getMonedaSucursal',["codigo"=>$sucursal->codigo]);
+
+            if ($response->ok()) {
+                $res = $response->json();
+                foreach ($res as $key => $e) {
+                    moneda::updateOrCreate(["tipo"=>$e["tipo"]], [
+                        "tipo"=>$e["tipo"],
+                        "valor"=>$e["valor"]
+                    ]);
+                }
+        
+                Cache::forget('bs');
+                Cache::forget('cop');
+                
+            }else{
+                return "Error: ".$response->body();
+
+            }
+            
+        } catch (\Exception $e) {
+            return Response::json(["estado"=>false,"msj"=>"Error de sucursal: ".$e->getMessage()]);
         }
     }
 

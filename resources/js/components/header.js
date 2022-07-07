@@ -1,6 +1,7 @@
 import logo from "../../images/logo.png"
 import carrito from "../../images/carrito1.png"
 function Header({
+  updatetasasfromCentral,
   user, logout, getip,
   settoggleClientesBtn,toggleClientesBtn,getVentasClick,dolar,peso,view,setView,setMoneda,getPedidos,setViewCaja,viewCaja,setShowModalMovimientos,showModalMovimientos,auth}) {
   
@@ -68,6 +69,8 @@ function Header({
             <>
               <small className="p-3 monto-header" onClick={setMoneda} data-type="1">USD {dolar} </small>
               <small className="p-3 monto-header" onClick={setMoneda} data-type="2">COP {peso} </small>
+              <small className="p-3 monto-header"><i className="fa fa-refresh" onClick={updatetasasfromCentral}></i> </small>
+              
             </>
             :null}
             
@@ -94,8 +97,8 @@ function Header({
                   : null
               }
               
-              {auth(1) ? <span className={(view == "panelcentrodeacopio" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("panelcentrodeacopio")}>Centro de acopio</span> : null}
               {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Administración</span>:null}
+              {auth(1) ? <span className={(view == "panelcentrodeacopio" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("panelcentrodeacopio")}>Centro de acopio</span> : null}
           </div>
         </div>
       </div>
