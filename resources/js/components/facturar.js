@@ -450,6 +450,28 @@ const [subViewConfig, setsubViewConfig] = useState("usuarios")
     })
   }
 
+  const updatetasasfromCentral = () => {
+    setLoading(true)
+    db.updatetasasfromCentral({}).then(res=>{
+      getMoneda()
+      setLoading(false)
+    })
+  }
+  const setchangetasasucursal = (e) => {
+    let tipo = e.currentTarget.attributes["data-type"].value
+    let valor = window.prompt("Nueva tasa")
+    if (valor) {
+      if (number(valor)) {
+        setLoading(true)
+        db.setnewtasainsucursal({tipo,valor,id_sucursal:selectSucursalCentral}).then(res=>{
+          notificar(res)
+          getInventarioSucursalFromCentral("tasaventapanelcentroacopio")
+          setLoading(false)
+        })
+      }
+    }
+  }
+
   
   const saveChangeInvInSucurFromCentral = () => {
     setLoading(true)
@@ -3659,6 +3681,7 @@ const auth = permiso => {
     <>
       
         <Header
+        updatetasasfromCentral={updatetasasfromCentral}
         getip={getip}
         auth={auth}
         logout={logout}
@@ -4335,6 +4358,8 @@ const auth = permiso => {
             cierrespanelcentroacopio={cierrespanelcentroacopio}
             diadeventapanelcentroacopio={diadeventapanelcentroacopio}
             tasaventapanelcentroacopio={tasaventapanelcentroacopio}
+
+            setchangetasasucursal={setchangetasasucursal}
 
             inventariSucursalFromCentral={inventariSucursalFromCentral}
             categorias={categorias}

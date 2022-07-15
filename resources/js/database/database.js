@@ -159,6 +159,10 @@ const db = {
   setCambiosInventarioSucursal: data => axios.post(host + "setCambiosInventarioSucursal", data),
   getInventarioFromSucursal: data => axios.post(host + "getInventarioFromSucursal", data),
   saveChangeInvInSucurFromCentral: data => axios.post(host + "saveChangeInvInSucurFromCentral", data),
+  setnewtasainsucursal: data => axios.post(host + "setnewtasainsucursal", data),
+  updatetasasfromCentral: data => axios.post(host + "updatetasasfromCentral", data),
+  
+  
   
   
   

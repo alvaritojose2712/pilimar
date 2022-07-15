@@ -23,10 +23,12 @@ export default function Panelcentrodeacopio({
     cierrespanelcentroacopio,
     diadeventapanelcentroacopio,
     tasaventapanelcentroacopio,
+    setchangetasasucursal,
 }) {
     const type = type => {
         return !type || type === "delete" ? true : false
     }
+    console.log(tasaventapanelcentroacopio)
     return (
         <div className="container">
             <div className="row">
@@ -270,28 +272,46 @@ export default function Panelcentrodeacopio({
                                 </form>
                             </>:null}
                             {subviewpanelcentroacopio=="fallaspanelcentroacopio"?<>
-                                <h1>Fallas</h1>
+                                <h1>Fallas <button className="btn btn-outline-success btn-sm" onClick={()=>getInventarioSucursalFromCentral("fallaspanelcentroacopio")}>Actualizar</button></h1>  
 
                             </>:null}
                             {subviewpanelcentroacopio=="estadisticaspanelcentroacopio"?<>
-                                <h1>Estadísticas</h1>
+                                <h1>Estadísticas <button className="btn btn-outline-success btn-sm" onClick={()=>getInventarioSucursalFromCentral("estadisticaspanelcentroacopio")}>Actualizar</button></h1> 
 
                             </>:null}
                             {subviewpanelcentroacopio=="gastospanelcentroacopio"?<>
-                                <h1>Gastos</h1>
+                                <h1>Gastos <button className="btn btn-outline-success btn-sm" onClick={()=>getInventarioSucursalFromCentral("gastospanelcentroacopio")}>Actualizar</button></h1> 
 
                             </>:null}
                             {subviewpanelcentroacopio=="cierrespanelcentroacopio"?<>
-                                <h1>Cierres</h1>
+                                <h1>Cierres <button className="btn btn-outline-success btn-sm" onClick={()=>getInventarioSucursalFromCentral("cierrespanelcentroacopio")}>Actualizar</button></h1> 
 
                             </>:null}
                             {subviewpanelcentroacopio=="diadeventapanelcentroacopio"?<>
-                                <h1>Día de Venta</h1>
+                                <h1>Día de Venta <button className="btn btn-outline-success btn-sm" onClick={()=>getInventarioSucursalFromCentral("diadeventapanelcentroacopio")}>Actualizar</button></h1> 
 
                             </>:null}
                             {subviewpanelcentroacopio=="tasaventapanelcentroacopio"?<>
-                                <h1>Tasas de Venta</h1>
-
+                                <h1>Tasas de Venta <button className="btn btn-outline-success btn-sm" onClick={()=>getInventarioSucursalFromCentral("tasaventapanelcentroacopio")}>Actualizar</button></h1> 
+                                <table className="table">
+                                        <thead>
+                                            <tr>
+                                              <th>ID</th>
+                                              <th>Tipo</th>
+                                              <th>Valor</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {tasaventapanelcentroacopio.length?tasaventapanelcentroacopio.map(e=>
+                                          <tr key={e.id} className="pointer" onClick={setchangetasasucursal} data-type={e.tipo}>
+                                            <th>{e.id}</th>
+                                            <th>{e.tipo==1?"Bolivares":"Pesos Colombianos"}</th>
+                                            <th>{e.valor}</th>
+                                          </tr>
+                                        ):null}
+                                        </tbody>
+                                </table>         
+                                
                             </>:null}
                             
                         </>

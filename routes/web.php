@@ -224,6 +224,10 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('setFacturasCentral', [sendCentral::class,"setFacturasCentral"]);
 		
 		Route::post('getmastermachine', [sendCentral::class,"getmastermachine"]);
+		Route::post('setnewtasainsucursal', [sendCentral::class,"setnewtasainsucursal"]);
+		Route::post('updatetasasfromCentral', [sendCentral::class,"updatetasasfromCentral"]);
+		
+		
 
 		
 		
