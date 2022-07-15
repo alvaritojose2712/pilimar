@@ -137,7 +137,8 @@
 					<th class="right">
 						INVENTARIO
 					</th>
-					<td class="">{{$total_inventario_format}}</td>
+					<td class="">Venta: {{$total_inventario_format}}<br>Base: {{$total_inventario_base_format}}</td>
+
 					<td>
 						<b>VUELTOS TOTALES</b> <hr>
 						{{($vueltos_totales)}}

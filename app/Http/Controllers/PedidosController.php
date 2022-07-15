@@ -33,11 +33,12 @@ class PedidosController extends Controller
 {   
 
     protected $sends = [
-        // "arabitoferreteria@gmail.com"           
+        "wasim6785@gmail.com",         
+        "wasim6785@hotmail.com",         
         "omarelhenaoui@hotmail.com",           
         "yeisersalah2@gmail.com",           
         "amerelhenaoui@outlook.com",           
-        "yesers982@hotmail.com",          
+        "yesers982@hotmail.com",           
     ];
     protected  $letras = [
                 1=>"L",
@@ -1029,6 +1030,10 @@ class PedidosController extends Controller
 
         $total_inventario = DB::table("inventarios")
         ->select(DB::raw("sum(precio*cantidad) as suma"))->first()->suma;
+
+       $total_inventario_base = DB::table("inventarios")
+        ->select(DB::raw("sum(precio_base*cantidad) as suma"))->first()->suma;
+        
         $vueltos = pago_pedidos::where("tipo",6)->where("monto","<>",0);
         $vueltos_totales = $vueltos->sum("monto");
         
@@ -1036,7 +1041,7 @@ class PedidosController extends Controller
 
 
         
-
+        
         $movimientos = movimientos::with(["items"=>function($q){
             $q->with("producto");
         }])->where("created_at","LIKE",$req->fecha."%")->get();
@@ -1046,8 +1051,12 @@ class PedidosController extends Controller
             "referencias"=>$pagos_referencias,
             "cierre" => $cierre,
             "cierre_tot" => number_format($cierre->debito+$cierre->efectivo+$cierre->transferencia,2,",","."),
+           
             "total_inventario" =>($total_inventario),
             "total_inventario_format" =>number_format($total_inventario,2,",","."),
+            "total_inventario_base" =>($total_inventario_base),
+            "total_inventario_base_format" =>number_format($total_inventario_base,2,",","."),
+           
             "vueltos_totales" =>number_format($vueltos_totales,2,",","."),
             "vueltos_des" =>$facturado["vueltos_des"],
 
@@ -1090,6 +1099,7 @@ class PedidosController extends Controller
         $arr_send["facturado"]["6"] = number_format($arr_send["facturado"]["6"],2,",",".");
         //foreach ($this->letras as $key => $value) {
             $arr_send["total_inventario_format"] = toLetras($arr_send["total_inventario_format"]); 
+            $arr_send["total_inventario_base_format"] = toLetras($arr_send["total_inventario_base_format"]); 
             $arr_send["vueltos_totales"] = toLetras($arr_send["vueltos_totales"]); 
             $arr_send["precio"] = toLetras($arr_send["precio"]); 
             $arr_send["precio_base"] = toLetras($arr_send["precio_base"]); 
