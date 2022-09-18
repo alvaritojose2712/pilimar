@@ -116,6 +116,10 @@ class PedidosController extends Controller
     } 
     public function sumpedidos(Request $req)
     {
+        $cop = $this->get_moneda()["cop"];
+        $bs = $this->get_moneda()["bs"];
+
+
         $ped = pedidos::with(["cliente","pagos","items"=>function($q)
         {
 
@@ -174,10 +178,10 @@ class PedidosController extends Controller
             "created_at"=> $this->today(),
             "id"=>time(),
 
-            "subtotal"=> round($subtotal,2),
+            "subtotal"=> ($subtotal*$bs),
             "total_porciento"=> $total_porciento,
-            "total_des"=> round($total_des,2),
-            "total"=> round($total,2)
+            "total_des"=> ($total_des*$bs),
+            "total"=> ($total*$bs)
         ]);
 
     }
@@ -554,8 +558,13 @@ class PedidosController extends Controller
                     $iva_val = "0";
                     $iva_m = 0;
                 }else{
-                    
-                    $item->producto["precio"] = $item->producto["precio"]*$factor;
+                    $des_unitario = 0;
+                    if ($item->descuento<0) {
+                        # code...
+                        $item->des_unitario = (($item->descuento/100)*$item->producto["precio"]);
+                    }
+
+                    $item->producto["precio"] = ($item->producto["precio"])*$factor;
                     $subtotal = ($item->producto["precio"]*$item->cantidad);
                     $iva_val = $item->producto["iva"];
                     $iva_m = $iva_val/100;
@@ -591,7 +600,7 @@ class PedidosController extends Controller
                 
             });
             $pedido->tot_items =count($pedido->items);
-            $pedido->total_des = number_format($total_des_ped,2,".",",");
+            $pedido->total_des = number_format(($total_des_ped>0?$total_des_ped:0),2,".",",");
             $pedido->subtotal = number_format($subtotal_ped,2,".",",");
             $pedido->total = number_format(round( $total_ped,3),2,".",",");
 
