@@ -21,6 +21,7 @@ class tickera extends Controller
     public function imprimir(Request $req)
     {
 
+        //return gethostname();
         function addSpaces($string = '', $valid_string_length = 0) {
             if (strlen($string) < $valid_string_length) {
                 $spaces = $valid_string_length - strlen($string);
@@ -52,7 +53,14 @@ class tickera extends Controller
         $fecha_emision = date("Y-m-d H:i:s");
 
         try {
+            $arr_printers = explode(";", $sucursal->tickera);
+            $printer = 1;
+
+            if ($req->printer) {
+                $printer = $req->printer-1;
+            }
             
+            return $arr_printers[$printer];
             $connector = new WindowsPrintConnector($sucursal->tickera);
             //smb://computer/printer
             $printer = new Printer($connector);

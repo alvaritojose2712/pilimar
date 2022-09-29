@@ -45,7 +45,8 @@ import ViewPedidoVendedor from '../components/viewPedidoVendedor';
 
 export default function Facturar({user,notificar,setLoading}) {
 
-  
+    
+  const [selectprinter, setselectprinter] = useState(null)
   
   const [dropprintprice, setdropprintprice] = useState(false)
   
@@ -1636,18 +1637,29 @@ const toggleImprimirTicket = (id_fake=null) => {
 
     if (identificacion) {
       let nombres = window.prompt("Nombre y Apellido",pedidoData.cliente?pedidoData.cliente.nombre:"")
-      if (nombres) {
+      let printer = null
+      if (selectprinter) {
+        printer = selectprinter
+      }else{
+        printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4")
+      }
+      if (printer&&number(printer)) {
+        setselectprinter(printer)
+        if (nombres) {
 
-        console.log("Imprimiendo...")
+          console.log("Imprimiendo...")
 
-        db.imprimirTicked({
-          id: id_fake ?id_fake:pedidoData.id,
-          identificacion,
-          nombres,
-          moneda,
-        }).then(res=>{
-          notificar(res)
-        })
+          db.imprimirTicked({
+            id: id_fake ?id_fake:pedidoData.id,
+            identificacion,
+            nombres,
+            moneda,
+            printer
+          }).then(res=>{
+            notificar(res)
+          })
+        }
+
       }
     }
     
