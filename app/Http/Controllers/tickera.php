@@ -122,9 +122,9 @@ class tickera extends Controller
                 
                $printer->setJustification(Printer::JUSTIFY_CENTER);
 
-                $tux = EscposImage::load(resource_path() . "/images/logo-small.jpg", false);
-                $printer -> bitImage($tux);
-                $printer->setEmphasis(true);
+                // $tux = EscposImage::load(resource_path() . "/images/logo-small.jpg", false);
+                // $printer -> bitImage($tux);
+                // $printer->setEmphasis(true);
 
                 // $printer->text("\n");
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
@@ -200,10 +200,9 @@ class tickera extends Controller
                             $items[] = [
                                 'descripcion' => $val->producto->descripcion,
                                 'codigo_barras' => $val->producto->codigo_barras,
-                                'pu' => $val->producto->precio,
+                                'pu' => ($val->descuento<0)?number_format($val->producto->precio-$val->des_unitario,3):$val->producto->precio,
                                 'cantidad' => $val->cantidad,
                                 'totalprecio' => $val->total,
-                               
                             ];
                         }
                     }
@@ -214,6 +213,9 @@ class tickera extends Controller
                     //Current item ROW 1
                    $printer->text($item['descripcion']);
                    $printer->text("\n");
+                   $printer->text($item['codigo_barras']);
+                   $printer->text("\n");
+
 
                    $printer->text(addSpaces("P/U. ",6).$item['pu']);
                    $printer->text("\n");

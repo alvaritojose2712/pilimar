@@ -4340,6 +4340,7 @@ const auth = permiso => {
           getCredito={getCredito}
           getTransferencia={getTransferencia}
           getEfectivo={getEfectivo}
+          auth={auth}
           />
         :null}
         {view =="panelcentrodeacopio"?

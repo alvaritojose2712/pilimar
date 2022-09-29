@@ -1,3 +1,4 @@
+<?php $t_base = 0; ?>
 <!doctype html>
 <html lang="es">
 <head>
@@ -75,13 +76,13 @@
 							Cantidad
 						</th>
 						<th>
-							P/U
+							P/U BASE / VENTA
 						</th>
 						<th>
 							Descuento
 						</th>
 						<th class="text-right">
-							Monto
+							TOTAL VENTA / BASE
 						</th>
 					</tr>
 					@foreach ($pedido->items as $val)
@@ -96,15 +97,18 @@
 								{{$val->cantidad}}
 							</td>
 							<td>
+								{{$val->producto->precio_base}} / 
 								{{$val->producto->precio}}
 							</td>
 							<td>
 								{{$val->total_des}} ({{$val->descuento}}%)
 							</td>
 							<td class="text-right">
-								{{$val->total}}
+								{{$val->cantidad*$val->producto->precio_base}} / {{$val->total}}
 							</td>
 						</tr>
+
+						<?php $t_base += $val->cantidad*$val->producto->precio_base; ?>
 					@endforeach
 						
 					<tr class='hover'>
@@ -129,8 +133,8 @@
                       <td class="text-right">{{$pedido->monto_iva}}</td>
                     </tr>
                     <tr class="hover h4">
-                      <th colspan="5" class="text-right">Total</th>
-                      <td class="text-right">{{$pedido->total}}</td>
+                      <th colspan="5" class="text-right">Total BASE / VENTA</th>
+                      <td class="text-right">{{$t_base}} / {{$pedido->total}}</td>
                     </tr>
 				</tbody>
 

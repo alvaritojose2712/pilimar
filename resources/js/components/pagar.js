@@ -118,6 +118,7 @@ peso,
 showinputaddCarritoFast,
 setshowinputaddCarritoFast,
 qProductosMain,
+auth
 }) {
 
   const [vuelto_penddolar,setvuelto_penddolar] = useState(0)
@@ -357,12 +358,15 @@ qProductosMain,
                     <th className="text-sinapsis cell2">Código</th>
                     <th className="text-sinapsis cell3">Producto</th>
                     <th className="text-sinapsis cell1">Cant.</th>
+                    {auth(1)?<th className="text-sinapsis cell1">P. Base</th>:null}
+
                     <th className="text-sinapsis cell1">Precio</th>
                     {/*
                     <th className="text-sinapsis">Sub-total</th>
                     <th className="text-sinapsis">Desc.%</th>
                     <th className="text-sinapsis">Tot.Desc.</th>
                     */}
+
                     <th className="text-sinapsis cell2">Total</th>
                     {editable?
                     <th className='cell1'><button className="btn btn-circle text-white btn-sinapsis btn-sm" onClick={toggleModalProductos}>F1 <i className="fa fa-plus"></i></button></th>
@@ -397,6 +401,7 @@ qProductosMain,
                       <td className="pointer clickme align-middle" onClick={setCantidadCarrito} data-index={e.id}>
                         {e.cantidad.replace(".00","")} 
                       </td>
+                      {auth(1)?<th className="pointer align-middle">{e.producto.precio_base}</th>:null}
                       {e.producto.precio1?
                       <td className="align-middle text-success pointer" data-iditem={e.id} onClick={setPrecioAlternoCarrito} >{e.producto.precio}</td>
                         :
