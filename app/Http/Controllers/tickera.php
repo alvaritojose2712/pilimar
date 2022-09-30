@@ -60,8 +60,8 @@ class tickera extends Controller
                 $printer = $req->printer-1;
             }
             
-            return $arr_printers[$printer];
-            $connector = new WindowsPrintConnector($sucursal->tickera);
+            
+            $connector = new WindowsPrintConnector($arr_printers[$printer]);
             //smb://computer/printer
             $printer = new Printer($connector);
             $printer->setEmphasis(true);
