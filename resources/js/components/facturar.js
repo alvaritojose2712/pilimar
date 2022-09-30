@@ -1637,30 +1637,28 @@ const toggleImprimirTicket = (id_fake=null) => {
 
     if (identificacion) {
       let nombres = window.prompt("Nombre y Apellido",pedidoData.cliente?pedidoData.cliente.nombre:"")
-      let printer = null
+      let printer = 1
       if (selectprinter) {
         printer = selectprinter
       }else{
         printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4")
         setselectprinter(printer)
       }
-      if (printer) {
-        if (nombres) {
+      if (nombres) {
 
-          console.log("Imprimiendo...")
+        console.log("Imprimiendo...")
 
-          db.imprimirTicked({
-            id: id_fake ?id_fake:pedidoData.id,
-            identificacion,
-            nombres,
-            moneda,
-            printer
-          }).then(res=>{
-            notificar(res)
-          })
-        }
-
+        db.imprimirTicked({
+          id: id_fake ?id_fake:pedidoData.id,
+          identificacion,
+          nombres,
+          moneda,
+          printer
+        }).then(res=>{
+          notificar(res)
+        })
       }
+
     }
     
   }
