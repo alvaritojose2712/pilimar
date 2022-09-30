@@ -1642,9 +1642,9 @@ const toggleImprimirTicket = (id_fake=null) => {
         printer = selectprinter
       }else{
         printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4")
-      }
-      if (printer&&number(printer)) {
         setselectprinter(printer)
+      }
+      if (printer) {
         if (nombres) {
 
           console.log("Imprimiendo...")
