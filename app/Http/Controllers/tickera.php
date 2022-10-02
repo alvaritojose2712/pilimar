@@ -52,13 +52,13 @@ class tickera extends Controller
         $sucursal = sucursal::all()->first();
         $fecha_emision = date("Y-m-d H:i:s");
 
-        $arr_printers = explode(";", $sucursal->tickera);
-        $printer = 1;
-
-        if ($req->printer) {
-            $printer = $req->printer-1;
-        }
         try {
+            $arr_printers = explode(";", $sucursal->tickera);
+            $printer = 1;
+
+            if ($req->printer) {
+                $printer = $req->printer-1;
+            }
             
             
             $connector = new WindowsPrintConnector($arr_printers[$printer]);
@@ -279,10 +279,10 @@ class tickera extends Controller
             $printer->pulse();
             $printer->close();
 
-          return Response::json(["msj"=>"Imprimiendo...".$arr_printers[$printer],"estado",true]);
+          return Response::json(["msj"=>"Imprimiendo...","estado",true]);
 
         } catch (Exception $e) {
-          return Response::json(["msj"=>"Error: ".$arr_printers[$printer]." ".$e->getMessage(),"estado",false]);
+          return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado",false]);
             
         }
     }
