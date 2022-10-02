@@ -8048,29 +8048,26 @@ function Facturar(_ref) {
 
       if (identificacion) {
         var nombres = window.prompt("Nombre y Apellido", pedidoData.cliente ? pedidoData.cliente.nombre : "");
-        var printer = null;
+        var printer = 1;
 
         if (selectprinter) {
           printer = selectprinter;
         } else {
           printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4");
+          setselectprinter(printer);
         }
 
-        if (printer && (0,_assets__WEBPACK_IMPORTED_MODULE_5__.number)(printer)) {
-          setselectprinter(printer);
-
-          if (nombres) {
-            console.log("Imprimiendo...");
-            _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].imprimirTicked({
-              id: id_fake ? id_fake : pedidoData.id,
-              identificacion: identificacion,
-              nombres: nombres,
-              moneda: _moneda,
-              printer: printer
-            }).then(function (res) {
-              notificar(res);
-            });
-          }
+        if (nombres) {
+          console.log("Imprimiendo...");
+          _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].imprimirTicked({
+            id: id_fake ? id_fake : pedidoData.id,
+            identificacion: identificacion,
+            nombres: nombres,
+            moneda: _moneda,
+            printer: printer
+          }).then(function (res) {
+            notificar(res);
+          });
         }
       }
     }

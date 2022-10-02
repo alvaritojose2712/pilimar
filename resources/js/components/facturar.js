@@ -1637,13 +1637,13 @@ const toggleImprimirTicket = (id_fake=null) => {
 
     if (identificacion) {
       let nombres = window.prompt("Nombre y Apellido",pedidoData.cliente?pedidoData.cliente.nombre:"")
-      let printer = 1
-      if (selectprinter) {
-        printer = selectprinter
-      }else{
-        printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4")
-        setselectprinter(printer)
-      }
+      // let printer = 1
+      // if (selectprinter) {
+      //   printer = selectprinter
+      // }else{
+        let printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4")
+        //setselectprinter(printer)
+      //}
       if (nombres) {
 
         console.log("Imprimiendo...")
