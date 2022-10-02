@@ -1632,6 +1632,7 @@ const toggleModalProductos = (prop,callback=null) => {
 }
 const toggleImprimirTicket = (id_fake=null) => {
   if (pedidoData) {
+    let printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4")
     let moneda = window.prompt("Moneda: $ | bs | cop","bs")
     let identificacion = window.prompt("Identificación", pedidoData.cliente?pedidoData.cliente.identificacion:"")
 
@@ -1641,7 +1642,6 @@ const toggleImprimirTicket = (id_fake=null) => {
       // if (selectprinter) {
       //   printer = selectprinter
       // }else{
-        let printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4")
         //setselectprinter(printer)
       //}
       if (nombres) {

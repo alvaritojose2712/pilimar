@@ -8042,20 +8042,19 @@ function Facturar(_ref) {
     var id_fake = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
 
     if (pedidoData) {
+      var printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4");
+
       var _moneda = window.prompt("Moneda: $ | bs | cop", "bs");
 
       var identificacion = window.prompt("Identificación", pedidoData.cliente ? pedidoData.cliente.identificacion : "");
 
       if (identificacion) {
-        var nombres = window.prompt("Nombre y Apellido", pedidoData.cliente ? pedidoData.cliente.nombre : "");
-        var printer = 1;
-
-        if (selectprinter) {
-          printer = selectprinter;
-        } else {
-          printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4");
-          setselectprinter(printer);
-        }
+        var nombres = window.prompt("Nombre y Apellido", pedidoData.cliente ? pedidoData.cliente.nombre : ""); // let printer = 1
+        // if (selectprinter) {
+        //   printer = selectprinter
+        // }else{
+        //setselectprinter(printer)
+        //}
 
         if (nombres) {
           console.log("Imprimiendo...");
