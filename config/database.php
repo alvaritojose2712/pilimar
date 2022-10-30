@@ -32,7 +32,6 @@ return [
     | choice installed on your machine before you begin development.
     |
     */
-
     'connections' => [
 
         'sqlite' => [
@@ -44,6 +43,13 @@ return [
         ],
 
         'mysql' => [
+            'dump' => [
+               'dump_binary_path' => 'C:/xampp/mysql/bin/', // only the path, so without `mysqldump` or `pg_dump`
+               'use_single_transaction'=>true,
+               'timeout' => 60 * 5, // 5 minute timeout
+               'exclude_tables' => ['migrations', 'facturas'],
+            ],
+            'dump_command_path' => "",
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),

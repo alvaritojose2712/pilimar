@@ -8,7 +8,7 @@ return [
          * The name of this application. You can use this name to monitor
          * the backups.
          */
-        'name' => env('APP_NAME', 'laravel-backup'),
+        'name' => env('APP_NAME'),
 
         'source' => [
 
@@ -151,12 +151,12 @@ return [
     'notifications' => [
 
         'notifications' => [
-            \Spatie\Backup\Notifications\Notifications\BackupHasFailed::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFound::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\CleanupHasFailed::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessful::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFound::class => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessful::class => ['mail'],
+            \Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification::class => [],
+\Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification::class => [],
+\Spatie\Backup\Notifications\Notifications\CleanupHasFailedNotification::class => [],
+\Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification::class => [],
+\Spatie\Backup\Notifications\Notifications\HealthyBackupWasFoundNotification::class => [],
+\Spatie\Backup\Notifications\Notifications\CleanupWasSuccessfulNotification::class => [],
         ],
 
         /*
@@ -196,7 +196,7 @@ return [
      */
     'monitor_backups' => [
         [
-            'name' => env('APP_NAME', 'laravel-backup'),
+            'name' => env('APP_NAME'),
             'disks' => ['local'],
             'health_checks' => [
                 \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
