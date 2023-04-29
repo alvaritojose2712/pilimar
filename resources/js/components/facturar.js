@@ -174,6 +174,8 @@ export default function Facturar({user,notificar,setLoading}) {
   const [dejar_bs,setDejar_bs] = useState("")
 
   const [cierre,setCierre] = useState({})
+  const [totalizarcierre,setTotalizarcierre] = useState(false)
+  
 
   const [today,setToday] = useState("")
   
@@ -1364,7 +1366,9 @@ const cerrar_dia = (e) => {
   total_punto,
   dejar_usd,
   dejar_cop,
-  dejar_bs,}).then(res=>{
+  dejar_bs,
+  totalizarcierre,
+}).then(res=>{
 
     let cierreData = res.data
     if (res.data) {
@@ -2318,6 +2322,7 @@ const guardar_cierre = (e,callback=null) => {
     
 
     notaCierre,
+    totalizarcierre,
   }).then(res=>{
     
     setLoading(false)
@@ -2329,7 +2334,7 @@ const guardar_cierre = (e,callback=null) => {
       }else{
         setLoading(true)
         
-        db.sendCierre({type,fecha:fechaCierre}).then(res=>{
+        db.sendCierre({type,fecha:fechaCierre,totalizarcierre}).then(res=>{
           notificar(res,false)
 
           notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
@@ -2351,7 +2356,7 @@ const guardar_cierre = (e,callback=null) => {
 const verCierreReq = (fechaCierre,type="ver") => {
   // console.log(fecha)
   // if (window.confirm("Confirme envio")) {
-    db.openVerCierre({fechaCierre,type})
+    db.openVerCierre({fechaCierre,type,totalizarcierre})
   // }
 }
 const setPagoCredito = e =>{
@@ -3923,7 +3928,12 @@ const auth = permiso => {
         :null}
 
         {view=="cierres"?<Cierres
+          
+          totalizarcierre = {totalizarcierre}
+          setTotalizarcierre = {setTotalizarcierre}
+
           moneda={moneda}
+          auth={auth}
           sendCuentasporCobrar={sendCuentasporCobrar}
           fechaGetCierre2={fechaGetCierre2}
           setfechaGetCierre2={setfechaGetCierre2}

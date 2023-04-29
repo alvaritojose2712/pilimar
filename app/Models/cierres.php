@@ -15,6 +15,10 @@ class cierres extends Model
         return $date->format('Y-m-d H:i:s');
     }
 
+    public function usuario() { 
+        return $this->hasOne(\App\Models\usuarios::class,"id","id_usuario"); 
+    }
+
 
     protected $fillable = [
         "debito",

@@ -33,9 +33,10 @@ class CreateCierresTable extends Migration
             
             $table->text("nota")->nullable();
             
-            $table->date("fecha")->unique();
+            $table->date("fecha");
             
-            $table->integer("id_usuario");
+            $table->integer("id_usuario")->unsigned();
+            $table->foreign('id_usuario')->references('id')->on('usuarios');
 
             
             
@@ -48,6 +49,9 @@ class CreateCierresTable extends Migration
             $table->decimal("desc_total",10,2)->default(0);
             
             $table->boolean("push")->default(0);
+
+            $table->unique(["fecha","id_usuario"]);
+
             $table->timestamps();
 
 

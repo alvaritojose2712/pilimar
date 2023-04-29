@@ -27,7 +27,7 @@ if (! function_exists('toLetras')) {
 
         foreach ($letras as $numero => $letra) {
             
-            $val = str_replace($numero, $letra, $val);
+           // $val = str_replace($numero, $letra, $val);
         }
 
         return $val;

@@ -66,9 +66,11 @@ class PagoPedidosController extends Controller
                 if (($total_acumulado+$monto)<=$pendiente) {
                     $mov->id_pedido = $id_pedido;
                     $mov->categoria = 1;
-                    $mov->descripcion = "VUELTO Ped.".$id_pedido;
+                    $mov->descripcion = "VUELTO ENTREGADO Ped.".$id_pedido;
                     $mov->tipo = 1;
                     $mov->monto = $monto;
+                    $mov->id_vendedor = session('id_usuario');
+
 
                     if ($mov->save()) {
                         return Response::json(["msj"=>"Éxito a entregar","estado"=>true]);

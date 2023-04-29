@@ -10,6 +10,8 @@ use App\Models\inventario;
 use App\Models\items_pedidos;
 use App\Models\pago_pedidos;
 use App\Models\clientes;
+use App\Models\usuarios;
+
 
 use App\Models\movimientos_caja;
 use App\Models\sucursal;
@@ -33,12 +35,11 @@ class PedidosController extends Controller
 {   
 
     protected $sends = [
-        "wasim6785@gmail.com",         
-        "wasim6785@hotmail.com",         
-        "omarelhenaoui@hotmail.com",           
+        /* "omarelhenaoui@hotmail.com",           
         "yeisersalah2@gmail.com",           
         "amerelhenaoui@outlook.com",           
-        "yesers982@hotmail.com",           
+        "yesers982@hotmail.com",  */  
+        "alvaroospino79@gmail.com"        
     ];
     protected  $letras = [
                 1=>"L",
@@ -188,7 +189,9 @@ class PedidosController extends Controller
     }
     public function getDiaVentaFun($fechaventas)
     {
-        $arr = $this->cerrarFun($fechaventas,0,0,[],true);
+        
+
+        $arr = $this->cerrarFun($fechaventas,0,0,[],true,false);
 
         if ($fechaventas) {
             // code...
@@ -702,23 +705,23 @@ class PedidosController extends Controller
         }
     }
 
-    public function entregadoPendi($fecha)
+    public function entregadoPendi($fecha,$id_vendedor)
     {
-        $entregado = movimientos_caja::where("created_at","LIKE",$fecha."%")->where("tipo",1);
+        $entregado = movimientos_caja::where("created_at","LIKE",$fecha."%")->where("tipo",1)->whereIn("id_vendedor",$id_vendedor);
         $entregado_sum = $entregado->sum("monto");
 
-        $pendiente = movimientos_caja::where("created_at","LIKE",$fecha."%")->where("tipo",0);
+        $pendiente = movimientos_caja::where("created_at","LIKE",$fecha."%")->where("tipo",0)->whereIn("id_vendedor",$id_vendedor);
         $pendiente_sum = $pendiente->sum("monto");
 
         return [
             "entregado"=>$entregado_sum,
             "pendiente"=>$pendiente_sum,
-            "entre_pend_get"=> movimientos_caja::where("created_at","LIKE",$fecha."%")->get(),
+            "entre_pend_get"=> movimientos_caja::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor)->get(),
         ];
     }
-    public function ultimoCierre($fecha)
+    public function ultimoCierre($fecha,$id_vendedor)
     {
-        return cierres::where("fecha","<",$fecha)->orderBy("fecha","desc")->first();
+        return cierres::where("fecha","<",$fecha)->whereIn("id_usuario",$id_vendedor)->orderBy("fecha","desc")->first();
     }
 
     public function getEntreGadoCajainicial($fecha)
@@ -728,14 +731,25 @@ class PedidosController extends Controller
             "ultimo_cierre" =>$this->ultimoCierre($fecha)
         ];
     }
-    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$dejar=[],$grafica=false)
+    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$dejar=[],$grafica=false,$totalizarcierre=false)
     {   
         if (!$fecha) {
             return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);
 
         }
-        $entregado_fun = $this->entregadoPendi($fecha);
-        $ultimo_cierre = $this->ultimoCierre($fecha);
+
+        if ($totalizarcierre) {
+            $id_vendedor =  pedidos::select('id_vendedor')->distinct()->get()->map(function($e){
+                return $e->id_vendedor;
+            });
+            
+        }else{
+            $id_vendedor = [session("id_usuario")];
+        } 
+
+        $usuariosget = usuarios::whereIn("id",$id_vendedor)->get();
+        $entregado_fun = $this->entregadoPendi($fecha,$id_vendedor);
+        $ultimo_cierre = $this->ultimoCierre($fecha,$id_vendedor);
 
 
         $cop = $this->get_moneda()["cop"];
@@ -745,7 +759,7 @@ class PedidosController extends Controller
         if ($ultimo_cierre) {
             $caja_inicial = round($ultimo_cierre->dejar_dolar + ($ultimo_cierre->dejar_peso/$cop) + ($ultimo_cierre->dejar_bss/$bs),3);
         }
-        $pedido = pedidos::where("created_at","LIKE",$fecha."%");
+        $pedido = pedidos::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor);
 
         /////Montos de ganancias
             //Var vueltos_des
@@ -755,14 +769,14 @@ class PedidosController extends Controller
             //Var ganancia
             //Var porcentaje
             $vueltos_des = pago_pedidos::where("tipo",6)->where("monto","<>",0)
-            ->whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->select("id"))
+            ->whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor)->select("id"))
             ->get()
             ->map(function($q){
                 $q->cliente = pedidos::with("cliente")->find($q->id_pedido);
                 return $q;
             });
 
-            $inv = items_pedidos::with("producto")->whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->where("estado",1)->select("id"))
+            $inv = items_pedidos::with("producto")->whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor)->where("estado",1)->select("id"))
             ->get()
             ->map(function($q){
                 if (isset($q->producto)) {
@@ -776,7 +790,7 @@ class PedidosController extends Controller
             $precio = $inv->sum("monto");
             $precio_base = $inv->sum("base_tot");
             
-            $desc_total = items_pedidos::whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->where("estado",1)->select("id"))
+            $desc_total = items_pedidos::whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor)->where("estado",1)->select("id"))
             ->get()
             ->map(function($q){
 
@@ -788,7 +802,7 @@ class PedidosController extends Controller
                 return $q;
             })->sum("monto_sin");
 
-            $credi_total = pago_pedidos::whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->where("tipo",4)->select("id"))
+            $credi_total = pago_pedidos::whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor)->where("tipo",4)->select("id"))
             ->get()
             ->sum("monto");
 
@@ -842,6 +856,8 @@ class PedidosController extends Controller
             4=>0,
             5=>0,
             6=>0,
+
+            "usuariosget" => $usuariosget
         ];
         $numventas_arr = [];
         pago_pedidos::whereIn("id_pedido",$pedido->select("id"))
@@ -912,9 +928,9 @@ class PedidosController extends Controller
         $fechaGetCierre = $req->fechaGetCierre;
         $fechaGetCierre2 = $req->fechaGetCierre2;
         if (!$fechaGetCierre&&!$fechaGetCierre2) {
-            $cierres = cierres::orderBy("fecha","desc");
+            $cierres = cierres::with("usuario")->orderBy("fecha","desc");
         }else{
-            $cierres = cierres::whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2]);
+            $cierres = cierres::with("usuario")->whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2]);
         }
         
         
@@ -937,14 +953,23 @@ class PedidosController extends Controller
     }
     public function cerrar(Request $req)
     {
-        return $this->cerrarFun($req->fechaCierre,$req->total_caja_neto,$req->total_punto,["dejar_bs"=>$req->dejar_bs, "dejar_usd"=>$req->dejar_usd, "dejar_cop"=>$req->dejar_cop]);
+        
+        return $this->cerrarFun(
+            $req->fechaCierre,
+            $req->total_caja_neto,
+            $req->total_punto,
+            ["dejar_bs"=>$req->dejar_bs, "dejar_usd"=>$req->dejar_usd, "dejar_cop"=>$req->dejar_cop],
+            false,
+            filter_var($req->totalizarcierre, FILTER_VALIDATE_BOOLEAN),
+
+        );
     }
 
     public function msj_cuadre($total_entregado,$monto_facturado,$clave,&$arr_pagos,$tolerancia=10)
     {
-        if ($monto_facturado) {
+        if ($monto_facturado OR $monto_facturado===0) {
             $diff = round($total_entregado-$monto_facturado,3);
-            if (($diff>=-1) && ($diff<=$tolerancia)) {
+            if (($diff>=0) && ($diff<=$tolerancia)) {
                 $arr_pagos["msj_".$clave] = "Cuadrado. Sobran ".$diff;
                 $arr_pagos["estado_".$clave] = 1;
             }
@@ -969,8 +994,19 @@ class PedidosController extends Controller
             $cop = $this->get_moneda()["cop"];
             $bs = $this->get_moneda()["bs"];
 
-            $last_cierre = cierres::orderBy("fecha","desc")->first();
-            $check = cierres::where("fecha",$req->fechaCierre)->first();
+            $totalizarcierre = filter_var($req->totalizarcierre, FILTER_VALIDATE_BOOLEAN);
+            if ($totalizarcierre) {
+                $id_vendedor =  pedidos::select('id_vendedor')->distinct()->get()->map(function($e){
+                    return $e->id_vendedor;
+                });
+                
+            }else{
+                $id_vendedor = [session("id_usuario")];
+            } 
+
+
+            $last_cierre = cierres::whereIn("id_usuario",$id_vendedor)->orderBy("fecha","desc")->first();
+            $check = cierres::whereIn("id_usuario",$id_vendedor)->where("fecha",$req->fechaCierre)->first();
             
             $fecha_ultimo_cierre = "0";
             if ($last_cierre) {
@@ -983,11 +1019,11 @@ class PedidosController extends Controller
             
 
             $today = $this->today(); */
-
+            $id_usuario = session("id_usuario");
             if ($check===null || $fecha_ultimo_cierre==$req->fechaCierre) {
                 if ($req->total_punto || $req->efectivo || $req->transferencia) {
                     cierres::updateOrCreate(
-                        ["fecha"=>$req->fechaCierre],
+                        ["fecha"=>$req->fechaCierre, "id_usuario" => $id_usuario],
                         [
                             "debito" => floatval($req->total_punto),
                             "efectivo" => floatval($req->efectivo),
@@ -1001,7 +1037,7 @@ class PedidosController extends Controller
                             "efectivo_guardado_bs" => floatval($req->guardar_bs),
                             "tasa" => $bs,
                             "nota" => $req->notaCierre,
-                            "id_usuario" => session()->has("id_usuario"),
+                            "id_usuario" => $id_usuario,
         
                             "precio" => floatval($req->precio),
                             "precio_base" => floatval($req->precio_base),
@@ -1032,7 +1068,17 @@ class PedidosController extends Controller
         $type = $req->type;
         $sucursal = sucursal::all()->first();
 
-        $cierre = cierres::where("fecha",$req->fecha)->first();
+        $totalizarcierre = filter_var($req->totalizarcierre, FILTER_VALIDATE_BOOLEAN);
+        if ($totalizarcierre) {
+            $id_vendedor =  pedidos::select('id_vendedor')->distinct()->get()->map(function($e){
+                return $e->id_vendedor;
+            });
+            
+        }else{
+            $id_vendedor = [session("id_usuario")];
+        } 
+
+        $cierre = cierres::with("usuario")->where("fecha",$req->fecha)->whereIn('id_usuario',$id_vendedor)->first();
         if (!$cierre) {
             return "No hay cierre guardado para esta fecha";
         }
@@ -1042,11 +1088,21 @@ class PedidosController extends Controller
 
        $total_inventario_base = DB::table("inventarios")
         ->select(DB::raw("sum(precio_base*cantidad) as suma"))->first()->suma;
+
+
         
-        $vueltos = pago_pedidos::where("tipo",6)->where("monto","<>",0);
-        $vueltos_totales = $vueltos->sum("monto");
+        $vuelto_entregado = movimientos_caja::where('categoria',1)->where('tipo',1)->whereIn('id_vendedor',$id_vendedor)->sum('monto');
         
-        $pagos_referencias = pagos_referencias::where("created_at","LIKE",$req->fecha."%")->orderBy("tipo","desc")->get();
+        $vueltos = pago_pedidos::where("tipo",6)->where("monto","<>",0)->whereIn('id_pedido',function($q) use ($id_vendedor){
+            $q->from('pedidos')->whereIn('id_vendedor',$id_vendedor)->select('id');
+        });
+        $vueltos_totales = $vueltos->sum("monto")-$vuelto_entregado;
+
+        $pagos_referencias = pagos_referencias::where("created_at","LIKE",$req->fecha."%")
+        ->whereIn('id_pedido',function($q) use ($id_vendedor){
+            $q->from('pedidos')->whereIn('id_vendedor',$id_vendedor)->select('id');
+        })
+        ->orderBy("tipo","desc")->get();
 
 
         
@@ -1054,8 +1110,10 @@ class PedidosController extends Controller
         $movimientos = movimientos::with(["items"=>function($q){
             $q->with("producto");
         }])->where("created_at","LIKE",$req->fecha."%")->get();
-        // return $vueltos_des;
-        $facturado = $this->cerrarFun($req->fecha,0,0);
+
+        $facturado = $this->cerrarFun($req->fecha,0,0,[],false,$totalizarcierre);
+
+
         $arr_send = [
             "referencias"=>$pagos_referencias,
             "cierre" => $cierre,

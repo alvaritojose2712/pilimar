@@ -65,6 +65,10 @@ function Cierre({
 	setfechaGetCierre2,
 	getCierres, 
 	verCierreReq,
+
+	auth,
+	totalizarcierre,
+	setTotalizarcierre,
 }) {
 
 	const fun_setguardar = (type,val) =>{
@@ -99,11 +103,27 @@ function Cierre({
 	
 	return (
 		<div className="container">
-			<div className="btn-group mb-2">
-				<button className={(viewCierre=="cuadre"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("cuadre")}>Cuadre</button>
-				<button className={(viewCierre=="historico"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("historico")}>Histórico</button>
-				
+			<div className="row">
+				<div className="col">
+					
+					<span className="">{totalizarcierre?"Totalizando":"Cajero"} ( {cierre["fecha"]?cierre["usuariosget"].map(e=>e.usuario+" "):null})</span>
+					
+					<br />
+					<div className="btn-group mb-2">
+						<button className={(viewCierre=="cuadre"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("cuadre")}>Cuadre</button>
+						<button className={(viewCierre=="historico"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("historico")}>Histórico</button>
+					</div>
+				</div>
+				<div className="col text-right">
+					<div className="btn-group mb-2">
+						{auth(1)?
+						<button className={"btn "+(totalizarcierre?"btn-success":"btn-outline-success")+" btn-lg"} onClick={()=>setTotalizarcierre(!totalizarcierre)}>Totalizar</button>
+						
+						:null}
+					</div>
+				</div>
 			</div>
+			<br/>
 			{viewCierre=="cuadre"?
 			<>
 				<div className="input-group">
@@ -111,15 +131,15 @@ function Cierre({
 
 					<input type="date" required={true} value={fechaCierre} className="form-control" onChange={e=>setFechaCierre(e.target.value)}/>
 					{cierre["fecha"]?
-						<>
+						<div className='btn-group-vertical'>
+							<button className="btn btn-sinapsis" onClick={guardar_cierre} type="button" data-type="ver">Ver</button>
 							<button className="btn" onClick={()=>setToggleDetallesCierre(!toggleDetallesCierre)}>Ver detalles</button>
 
-							<button className="btn btn-sinapsis" onClick={guardar_cierre} type="button" data-type="ver">Ver</button>
 
-							<button className="btn btn-warning" onClick={guardar_cierre} type="button" data-type="enviar">Enviar Cierre</button>
+							{totalizarcierre?<button className="btn btn-warning" onClick={guardar_cierre} type="button" data-type="enviar">Enviar Cierre</button>:null}
 							{/*<button className="btn btn-warning" onClick={sendCuentasporCobrar} type="button" data-type="enviar">Enviar Cuentas por Cobrar</button>*/}
 							
-						</>
+						</div>
 					:null}
 				</div>
 				{cierre["fecha"]?
@@ -283,13 +303,13 @@ function Cierre({
 									<td className="text-success">Facturado</td>
 								</tr>
 								<tr>
-									<th className="text-right align-middle">Débito</th>
+									<th className="text-right">Débito</th>
 									<td>
 										{total_punto}
 										<div className={(cierre["estado_punto"]==1?"text-success":"text-danger")}>
-											<small className="fst-italic">
+											<span className="fst-italic fs-2">
 												{cierre["msj_punto"]?cierre["msj_punto"]:null}
-											</small>
+											</span>
 										</div>
 									</td>
 									<td className="align-middle">
@@ -297,13 +317,13 @@ function Cierre({
 									</td>
 								</tr>
 								<tr>
-									<th className="text-right align-middle">Efectivo</th>
+									<th className="text-right">Efectivo</th>
 									<td>
 										{cierre["total_caja"]?cierre["total_caja"]:0}
 										<div className={(cierre["estado_efec"]==1?"text-success":"text-danger")}>
-											<small className="fst-italic">
+											<span className="fst-italic fs-2">
 												{cierre["msj_efec"]?cierre["msj_efec"]:null}
-											</small>
+											</span>
 										</div>
 									</td>
 									<td className="align-middle">

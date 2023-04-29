@@ -30,7 +30,7 @@ function Header({
             
             <div onClick={getip}>
               <span className="fw-bold">{user.nombre}</span><br/>
-              <span className="fst-italic">{user.role}</span>
+              <span className="fst-italic">{user.usuario} ({user.role})</span>
             </div>
             <span className="m-1 btn text-danger" onClick={logout}><i className="fa fa-times"></i></span>
           </div>

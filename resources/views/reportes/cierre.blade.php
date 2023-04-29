@@ -126,7 +126,7 @@
 					</td>
 					<td>
 						<h2>{{$cierre->fecha}}</h2>
-						<h4>CAJERO: {{$cierre->id_usuario}}</h4>
+						<h4>CAJERO: {{$cierre->usuario->usuario}}</h4>
 					</td>
 				</tr>
 				<tr class="">

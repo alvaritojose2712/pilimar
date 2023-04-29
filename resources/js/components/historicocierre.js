@@ -19,6 +19,7 @@ export default function Historicocierre({
 			<table className="table table-sm">
 				<thead>
 					<tr>
+						<th>Cajero</th>
 						<th>Num. Ventas</th>
 						<th>Débito</th>
 						<th>Efectivo</th>
@@ -35,6 +36,7 @@ export default function Historicocierre({
 					</tr>
 					{cierres ? cierres.cierres ? cierres.cierres.length ? cierres.cierres.map(e=>
 						<tr key={e.id}>
+							<td>{e.usuario.usuario}</td>
 							<td>{e.numventas}</td>
 							<td>{e.debito}</td>
 							<td>{e.efectivo}</td>
