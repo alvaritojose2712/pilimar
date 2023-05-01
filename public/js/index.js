@@ -10350,6 +10350,12 @@ function Facturar(_ref) {
     return false;
   };
 
+  var printTickedPrecio = function printTickedPrecio(id) {
+    _database_database__WEBPACK_IMPORTED_MODULE_4__["default"].printTickedPrecio({
+      id: id
+    });
+  };
+
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_components_header__WEBPACK_IMPORTED_MODULE_11__["default"], {
       updatetasasfromCentral: updatetasasfromCentral,
@@ -10665,6 +10671,7 @@ function Facturar(_ref) {
       tipoestadopedido: tipoestadopedido,
       setTipoestadopedido: setTipoestadopedido
     }) : null, view == "inventario" ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_23__.jsx)(_components_inventario__WEBPACK_IMPORTED_MODULE_19__["default"], {
+      printTickedPrecio: printTickedPrecio,
       sameCatValue: sameCatValue,
       sameProValue: sameProValue,
       setdropprintprice: setdropprintprice,
@@ -11943,7 +11950,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 function Inventario(_ref) {
-  var setdropprintprice = _ref.setdropprintprice,
+  var printTickedPrecio = _ref.printTickedPrecio,
+      setdropprintprice = _ref.setdropprintprice,
       dropprintprice = _ref.dropprintprice,
       printPrecios = _ref.printPrecios,
       setCtxBulto = _ref.setCtxBulto,
@@ -12392,6 +12400,7 @@ function Inventario(_ref) {
         addNewLote: addNewLote,
         changeModLote: changeModLote
       }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_components_inventarioForzado__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        printTickedPrecio: printTickedPrecio,
         sameCatValue: sameCatValue,
         sameProValue: sameProValue,
         setCtxBulto: setCtxBulto,
@@ -12525,6 +12534,7 @@ function InventarioForzado(_ref) {
       setQBuscarInventario = _ref.setQBuscarInventario,
       type = _ref.type,
       changeInventario = _ref.changeInventario,
+      printTickedPrecio = _ref.printTickedPrecio,
       Invnum = _ref.Invnum,
       setInvnum = _ref.setInvnum,
       InvorderColumn = _ref.InvorderColumn,
@@ -13211,7 +13221,15 @@ function InventarioForzado(_ref) {
                     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("i", {
                       className: "fa fa-arrow-left"
                     })
-                  }) : null]
+                  }) : null, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("span", {
+                    className: "btn-sm btn btn-warning",
+                    onClick: function onClick() {
+                      return printTickedPrecio(e.id);
+                    },
+                    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("i", {
+                      className: "fa fa-print"
+                    })
+                  })]
                 })
               })]
             }, i);
@@ -18495,6 +18513,11 @@ var db = {
   },
   sendCierre: function sendCierre(data) {
     return axios__WEBPACK_IMPORTED_MODULE_1___default().get(host + "verCierre", {
+      params: data
+    });
+  },
+  printTickedPrecio: function printTickedPrecio(data) {
+    return axios__WEBPACK_IMPORTED_MODULE_1___default().get(host + "printTickedPrecio", {
       params: data
     });
   },

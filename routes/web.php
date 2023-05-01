@@ -180,7 +180,8 @@ Route::group(['middleware' => ['login']], function () {
 		
 		
 		
-		Route::get('tickedprecio', [tickeprecioController::class,"tickedPrecio"]);
+		Route::get('printTickedPrecio', [tickeprecioController::class,"tickedPrecio"]);
+		
 	});
 		Route::post('delMov', [MovimientosController::class,"delMov"]);
 	Route::post('getPedidosList', [PedidosController::class,"getPedidosUser"]);

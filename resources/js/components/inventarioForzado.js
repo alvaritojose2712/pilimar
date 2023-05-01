@@ -6,6 +6,7 @@ export default function InventarioForzado({
     type,
 
     changeInventario,
+    printTickedPrecio,
 
     Invnum,
     setInvnum,
@@ -392,6 +393,9 @@ export default function InventarioForzado({
                                             {e.type === "delete" ?
                                                 <span className="btn-sm btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delModeUpdateDelete")}><i className="fa fa-arrow-left"></i></span>
                                                 : null}
+
+                                            <span className="btn-sm btn btn-warning" onClick={() => printTickedPrecio(e.id)}><i className="fa fa-print"></i></span>
+
                                         </div>
                                     </td>
                                 

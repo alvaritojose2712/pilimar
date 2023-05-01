@@ -103,6 +103,8 @@ const db = {
   delFalla: data=>axios.post(host+"delFalla",data),
   imprimirTicked: data=>axios.post(host+"imprimirTicked",data),
   sendCierre: data=>axios.get(host+"verCierre",{params:data}),
+  printTickedPrecio: data=>axios.get(host+"printTickedPrecio",{params:data}),
+  
 
   saveMontoFactura: data=>axios.post(host+"saveMontoFactura",data),
 

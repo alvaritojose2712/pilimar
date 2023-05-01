@@ -13,6 +13,7 @@ import Gastos from '../components/gastos';
 
 
 function Inventario({
+  printTickedPrecio,
   setdropprintprice,
 dropprintprice,
   printPrecios,
@@ -449,6 +450,7 @@ dropprintprice,
               
             />
             : <InventarioForzado
+                printTickedPrecio={printTickedPrecio}
                 sameCatValue={sameCatValue}
                 sameProValue={sameProValue}
                 setCtxBulto={setCtxBulto}

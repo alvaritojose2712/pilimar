@@ -3691,6 +3691,9 @@ const auth = permiso => {
   }
   return false
 }
+const printTickedPrecio = id => {
+  db.printTickedPrecio({id})
+}
 
   return (
     <>
@@ -4033,6 +4036,7 @@ const auth = permiso => {
 
         
         {view=="inventario"?<Inventario
+          printTickedPrecio={printTickedPrecio}
           sameCatValue={sameCatValue}
           sameProValue={sameProValue}
           setdropprintprice={setdropprintprice}
