@@ -59,7 +59,41 @@ class CreateInventariosTable extends Migration
             $table->timestamps();
         });
 
-      
+        
+        $arrinsert = [];
+        
+        $con = new Mysqli("localhost","root","","administrativo");
+        
+        $sql = $con->query("
+        SELECT articulos.*,
+        (SELECT SUM(cantidad) 
+            FROM inventario
+            WHERE articulo = articulos.id) ct
+            
+            FROM articulos articulos order by ct desc");
+            
+        $i = 1;
+        while($row = $sql->fetch_assoc()){
+            array_push($arrinsert,[
+                'codigo_barras' => $row['id'],
+                'codigo_proveedor' => $row['codigo'],
+                'id_proveedor' => 1,
+                'id_categoria' => 14,
+                'descripcion' => $row['descripcion'],
+                'precio_base' => $row['costod'],
+                'precio' => $row['preciod'],
+                'cantidad' => $row['ct'],  
+            ]);
+            if ($i==1000) {
+                DB::table("inventarios")->insert($arrinsert);
+                $arrinsert = [];
+            }
+            
+            $i++;
+                
+        }
+
+        
         
 
 
