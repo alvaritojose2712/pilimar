@@ -721,7 +721,8 @@ class PedidosController extends Controller
     }
     public function ultimoCierre($fecha,$id_vendedor)
     {
-        return cierres::where("fecha","<",$fecha)->whereIn("id_usuario",$id_vendedor)->orderBy("fecha","desc")->first();
+        $fecha_pasada = cierres::where("fecha","<",$fecha)->orderBy("fecha","desc")->first()->fecha;
+        return cierres::where("fecha",$fecha_pasada)->whereIn("id_usuario",$id_vendedor)->orderBy("fecha","desc");
     }
 
     public function getEntreGadoCajainicial($fecha)
@@ -757,7 +758,7 @@ class PedidosController extends Controller
             
         $caja_inicial = 0;
         if ($ultimo_cierre) {
-            $caja_inicial = round($ultimo_cierre->dejar_dolar + ($ultimo_cierre->dejar_peso/$cop) + ($ultimo_cierre->dejar_bss/$bs),3);
+            $caja_inicial = round($ultimo_cierre->sum("dejar_dolar") + ($ultimo_cierre->sum("dejar_peso")/$cop) + ($ultimo_cierre->sum("dejar_bss")/$bs),3);
         }
         $pedido = pedidos::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor);
 
