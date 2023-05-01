@@ -84,7 +84,7 @@ class CreateInventariosTable extends Migration
                 'precio' => $row['preciod'],
                 'cantidad' => $row['ct'],  
             ]);
-            if ($i==1000) {
+            if ($i==1000 OR $i==2000 OR $i==3000 OR $i==4000 OR $i==5000 OR $i==6000 OR $i==7000 OR $i==8000 OR $i==9278) {
                 DB::table("inventarios")->insert($arrinsert);
                 $arrinsert = [];
             }

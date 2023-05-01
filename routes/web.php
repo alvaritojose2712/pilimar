@@ -27,6 +27,8 @@ use App\Http\Controllers\LotesController;
 use App\Http\Controllers\PagoFacturasController;
 use App\Http\Controllers\PagosReferenciasController;
 use App\Http\Controllers\GastosController;
+use App\Http\Controllers\tickeprecioController;
+
 
 
 Route::get('getip', [sendCentral::class,"getip"]);
@@ -174,8 +176,11 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('delPagoProveedor', [PagoFacturasController::class,"delPagoProveedor"]);
 		
 		Route::post('delMovCaja', [MovimientosCajaController::class,"delMovCaja"]);
-
-
+		
+		
+		
+		
+		Route::get('tickedprecio', [tickeprecioController::class,"tickedPrecio"]);
 	});
 		Route::post('delMov', [MovimientosController::class,"delMov"]);
 	Route::post('getPedidosList', [PedidosController::class,"getPedidosUser"]);

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\sucursal;
 
-
 use Illuminate\Http\Request;
 use Mike42\Escpos;
 use Mike42\Escpos\Printer;
@@ -286,4 +285,6 @@ class tickera extends Controller
             
         }
     }
+
+    
 }

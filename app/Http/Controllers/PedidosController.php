@@ -1078,7 +1078,7 @@ class PedidosController extends Controller
             $id_vendedor = [session("id_usuario")];
         } 
 
-        $cierre = cierres::with("usuario")->where("fecha",$req->fecha)->whereIn('id_usuario',$id_vendedor)->first();
+        $cierre = cierres::with("usuario")->where("fecha",$req->fecha)->where('id_usuario',session("id_usuario"))->first();
         if (!$cierre) {
             return "No hay cierre guardado para esta fecha";
         }
