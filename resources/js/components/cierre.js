@@ -115,12 +115,14 @@ function Cierre({
 			<div className="row">
 				
 				<div className="col">
-					<div className="container">
+					<div className="container-fluid">
 						<div className="row">
 							<div className="col">
 								<div className="btn-group mb-1">
 									<button className={(viewCierre=="cuadre"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("cuadre")}>Cuadre</button>
-									<button className={(viewCierre=="historico"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("historico")}>Histórico</button>
+									{auth(1)?
+										<button className={(viewCierre=="historico"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("historico")}>Histórico</button>
+									:null}
 								</div>
 								<br />
 							</div>
@@ -132,28 +134,42 @@ function Cierre({
 							<div className="input-group">
 								<button className="btn btn-sinapsis" onClick={cerrar_dia}><i className="fa fa-cogs"></i></button>
 
-								<input type="date" required={true} value={fechaCierre} className="form-control" onChange={e=>setFechaCierre(e.target.value)}/>
+								<input type="date" disabled={true} value={fechaCierre} className="form-control" onChange={null}/>
 							</div>
 							{cierre["fecha"]?
-								<div className='btn-group mt-2 mb-2'>
-	
-									{tipo_accionCierre=="guardar"?
-									<button className="btn btn-outline-success" onClick={guardar_cierre} type="button">Guardar</button>
-									:
-									<button className="btn btn-warning" onClick={guardar_cierre} type="button">Editar</button>
-									}
-									<button className="btn btn-sinapsis" onClick={veryenviarcierrefun} type="button" data-type="ver">Ver</button>
+								<div className='d-flex justify-content-between'>
 
-									
-									<button className="btn" onClick={()=>setToggleDetallesCierre(!toggleDetallesCierre)}>Ver detalles</button>
-									{auth(1)?
-									<button className={"btn "+(totalizarcierre?"btn-success":"btn-outline-success")+" btn-lg"} onClick={()=>getTotalizarCierre()}>Totalizar</button>
-									
-									:null}
+									<div className='btn-group mt-2 mb-2 w-30'>
+		
+										{tipo_accionCierre=="guardar"?
+										<button className="btn-sm btn btn-outline-success" onClick={guardar_cierre} type="button">Guardar</button>
+										:
+											<button className="btn-sm btn btn-warning" onClick={guardar_cierre} type="button">Editar</button>
+										}
+										<button className="btn-sm btn btn-sinapsis" onClick={veryenviarcierrefun} type="button" data-type="ver">Ver</button>
+
+										
+										<button className="btn btn-sm" onClick={()=>setToggleDetallesCierre(!toggleDetallesCierre)}>Ver detalles</button>
+									</div>
+									<div className='d-flex flex-column'>
+
+										<div className='btn-group mt-2 mb-2'>
+
+											{auth(1)?
+											<button className={"btn "+(totalizarcierre?"btn-success":"btn-outline-success")+" btn-lg"} onClick={()=>getTotalizarCierre()}>Totalizar</button>
+											
+											:null}
 
 
-									{totalizarcierre?<button className="btn btn-warning" onClick={guardar_cierre} type="button" data-type="enviar">Enviar Cierre</button>:null}
-									{/*<button className="btn btn-warning" onClick={sendCuentasporCobrar} type="button" data-type="enviar">Enviar Cuentas por Cobrar</button>*/}
+											{totalizarcierre?<button className="btn btn-warning" onClick={guardar_cierre} type="button" data-type="enviar">Enviar Cierre</button>:null}
+											{/*<button className="btn btn-warning" onClick={sendCuentasporCobrar} type="button" data-type="enviar">Enviar Cuentas por Cobrar</button>*/}
+										</div>
+										<span>
+											{totalizarcierre?"Totalizando ":"Cajero "} {cierre["fecha"]?cierre["usuariosget"].map(e=>
+												<span key={e.id}> {e.usuario} </span>
+											):null}
+										</span>		
+									</div>
 									
 								</div>
 							:null}
@@ -161,23 +177,22 @@ function Cierre({
 								<form onSubmit={cerrar_dia}>
 									<button hidden={true}></button>
 									<div className="container-fluid p-0">
-											<span >{totalizarcierre?"Totalizando":"Cajero"} {cierre["fecha"]?cierre["usuariosget"].map(e=>
-													<span key={e.id}>(ID:{e.id} U:{e.usuario} Role:{e.tipo_usuario==1?"Administrador":(e.tipo_usuario==4?"Cajero-Vendedor":e.tipo_usuario)}),</span>
-												):null}</span>		
 											{toggleDetallesCierre?
 												<table className="table">
-													<tr>
-														<td><span className="fw-bold">Entregado:</span> {cierre["entregado"]}</td>
-														
-														<td><span className="fw-bold">Pendiente:</span> {cierre["pendiente"]}</td>
-														
-														<td><span className="fw-bold">Caja inicial:</span> {cierre["caja_inicial"]}</td>
-														
-													</tr>
+													<tbody>
+														<tr>
+															<td><span className="fw-bold">Entregado:</span> {cierre["entregado"]}</td>
+															
+															<td><span className="fw-bold">Pendiente:</span> {cierre["pendiente"]}</td>
+															
+															<td><span className="fw-bold">Caja inicial:</span> {cierre["caja_inicial"]}</td>
+															
+														</tr>
+													</tbody>
 												</table>
 											:null}
 											<div className="p-3 card shadow-card mb-2 mt-2">
-												<div className="row mb-2">
+												<div className="row mb-2 border-bottom">
 													<div className="col h3 text-center" >
 														¿Cuánto hay en caja?
 													</div>
@@ -232,7 +247,7 @@ function Cierre({
 
 											<div className="p-3 card shadow-card mb-2">
 											
-												<div className="row p-2">
+												<div className="row p-2 border-bottom">
 													<div className="col h3 text-center" >
 														¿Cuánto dejarás en caja?
 													</div>
@@ -261,7 +276,7 @@ function Cierre({
 
 
 											<div className="p-3 card shadow-card mb-2">
-												<div className="row p-2">
+												<div className="row p-2 border-bottom">
 													<div className="col h3 text-center">
 														Cuadre Final
 													</div>

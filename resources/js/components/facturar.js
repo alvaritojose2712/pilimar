@@ -1368,7 +1368,7 @@ const cerrar_dia = (e=null) => {
   }
   setLoading(true)
   db.cerrar({
-  fechaCierre,
+  
   total_caja_neto,
   total_punto,
   dejar_usd,
@@ -1383,6 +1383,7 @@ const cerrar_dia = (e=null) => {
       setguardar_cop("")
       setguardar_bs("")
       settipo_accionCierre(cierreData["tipo_accion"])
+      setFechaCierre(cierreData["fecha"])
     }
     setCierre(cierreData)
 
@@ -1492,7 +1493,7 @@ const getToday = () =>{
   db.today({}).then(res=>{
     let today = res.data
     setToday(today)
-    setFechaCierre(today)
+    
     setFecha1pedido(today)
     setFecha2pedido(today)
     setFechaMovimientos(today)
@@ -2508,16 +2509,22 @@ const setDevolucion = e => {
   }
 }
 const getTotalizarCierre = () => {
+  if (!totalizarcierre) {
+    db.getTotalizarCierre({}).then(res=>{
+      if (res.data) {
+        let d = res.data
+        setCaja_usd(d.caja_usd)
+        setCaja_cop(d.caja_cop)
+        setCaja_bs(d.caja_bs)
+        setCaja_punto(d.caja_punto)
+        
+        setDejar_usd(d.dejar_dolar)
+        setDejar_cop(d.dejar_peso)
+        setDejar_bs(d.dejar_bss)
+      }
+    })
+  }
   setTotalizarcierre(!totalizarcierre)
-  /* db.getTotalizarCierre({}).then(res=>{
-    if (res.data) {
-      let d = res.data
-      setCaja_usd(d.caja_usd)
-      setCaja_cop(d.caja_cop)
-      setCaja_bs(d.caja_bs)
-      setCaja_punto(d.caja_punto)
-    }
-  }) */
 
 }
 const buscarInventario = e => {

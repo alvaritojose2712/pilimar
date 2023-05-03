@@ -721,44 +721,38 @@ class PedidosController extends Controller
     }
     public function ultimoCierre($fecha,$id_vendedor)
     {
-        $fecha_pasadaquery = cierres::where("fecha","<",$fecha)->orderBy("fecha","desc")->first();
+        $fecha_pasadaquery = cierres::where("fecha","<",$fecha)->whereIn("id_usuario",$id_vendedor)->orderBy("fecha","desc")->first();
         if ($fecha_pasadaquery) {
             $fecha_pasada = $fecha_pasadaquery->fecha;
         }else {
-            throw new \Exception("Debe crear un cierre pasado para tomar valores de caja inicial", 1);
-            
+            $fecha_pasada = "2023-01-01";
+            $id_vendedor = [1];
         }
-        return cierres::where("fecha",$fecha_pasada)->whereIn("id_usuario",$id_vendedor)->orderBy("fecha","desc");
+        //toma a todos los cierres tipo cajero
+
+        return cierres::where("fecha",$fecha_pasada)->whereIn("id_usuario",$id_vendedor)->where("tipo_cierre",0)->orderBy("fecha","desc");
     }
 
-    public function getEntreGadoCajainicial($fecha)
+    public function selectUsersTotalizar($totalizarcierre)
     {
-        return [
-            "entregado" =>$this->entregadoPendi($fecha),
-            "ultimo_cierre" =>$this->ultimoCierre($fecha)
-        ];
-    }
-    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$dejar=[],$grafica=false,$totalizarcierre=false)
-    {   
-        if (!$fecha) {
-            return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);
-
-        }
-
         if ($totalizarcierre) {
-            $id_vendedor =  pedidos::select('id_vendedor')->distinct()->get()->map(function($e){
+            return pedidos::select('id_vendedor')->distinct()->get()->map(function($e){
                 return $e->id_vendedor;
             });
             
         }else{
-            $id_vendedor = [session("id_usuario")];
+            return [session("id_usuario")];
         } 
+    }
+    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$dejar=[],$grafica=false,$totalizarcierre=false)
+    {   
+        if (!$fecha) {return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);}
 
+        $id_vendedor = $this->selectUsersTotalizar($totalizarcierre); 
 
         $usuariosget = usuarios::whereIn("id",$id_vendedor)->get(["id","usuario","tipo_usuario","nombre"]);
         $entregado_fun = $this->entregadoPendi($fecha,$id_vendedor);
         $ultimo_cierre = $this->ultimoCierre($fecha,$id_vendedor);
-
 
         $cop = $this->get_moneda()["cop"];
         $bs = $this->get_moneda()["bs"];
@@ -945,7 +939,7 @@ class PedidosController extends Controller
         if (!$fechaGetCierre&&!$fechaGetCierre2) {
             $cierres = cierres::with("usuario")->orderBy("fecha","desc");
         }else{
-            $cierres = cierres::with("usuario")->whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2]);
+            $cierres = cierres::with("usuario")->where("tipo_cierre",0)->whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2])->orderBy("id_usuario","asc");
         }
         
         
@@ -962,15 +956,30 @@ class PedidosController extends Controller
 
             "ganancia" => number_format($cierres->sum("ganancia"),2),
             "porcentaje" => number_format($cierres->avg("porcentaje"),2),
+
+            
+
+
+            "dejar_dolar" => number_format($cierres->sum("dejar_dolar"),2),
+            "dejar_peso" => number_format($cierres->sum("dejar_peso"),2),
+            "dejar_bss" => number_format($cierres->sum("dejar_bss"),2),
+            "efectivo_guardado" => number_format($cierres->sum("efectivo_guardado"),2),
+            "efectivo_guardado_cop" => number_format($cierres->sum("efectivo_guardado_cop"),2),
+            "efectivo_guardado_bs" => number_format($cierres->sum("efectivo_guardado_bs"),2),
+            "efectivo_actual" => number_format($cierres->sum("efectivo_actual"),2),
+            "efectivo_actual_cop" => number_format($cierres->sum("efectivo_actual_cop"),2),
+            "efectivo_actual_bs" => number_format($cierres->sum("efectivo_actual_bs"),2),
+            "puntodeventa_actual_bs" => number_format($cierres->sum("puntodeventa_actual_bs"),2),
             
         ];
         
     }
     public function cerrar(Request $req)
     {
+        $today = (new PedidosController)->today();
         
         return $this->cerrarFun(
-            $req->fechaCierre,
+            $today,
             $req->total_caja_neto,
             $req->total_punto,
             ["dejar_bs"=>$req->dejar_bs, "dejar_usd"=>$req->dejar_usd, "dejar_cop"=>$req->dejar_cop],
@@ -1005,23 +1014,19 @@ class PedidosController extends Controller
     public function guardarCierre(Request $req)
     {
         try {
+            $today = (new PedidosController)->today();
             
             $cop = $this->get_moneda()["cop"];
             $bs = $this->get_moneda()["bs"];
 
             $totalizarcierre = filter_var($req->totalizarcierre, FILTER_VALIDATE_BOOLEAN);
-            if ($totalizarcierre) {
-                $id_vendedor =  pedidos::select('id_vendedor')->distinct()->get()->map(function($e){
-                    return $e->id_vendedor;
-                });
-                
-            }else{
-                $id_vendedor = [session("id_usuario")];
-            } 
+            
+            $id_vendedor = $this->selectUsersTotalizar($totalizarcierre);
+            $tipo_cierre = $totalizarcierre?1:0;
 
 
             $last_cierre = cierres::whereIn("id_usuario",$id_vendedor)->orderBy("fecha","desc")->first();
-            $check = cierres::whereIn("id_usuario",$id_vendedor)->where("fecha",$req->fechaCierre)->first();
+            $check = cierres::whereIn("id_usuario",$id_vendedor)->where("fecha",$today)->first();
             
             $fecha_ultimo_cierre = "0";
             if ($last_cierre) {
@@ -1029,7 +1034,7 @@ class PedidosController extends Controller
             }
 
             $id_usuario = session("id_usuario");
-            if ($check===null || $fecha_ultimo_cierre==$req->fechaCierre) {
+            if ($check===null || $fecha_ultimo_cierre==$today) {
                 if ($req->total_punto || $req->efectivo || $req->transferencia) {
                     
                     if ($req->tipo_accionCierre=="guardar") {
@@ -1048,7 +1053,7 @@ class PedidosController extends Controller
                         $objcierres->tasa = $bs;
                         $objcierres->nota = $req->notaCierre;
                         $objcierres->id_usuario = $id_usuario;
-                        $objcierres->fecha = $req->fechaCierre;
+                        $objcierres->fecha = $today;
 
                         $objcierres->precio = floatval($req->precio);
                         $objcierres->precio_base = floatval($req->precio_base);
@@ -1056,18 +1061,20 @@ class PedidosController extends Controller
                         $objcierres->porcentaje = floatval($req->porcentaje);
                         $objcierres->numventas = intval($req->numventas);
                         $objcierres->desc_total = floatval($req->desc_total);
-
+                        
+                        
                         $objcierres->efectivo_actual = floatval($req->caja_usd);
                         $objcierres->efectivo_actual_cop = floatval($req->caja_cop);
                         $objcierres->efectivo_actual_bs = floatval($req->caja_bs);
                         $objcierres->puntodeventa_actual_bs = floatval($req->caja_punto);
+                        
+                        $objcierres->tipo_cierre = $tipo_cierre;
                         $objcierres->save();
-                     
 
                     }else if($req->tipo_accionCierre=="editar"){
                         
                         cierres::updateOrCreate(
-                            ["fecha"=>$req->fechaCierre, "id_usuario" => $id_usuario],
+                            ["fecha"=>$today, "id_usuario" => $id_usuario],
                             [
                                 "debito" => floatval($req->total_punto),
                                 "efectivo" => floatval($req->efectivo),

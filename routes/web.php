@@ -111,9 +111,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('guardarCierre', [PedidosController::class,"guardarCierre"]);
 		Route::get('verCierre', [PedidosController::class,"verCierre"]);
 		Route::post('cerrar', [PedidosController::class,"cerrar"]);
-		Route::get('getCierres', [PedidosController::class,"getCierres"]);
 		Route::get('sendCuentasporCobrar', [PedidosController::class,"sendCuentasporCobrar"]);
-
+		
 		
 	});
 	Route::group(['middleware' => ['vendedor']], function () {
@@ -126,6 +125,7 @@ Route::group(['middleware' => ['login']], function () {
 		
 		/* GastosController */
 		
+		Route::get('getCierres', [PedidosController::class,"getCierres"]);
 		Route::post('setProveedor', [ProveedoresController::class,"setProveedor"]);
 		Route::post('guardarNuevoProducto', [InventarioController::class,"guardarNuevoProducto"]);
 		Route::post('guardarNuevoProductoLote', [InventarioController::class,"guardarNuevoProductoLote"]);

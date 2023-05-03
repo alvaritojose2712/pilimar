@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\inventario;
+
+
 use PhpAidc\LabelPrinter\Enum\Unit;
 use PhpAidc\LabelPrinter\Enum\Anchor;
 use PhpAidc\LabelPrinter\Enum\Charset;
@@ -11,9 +14,6 @@ use PhpAidc\LabelPrinter\Label\Label;
 use PhpAidc\LabelPrinter\Label\Element;
 use PhpAidc\LabelPrinter\CompilerFactory;
 use PhpAidc\LabelPrinter\Connector\NetworkConnector;
-
-use App\Models\inventario;
-
 
 class tickeprecioController extends Controller
 {
@@ -26,18 +26,8 @@ class tickeprecioController extends Controller
         $codigo_barras = $inventario->codigo_barras;
         $pu = number_format($inventario->precio,2,".",",");
 
-        return $pu;
 
-       /*  $label = Label::create(Unit::MM(), 43, 25)
-            ->charset(Charset::UTF8())
-            ->add(Element::textBlock(168, 95, 'Hello!', 'Univers', 8)->box(338, 100, 0)->anchor(Anchor::CENTER()))
-            ->add(Element::barcode(10, 10, '123456', 'CODE93')->height(60))
-        ;
-
-        (new Printer(new NetworkConnector('smb://ospino/4BARCODE_3B-365B'), CompilerFactory::tspl()))->print($label);
- */
-
- $printer = new Printer(new NetworkConnector('ospino/4BARCODE_3B-365B'));
+$printer = new Printer(new NetworkConnector('192.168.68.102'));
 
 \var_dump($printer->ask('? VERSION$(0)'));
 

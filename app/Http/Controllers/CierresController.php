@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\cierres;
+
 use Illuminate\Http\Request;
 
 class CierresController extends Controller
 {
     public function getStatusCierre(Request $req)
     {
-        $tipo_accion = cierres::where("fecha",$req->fechaCierre)->where("id_usuario",session("id_usuario"))->first();
+        $today = (new PedidosController)->today();
+
+        $tipo_accion = cierres::where("fecha",$today)->where("id_usuario",session("id_usuario"))->first();
         if ($tipo_accion) {
             $tipo_accion = "editar"; 
         }else{
@@ -21,10 +24,17 @@ class CierresController extends Controller
     }
     public function getTotalizarCierre(Request $req)
     {
-       /*  cierres::where
-        caja_usd
-        caja_cop
-        caja_bs
-        caja_punto */
+        $today = (new PedidosController)->today();
+        $c = cierres::where("tipo_cierre",0)->where("fecha",$today)->get();
+
+        return [
+            "caja_usd" => $c->sum("efectivo_actual"),
+            "caja_cop" => $c->sum("efectivo_actual_cop"),
+            "caja_bs" => $c->sum("efectivo_actual_bs"),
+            "caja_punto" => $c->sum("puntodeventa_actual_bs"),
+            "dejar_dolar" => $c->sum("dejar_dolar"),
+            "dejar_peso" => $c->sum("dejar_peso"),
+            "dejar_bss" => $c->sum("dejar_bss"),
+        ];
     }
 }

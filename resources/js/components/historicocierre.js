@@ -30,6 +30,12 @@ export default function Historicocierre({
 						<th>Guardado $</th>
 						<th>Guardado COP</th>
 						<th>Guardado BS</th>
+
+						<th>Actual $</th>
+						<th>Actual COP</th>
+						<th>Actual BS</th>
+						<th>Actual Punto BS</th>
+
 						<th>Tasa</th>
 						<th>Fecha</th>
 
@@ -47,6 +53,16 @@ export default function Historicocierre({
 							<td>{e.efectivo_guardado}</td>
 							<td>{e.efectivo_guardado_cop}</td>
 							<td>{e.efectivo_guardado_bs}</td>
+
+							<td>{e.efectivo_actual}</td>
+							<td>{e.efectivo_actual_cop}</td>
+							<td>{e.efectivo_actual_bs}</td>
+							<td>{e.puntodeventa_actual_bs}</td>
+							
+							
+							
+							
+
 							<td>{e.tasa}</td>
 							<th>{e.fecha}</th>
 							<td>
@@ -55,7 +71,25 @@ export default function Historicocierre({
 							</td>
 						</tr>
 
-					):null:null:null}
+):null:null:null}
+					<tr>
+						<td></td>
+						<th>{cierres.numventas}</th>
+						<th>{cierres.debito}</th>
+						<th>{cierres.efectivo}</th>
+						<th>{cierres.transferencia}</th>
+						<th>{cierres.dejar_dolar}</th>
+						<th>{cierres.dejar_peso}</th>
+						<th>{cierres.dejar_bss}</th>
+						<th>{cierres.efectivo_guardado}</th>
+						<th>{cierres.efectivo_guardado_cop}</th>
+						<th>{cierres.efectivo_guardado_bs}</th>
+						<th>{cierres.efectivo_actual}</th>
+						<th>{cierres.efectivo_actual_cop}</th>
+						<th>{cierres.efectivo_actual_bs}</th>
+						<th>{cierres.puntodeventa_actual_bs}</th>
+						
+					</tr>
 				</thead>
 			</table>
 			<h1>Total <b>{ fechaGetCierre}</b> - <b>{ fechaGetCierre2}</b></h1>
@@ -63,10 +97,6 @@ export default function Historicocierre({
 				<table className="table">
 					<thead>
 						<tr>
-							<th>Num. Ventas</th>
-							<th>Débito</th>
-							<th>Efectivo</th>
-							<th>Transferencia</th>
 							<th className="bg-success text-right">Inversión</th>
 							<th className="bg-success text-right">Venta</th>
 							<th className="bg-success text-right">Ganancia Estimada</th>
@@ -75,10 +105,6 @@ export default function Historicocierre({
 					</thead>
 					<tbody>
 						<tr>
-							<td>{cierres.numventas}</td>
-							<td>{cierres.debito}</td>
-							<td>{cierres.efectivo}</td>
-							<td>{cierres.transferencia}</td>
 							<td className="fw-bold text-right">{cierres.precio_base}</td>
 							<td className="fw-bold text-right">{cierres.precio}</td>
 							<td className="fw-bold  text-success text-right">{cierres.ganancia}</td>

@@ -54,10 +54,13 @@ class CreateCierresTable extends Migration
             $table->decimal("porcentaje",10,2)->default(0);
             $table->decimal("desc_total",10,2)->default(0);
             
+            $table->boolean("tipo_cierre")->default(0);
+            //0 cajero
+            //1 admin
+            
+            $table->unique(["fecha","id_usuario","tipo_cierre"]);
+            
             $table->boolean("push")->default(0);
-
-            $table->unique(["fecha","id_usuario"]);
-
             $table->timestamps();
 
 
