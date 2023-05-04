@@ -662,101 +662,95 @@ auth
               <div className="mt-2 mb-2 container-fluid">
                 
                 <div className="row">
-                  {editable?
-                    <>
-                      <div className="col p-0">
-                        
-                        <div className={(debito!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                          <div className="card-body">
-                            <div className="card-title pointer" onClick={getDebito}>Déb.</div>
-                            <div className="card-text pago-numero"><input type="text" value={debito} onChange={(e)=>syncPago(e.target.value,"Debito")} placeholder="D"/></div>
-                            <small className="text-muted fs-4">{debitoBs("debito")}</small>
-                            <span className='ref pointer' data-type="2" onClick={addRefPago}>Ref. <i className="fa fa-plus"></i></span>
-                          </div>
+                  
+                  <div className="col p-0">
+                    {editable?
+                      <div className={(debito!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
+                        <div className="card-body">
+                          <div className="card-title pointer" onClick={getDebito}>Déb.</div>
+                          <div className="card-text pago-numero"><input type="text" value={debito} onChange={(e)=>syncPago(e.target.value,"Debito")} placeholder="D"/></div>
+                          <small className="text-muted fs-4">{debitoBs("debito")}</small>
+                          <span className='ref pointer' data-type="2" onClick={addRefPago}>Ref. <i className="fa fa-plus"></i></span>
                         </div>
                       </div>
-                      <div className="col p-0">
+                    :
+                    <div className={(debito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
+                      <div className="card-body">
+                        <div className="card-title pointer">Déb.</div>
+                        <div className="card-text pago-numero">{debito}</div>
                         
-                        <div className={(efectivo!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                          <div className="card-body">
-                            <div className="card-title pointer" onClick={getEfectivo}>Efec.</div>
-                            <div className="card-text pago-numero"><input type="text" value={efectivo} onChange={(e)=>syncPago(e.target.value,"Efectivo")} placeholder="E"/></div>
-                            
-                          </div>
-                        </div>
                       </div>
+                    </div>
+                    }
+                    
+                  </div>
+                  <div className="col p-0">
+                    {editable?
+                    
+                    <div className={(efectivo!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
+                      <div className="card-body">
+                        <div className="card-title pointer" onClick={getEfectivo}>Efec.</div>
+                        <div className="card-text pago-numero"><input type="text" value={efectivo} onChange={(e)=>syncPago(e.target.value,"Efectivo")} placeholder="E"/></div>
+                      </div>
+                    </div>
+                    :
+                    <div className={(efectivo!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
+                      <div className="card-body">
+                        <div className="card-title pointer">Efec.</div>
+                        <div className="card-text pago-numero">{efectivo}</div>
+                        
+                      </div>
+                    </div>
+                    } 
 
-                      <div className="col p-0">
-                        
-                        <div className={(transferencia!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                          <div className="card-body">
-                            <div className="card-title pointer" onClick={getTransferencia}>Tran.</div>
-                            <div className="card-text pago-numero"><input type="text" value={transferencia} onChange={(e)=>syncPago(e.target.value,"Transferencia")} placeholder="T"/></div>
-                            <small className="text-muted fs-4">{debitoBs("transferencia")}</small>
-                            <span className='ref pointer' data-type="1" onClick={addRefPago}>Ref. <i className="fa fa-plus"></i></span>
+                  </div>
 
-                            
-                          </div>
-                        </div>
+                  <div className="col p-0">
+                    {editable?
+                    
+                    <div className={(transferencia!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
+                      <div className="card-body">
+                        <div className="card-title pointer" onClick={getTransferencia}>Tran.</div>
+                        <div className="card-text pago-numero"><input type="text" value={transferencia} onChange={(e)=>syncPago(e.target.value,"Transferencia")} placeholder="T"/></div>
+                        <small className="text-muted fs-4">{debitoBs("transferencia")}</small>
+                        <span className='ref pointer' data-type="1" onClick={addRefPago}>Ref. <i className="fa fa-plus"></i></span>
                       </div>
+                    </div>
 
-                      <div className="col p-0">
+                    :
+                    <div className={(transferencia!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
+                      <div className="card-body">
+                        <div className="card-title pointer">Tran.</div>
+                        <div className="card-text pago-numero">{transferencia}</div>
                         
-                        <div className={(credito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                          <div className="card-body">
-                            <div className="card-title pointer" onClick={getCredito}>Créd.</div>
-                            <div className="card-text pago-numero"><input type="text" value={credito} onChange={(e)=>syncPago(e.target.value,"Credito")} placeholder="C"/></div>
-                            
-                          </div>
-                        </div>
                       </div>
-                    </>:<>
-                      
-                      <div className="col p-0">
-                        
-                        <div className={(debito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                          <div className="card-body">
-                            <div className="card-title pointer">Déb.</div>
-                            <div className="card-text pago-numero">{debito}</div>
-                            
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col p-0">
-                        
-                        <div className={(efectivo!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                          <div className="card-body">
-                            <div className="card-title pointer">Efec.</div>
-                            <div className="card-text pago-numero">{efectivo}</div>
-                            
-                          </div>
-                        </div>
-                      </div>
+                    </div>
+                    } 
 
-                      <div className="col p-0">
-                        
-                        <div className={(transferencia!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                          <div className="card-body">
-                            <div className="card-title pointer">Tran.</div>
-                            <div className="card-text pago-numero">{transferencia}</div>
-                            
-                          </div>
-                        </div>
-                      </div>
+                  </div>
 
-                      <div className="col p-0">
+                  <div className="col p-0">
+                    {editable?
+                    
+                    <div className={(credito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
+                      <div className="card-body">
+                        <div className="card-title pointer" onClick={getCredito}>Créd.</div>
+                        <div className="card-text pago-numero"><input type="text" value={credito} onChange={(e)=>syncPago(e.target.value,"Credito")} placeholder="C"/></div>
                         
-                        <div className={(credito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                          <div className="card-body">
-                            <div className="card-title pointer">Créd.</div>
-                            <div className="card-text pago-numero">{credito}</div>
-                            
-                          </div>
-                        </div>
                       </div>
-                    </>
-                  }
+                    </div>
+                    :
 
+                    <div className={(credito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
+                      <div className="card-body">
+                        <div className="card-title pointer">Créd.</div>
+                        <div className="card-text pago-numero">{credito}</div>
+                        
+                      </div>
+                    </div>
+                    }
+                  </div>
+                    
                   <div className="col p-0">
                     
                     <div className={(vuelto!=""?"card-danger-pago":"t-5")+(" card pointer")}>
@@ -782,6 +776,14 @@ auth
                       </div>
                     </div>
                   </div>
+
+                  <div className="p-0 col-md-auto d-flex align-items-center">
+                    {autoCorrector?
+                      <button className="btn btn-outline-success btn-sm" onClick={()=>setautoCorrector(false)}>On</button>:
+                      <button className="btn btn-outline-danger btn-sm" onClick={()=>setautoCorrector(true)}>Off</button>
+                    }
+                    
+                  </div>
                 </div>
 
               </div>
@@ -804,14 +806,6 @@ auth
                       </ul>
 
                     </div>
-                    <div className="col text-right">
-                      {autoCorrector?
-                        <button className="btn btn-outline-success btn-sm" onClick={()=>setautoCorrector(false)}>Auto On</button>:
-                        <button className="btn btn-outline-danger btn-sm" onClick={()=>setautoCorrector(true)}>Off Auto</button>
-                      }
-                      
-                    </div>
-
                   </div>
                   
 
@@ -822,56 +816,33 @@ auth
               <div className="mt-1 mb-1">
                 <table className="table table-sm">
                   <tbody>
-                    <tr className='hover'>
+                    <tr className='hover text-center'>
                       <th className="">Sub-Total</th>
-                      <td colSpan="2" className="text-right">{subtotal}</td>
-                    </tr>
-                    <tr className='hover'>
-                      <th data-index={id} onClick={setDescuentoTotal} className="pointer clickme">Desc. {total_porciento}%
-                      </th>
-                      <td colSpan="2" className="text-right">{total_des}</td>
-                    </tr>
-                    <tr className='hover'>
+                      <th data-index={id} onClick={setDescuentoTotal} className="pointer clickme">Desc. {total_porciento}%</th>
                       <th className="">Monto Exento</th>
-                      <td colSpan="2" className="text-right">{exento}</td>
-                    </tr>
-                    <tr className='hover'>
                       <th className="">Monto Gravable</th>
-                      <td colSpan="2" className="text-right">{gravable}</td>
-                    </tr>
-                    <tr className='hover'>
                       <th className="">IVA <span>({ivas})</span></th>
-                      <td colSpan="2" className="text-right">{monto_iva}</td>
                     </tr>
-                    <tr className="hover h4">
-                      <th className="">Total</th>
-                      <td className="text-left text-muted align-bottom">
-                        {vuelto_penddolar?<>
-                          <span>Vuelto: {vuelto_penddolar}</span>
-                        </>:null}
-                      </td>
-                      <td className="text-right text-success fw-bold fs-11">
-                        <span onClick={setvueltopend} data-type="dolar" className="pointer">{total}</span>
-                      </td>
+                    <tr className="hover text-center">
+                      <td className="">{subtotal}</td>
+                      <td className="">{total_des}</td>
+                      <td className="">{exento}</td>
+                      <td className="">{gravable}</td>
+                      <td className="">{monto_iva}</td>
+                      
                     </tr>
-
+                    
                     <tr className="text-muted">
-                      <th>
-                        <span onClick={setvueltopend} data-type="cop" className='fs-5 pointer'>COP {cop}</span>
-
+                      <th colSpan="2" className='align-bottom text-right'>
+                        <span data-type="cop" className='fs-5 pointer'>COP {cop}</span>
                       </th>
-                      <td>
-                      </td>
-                      {/* <td className="text-left text-muted">
-                        {vuelto_pendbs?<>
-                          <span className="fs-2">Vuelto: {vuelto_pendbs}</span><br/>
-                        </>:null}
-                        {vuelto_pendcop?<>
-                          <span className="fs-5">Vuelto: {vuelto_pendcop}</span>
-                        </>:null}
-                      </td> */}
-                      <th className="text-right" colSpan="2">
-                        <span onClick={setvueltopend} data-type="bs" className='fs-2 pointer'> Bs {bs}</span><br/>
+                      <th colSpan="2" className='text-center align-bottom'>
+                        <span className="fw-bold ">Total</span>
+                        <br />
+                        <span data-type="dolar" className=" text-success fw-bold fs-11 pointer">{total}</span>
+                      </th>
+                      <th colSpan="2" className='align-bottom'>
+                        <span data-type="bs" className='fs-2 pointer'> Bs {bs}</span><br/>
                       </th>
                     </tr>
                   </tbody>
