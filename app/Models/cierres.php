@@ -41,5 +41,9 @@ class cierres extends Model
         "ganancia",
         "porcentaje",
         "desc_total",
+        "efectivo_actual",
+        "efectivo_actual_cop",
+        "efectivo_actual_bs",
+        "puntodeventa_actual_bs",
     ];
 }

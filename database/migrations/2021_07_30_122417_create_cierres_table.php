@@ -29,6 +29,12 @@ class CreateCierresTable extends Migration
             $table->decimal("efectivo_guardado_cop",10,2);
             $table->decimal("efectivo_guardado_bs",10,2);
 
+            $table->decimal("efectivo_actual",10,2)->default(0);
+            $table->decimal("efectivo_actual_cop",10,2)->default(0);
+            $table->decimal("efectivo_actual_bs",10,2)->default(0);
+
+            $table->decimal("puntodeventa_actual_bs",10,2)->default(0);
+
             $table->decimal("tasa",10,2); 
             
             $table->text("nota")->nullable();
@@ -56,6 +62,35 @@ class CreateCierresTable extends Migration
 
 
         });
+
+        DB::table("cierres")->insert([
+            [
+                "debito" =>0,
+                "efectivo" =>0,
+                "transferencia" =>0,
+                "dejar_dolar" =>0,
+                "dejar_peso" =>0,
+                "dejar_bss" =>0,
+                "efectivo_guardado" =>0,
+                "efectivo_guardado_cop" =>0,
+                "efectivo_guardado_bs" =>0,
+                "efectivo_actual" =>0,
+                "efectivo_actual_cop" =>0,
+                "efectivo_actual_bs" =>0,
+                "puntodeventa_actual_bs" =>0,
+                "tasa" =>0,
+                "nota" =>0,
+                "fecha" =>"2023-01-01",
+                "id_usuario" =>1,
+                "numventas" =>0,
+                "precio" =>0,
+                "precio_base" =>0,
+                "ganancia" =>0,
+                "porcentaje" =>0,
+                "desc_total" =>0,
+                "push" =>0,
+            ],
+        ]);
     }
 
     /**

@@ -102,6 +102,8 @@ const db = {
   setFalla: data=>axios.post(host+"setFalla",data),
   delFalla: data=>axios.post(host+"delFalla",data),
   imprimirTicked: data=>axios.post(host+"imprimirTicked",data),
+  getTotalizarCierre: data=>axios.post(host+"getTotalizarCierre",data),
+  
   sendCierre: data=>axios.get(host+"verCierre",{params:data}),
   printTickedPrecio: data=>axios.get(host+"printTickedPrecio",{params:data}),
   
@@ -112,6 +114,7 @@ const db = {
   setexportpedido: data => axios.post(host + "setexportpedido", data),
   
   getmastermachine: data=>axios.post(host+"getmastermachine",data),
+  getStatusCierre: data=>axios.post(host+"getStatusCierre",data),
   
 
   getSucursal: data=>axios.get(host+"getSucursal",{params:data}),

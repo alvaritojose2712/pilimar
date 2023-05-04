@@ -164,7 +164,7 @@ class sendCentral extends Controller
     }
     public function getInventarioSucursalFromCentral(Request $req)
     {
-        $id = $req->id;
+        /* $id = $req->id;
         $type = $req->type;
         $response = Http::post($this->path()."/getInventarioSucursalFromCentral",[
             "id"=>$id,
@@ -175,7 +175,7 @@ class sendCentral extends Controller
             return $res;
         }else{
             return "Error: ".$response->body();
-        }
+        } */
     }
     public function getSucursales()
     {

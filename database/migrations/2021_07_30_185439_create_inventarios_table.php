@@ -62,7 +62,7 @@ class CreateInventariosTable extends Migration
         
         $arrinsert = [];
         
-        $con = new Mysqli("localhost","root","","administrativo");
+        $con = new Mysqli("localhost","root","","administrativo2");
         
         $sql = $con->query("
         SELECT articulos.*,
@@ -82,9 +82,9 @@ class CreateInventariosTable extends Migration
                 'descripcion' => $row['descripcion'],
                 'precio_base' => $row['costod'],
                 'precio' => $row['preciod'],
-                'cantidad' => $row['ct'],  
+                'cantidad' => $row['ct']?$row['ct']:0,  
             ]);
-            if ($i==1000 OR $i==2000 OR $i==3000 OR $i==4000 OR $i==5000 OR $i==6000 OR $i==7000 OR $i==8000 OR $i==9278) {
+            if ($i==1000 OR $i==2000 OR $i==3583) {
                 DB::table("inventarios")->insert($arrinsert);
                 $arrinsert = [];
             }

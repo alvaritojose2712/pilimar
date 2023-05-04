@@ -28,6 +28,8 @@ use App\Http\Controllers\PagoFacturasController;
 use App\Http\Controllers\PagosReferenciasController;
 use App\Http\Controllers\GastosController;
 use App\Http\Controllers\tickeprecioController;
+use App\Http\Controllers\CierresController;
+
 
 
 
@@ -181,6 +183,11 @@ Route::group(['middleware' => ['login']], function () {
 		
 		
 		Route::get('printTickedPrecio', [tickeprecioController::class,"tickedPrecio"]);
+		Route::post('getStatusCierre', [CierresController::class,"getStatusCierre"]);
+		Route::post('getTotalizarCierre', [CierresController::class,"getTotalizarCierre"]);
+		
+
+		
 		
 	});
 		Route::post('delMov', [MovimientosController::class,"delMov"]);

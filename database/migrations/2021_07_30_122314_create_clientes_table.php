@@ -41,7 +41,7 @@ class CreateClientesTable extends Migration
 
             $arrinsert = [];
         
-        $con = new Mysqli("localhost","root","","administrativo");
+        $con = new Mysqli("localhost","root","","administrativo2");
         
         $sql = $con->query("SELECT * FROM clientes");
             
@@ -56,7 +56,7 @@ class CreateClientesTable extends Migration
                 "estado"=>"CF",
                 "ciudad"=>"CF",
             ]);
-            if ($i==1000 OR $i==2000 OR $i==3034) {
+            if ($i==1094) {
                 DB::table("clientes")->insert($arrinsert);
                 $arrinsert = [];
             }

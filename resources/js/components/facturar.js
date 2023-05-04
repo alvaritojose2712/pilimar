@@ -303,6 +303,10 @@ export default function Facturar({user,notificar,setLoading}) {
   const [guardar_cop,setguardar_cop] = useState("")
   const [guardar_bs,setguardar_bs] = useState("")
 
+
+  const [tipo_accionCierre,settipo_accionCierre] = useState("")
+  
+
   const [ventasData,setventasData] = useState([])
 
   const [fechaventas,setfechaventas] = useState("")
@@ -1357,8 +1361,11 @@ const getCierres = () => {
     }
   })
 }
-const cerrar_dia = (e) => {
-  e.preventDefault()
+const cerrar_dia = (e=null) => {
+  if (e) {
+    e.preventDefault()
+    
+  }
   setLoading(true)
   db.cerrar({
   fechaCierre,
@@ -1375,21 +1382,7 @@ const cerrar_dia = (e) => {
       setguardar_usd(cierreData["efectivo_guardado"])
       setguardar_cop("")
       setguardar_bs("")
-
-      // if (cierreData["match_cierre"]) {
-
-
-      //   setDejar_usd(cierreData["match_cierre"]["dejar_dolar"])
-      //   setDejar_cop(cierreData["match_cierre"]["dejar_peso"])
-      //   setDejar_bs(cierreData["match_cierre"]["dejar_bss"])
-      //   setNotaCierre(cierreData["match_cierre"]["nota"])
-
-
-      //   setguardar_usd(cierreData["match_cierre"]["efectivo_guardado"])
-      //   setguardar_cop(cierreData["match_cierre"]["efectivo_guardado_cop"])
-      //   setguardar_bs(cierreData["match_cierre"]["efectivo_guardado_bs"])
-        
-      // }
+      settipo_accionCierre(cierreData["tipo_accion"])
     }
     setCierre(cierreData)
 
@@ -1636,21 +1629,25 @@ const toggleModalProductos = (prop,callback=null) => {
 }
 const toggleImprimirTicket = (id_fake=null) => {
   if (pedidoData) {
-    let printer = window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4")
-    let moneda = window.prompt("Moneda: $ | bs | cop","bs")
-    let identificacion = window.prompt("Identificación", pedidoData.cliente?pedidoData.cliente.identificacion:"")
+    let printer = 0
+    if (!selectprinter) {
+      printer = parseInt(window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4"))
+    }
+
+    let promptInfoCliente = window.prompt("(Moneda: $ | bs | cop),(Identificación),(Nombre y Apellido) Separado por coma (,)", pedidoData.cliente?("bs,"+pedidoData.cliente.identificacion+","+pedidoData.cliente.nombre):"").split(",")
+    let moneda = promptInfoCliente[0]
+    let identificacion = promptInfoCliente[1]
+    let nombres = promptInfoCliente[2]
 
     if (identificacion) {
-      let nombres = window.prompt("Nombre y Apellido",pedidoData.cliente?pedidoData.cliente.nombre:"")
-      // let printer = 1
-      // if (selectprinter) {
-      //   printer = selectprinter
-      // }else{
-        //setselectprinter(printer)
-      //}
+      if (selectprinter) {
+        printer = selectprinter
+      }else{
+        setselectprinter(printer)
+      }
       if (nombres) {
 
-        console.log("Imprimiendo...")
+        console.log("Imprimiendo en Caja "+printer)
 
         db.imprimirTicked({
           id: id_fake ?id_fake:pedidoData.id,
@@ -2290,68 +2287,81 @@ const del_pedido = () =>{
   }
 }
 const guardar_cierre = (e,callback=null) => {
-  let type = e.currentTarget.attributes["data-type"].value
-  setLoading(true)
-  db.guardarCierre({
-    fechaCierre,
-    
-    total_caja_neto,
-
-    dejar_usd,
-    dejar_cop,
-    dejar_bs,
-
-    total_dejar_caja_neto,
-    total_punto,
-
-    guardar_usd,
-    guardar_cop,
-    guardar_bs,
-    
-    efectivo: cierre["total_caja"],
-    transferencia: cierre[1],
-    entregadomenospend: cierre["entregadomenospend"],
-    caja_inicial:cierre["caja_inicial"],
-
-    precio: cierre["precio"],
-    precio_base: cierre["precio_base"],
-    ganancia: cierre["ganancia"],
-    porcentaje: cierre["porcentaje"],
-    desc_total: cierre["desc_total"],
-    numventas: cierre["numventas"],
-    
-
-    notaCierre,
-    totalizarcierre,
-  }).then(res=>{
-    
-    setLoading(false)
-    notificar(res,false)
-    
-    if (res.data.estado) {
-      if (type=="ver") {
-        verCierreReq(fechaCierre,type)
-      }else{
-        setLoading(true)
-        
-        db.sendCierre({type,fecha:fechaCierre,totalizarcierre}).then(res=>{
-          notificar(res,false)
-
-          notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
-          setLoading(true)
-          db.backup({}).then(res=>{
-            notificar(res)
-            setLoading(false)
-          })
-          
-
+  if (window.confirm("¿Realmente desea Guardar/Editar?")) {
+    setLoading(true)
+    db.guardarCierre({
+      fechaCierre,
+      
+      total_caja_neto,
+  
+      dejar_usd,
+      dejar_cop,
+      dejar_bs,
+  
+      total_dejar_caja_neto,
+      total_punto,
+  
+      guardar_usd,
+      guardar_cop,
+      guardar_bs,
+  
+      caja_usd,
+      caja_cop,
+      caja_bs,
+      caja_punto,
+      
+      efectivo: cierre["total_caja"],
+      transferencia: cierre[1],
+      entregadomenospend: cierre["entregadomenospend"],
+      caja_inicial:cierre["caja_inicial"],
+  
+      precio: cierre["precio"],
+      precio_base: cierre["precio_base"],
+      ganancia: cierre["ganancia"],
+      porcentaje: cierre["porcentaje"],
+      desc_total: cierre["desc_total"],
+      numventas: cierre["numventas"],
+      
+  
+      notaCierre,
+      totalizarcierre,
+      tipo_accionCierre,
+    }).then(res=>{
+      
+      setLoading(false)
+      notificar(res,false)
+      if (res.data.estado) {
+        db.getStatusCierre({fechaCierre}).then(res=>{
+          settipo_accionCierre(res.data.tipo_accionCierre)
         })
-        
-      }
+      }    
+  
+    })
+  }
+}
 
-    }     
+const veryenviarcierrefun = (e,callback=null) => {
+  let type = e.currentTarget.attributes["data-type"].value
 
-  })
+  if (type=="ver") {
+    verCierreReq(fechaCierre,type)
+  }else{
+    setLoading(true)
+    
+    db.sendCierre({type,fecha:fechaCierre,totalizarcierre}).then(res=>{
+      notificar(res,false)
+
+      notificar({data:{msj:"Respaldando Base de Datos",estado:true}})
+      setLoading(true)
+      db.backup({}).then(res=>{
+        notificar(res)
+        setLoading(false)
+      })
+      
+
+    })
+    
+  }
 }
 const verCierreReq = (fechaCierre,type="ver") => {
   // console.log(fecha)
@@ -2496,6 +2506,19 @@ const setDevolucion = e => {
     })
 
   }
+}
+const getTotalizarCierre = () => {
+  setTotalizarcierre(!totalizarcierre)
+  /* db.getTotalizarCierre({}).then(res=>{
+    if (res.data) {
+      let d = res.data
+      setCaja_usd(d.caja_usd)
+      setCaja_cop(d.caja_cop)
+      setCaja_bs(d.caja_bs)
+      setCaja_punto(d.caja_punto)
+    }
+  }) */
+
 }
 const buscarInventario = e => {
 
@@ -3931,7 +3954,7 @@ const printTickedPrecio = id => {
         :null}
 
         {view=="cierres"?<Cierres
-          
+          getTotalizarCierre={getTotalizarCierre}
           totalizarcierre = {totalizarcierre}
           setTotalizarcierre = {setTotalizarcierre}
 
@@ -3947,15 +3970,24 @@ const printTickedPrecio = id => {
           cierres={cierres}
           number={number}
           guardar_usd={guardar_usd}
+
+          
+
           setguardar_usd={setguardar_usd}
           guardar_cop={guardar_cop}
           setguardar_cop={setguardar_cop}
           guardar_bs={guardar_bs}
           setguardar_bs={setguardar_bs}
+          settipo_accionCierre={settipo_accionCierre}
+          tipo_accionCierre={tipo_accionCierre}
           caja_usd={caja_usd}
+          setcaja_usd={setCaja_usd}
           caja_cop={caja_cop}
+          setcaja_cop={setCaja_cop}
           caja_bs={caja_bs}
+          setcaja_bs={setCaja_bs}
           caja_punto={caja_punto}
+          setcaja_punto={setCaja_punto}
 
           dejar_usd={dejar_usd}
           dejar_cop={dejar_cop}
@@ -3981,6 +4013,7 @@ const printTickedPrecio = id => {
           fechaCierre={fechaCierre}
           setFechaCierre={setFechaCierre}
           guardar_cierre={guardar_cierre}
+          veryenviarcierrefun={veryenviarcierrefun}
           notaCierre={notaCierre}
 
           billete1={billete1}

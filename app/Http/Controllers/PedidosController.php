@@ -721,7 +721,13 @@ class PedidosController extends Controller
     }
     public function ultimoCierre($fecha,$id_vendedor)
     {
-        $fecha_pasada = cierres::where("fecha","<",$fecha)->orderBy("fecha","desc")->first()->fecha;
+        $fecha_pasadaquery = cierres::where("fecha","<",$fecha)->orderBy("fecha","desc")->first();
+        if ($fecha_pasadaquery) {
+            $fecha_pasada = $fecha_pasadaquery->fecha;
+        }else {
+            throw new \Exception("Debe crear un cierre pasado para tomar valores de caja inicial", 1);
+            
+        }
         return cierres::where("fecha",$fecha_pasada)->whereIn("id_usuario",$id_vendedor)->orderBy("fecha","desc");
     }
 
@@ -748,7 +754,8 @@ class PedidosController extends Controller
             $id_vendedor = [session("id_usuario")];
         } 
 
-        $usuariosget = usuarios::whereIn("id",$id_vendedor)->get();
+
+        $usuariosget = usuarios::whereIn("id",$id_vendedor)->get(["id","usuario","tipo_usuario","nombre"]);
         $entregado_fun = $this->entregadoPendi($fecha,$id_vendedor);
         $ultimo_cierre = $this->ultimoCierre($fecha,$id_vendedor);
 
@@ -818,10 +825,15 @@ class PedidosController extends Controller
                 $porcentaje = round( (($ganancia*100) / $precio_base),2 ); 
             }
         /////End Montos de ganancias
+        $tipo_accion = cierres::where("fecha",$fecha)->where("id_usuario",session("id_usuario"))->first();
+        if ($tipo_accion) {
+            $tipo_accion = "editar"; 
+        }else{
+            $tipo_accion = "guardar"; 
 
-
+        }
+        // "match_cierre"* => $match_cierre,
         $arr_pagos = [
-            // "match_cierre" => $match_cierre,
             "total"=>0,
             "fecha"=>$fecha,
             "caja_inicial"=>$caja_inicial,
@@ -858,7 +870,9 @@ class PedidosController extends Controller
             5=>0,
             6=>0,
 
-            "usuariosget" => $usuariosget
+            "usuariosget" => $usuariosget,
+            "tipo_accion" => $tipo_accion,
+            
         ];
         $numventas_arr = [];
         pago_pedidos::whereIn("id_pedido",$pedido->select("id"))
@@ -1014,42 +1028,79 @@ class PedidosController extends Controller
                 $fecha_ultimo_cierre = $last_cierre["fecha"];
             }
 
-            /* $last_debito = $last_cierre->debito;
-            $last_efectivo = $last_cierre->efectivo;
-            $last_transferencia = $last_cierre->transferencia;
-            
-
-            $today = $this->today(); */
             $id_usuario = session("id_usuario");
             if ($check===null || $fecha_ultimo_cierre==$req->fechaCierre) {
                 if ($req->total_punto || $req->efectivo || $req->transferencia) {
-                    cierres::updateOrCreate(
-                        ["fecha"=>$req->fechaCierre, "id_usuario" => $id_usuario],
-                        [
-                            "debito" => floatval($req->total_punto),
-                            "efectivo" => floatval($req->efectivo),
-                            "transferencia" => floatval($req->transferencia),
-                            "dejar_dolar" => floatval($req->dejar_usd),
-                            "dejar_peso" => floatval($req->dejar_cop),
-                            "dejar_bss" => floatval($req->dejar_bs),
-        
-                            "efectivo_guardado" => floatval($req->guardar_usd),
-                            "efectivo_guardado_cop" => floatval($req->guardar_cop),
-                            "efectivo_guardado_bs" => floatval($req->guardar_bs),
-                            "tasa" => $bs,
-                            "nota" => $req->notaCierre,
-                            "id_usuario" => $id_usuario,
-        
-                            "precio" => floatval($req->precio),
-                            "precio_base" => floatval($req->precio_base),
-                            "ganancia" => floatval($req->ganancia),
-                            "porcentaje" => floatval($req->porcentaje),
-                            "numventas" => intval($req->numventas),
-                            "desc_total" => floatval($req->desc_total),
-                            
-                        ]
-        
-                    );
+                    
+                    if ($req->tipo_accionCierre=="guardar") {
+                        $objcierres = new cierres;
+
+                        $objcierres->debito = floatval($req->total_punto);
+                        $objcierres->efectivo = floatval($req->efectivo);
+                        $objcierres->transferencia = floatval($req->transferencia);
+                        $objcierres->dejar_dolar = floatval($req->dejar_usd);
+                        $objcierres->dejar_peso = floatval($req->dejar_cop);
+                        $objcierres->dejar_bss = floatval($req->dejar_bs);
+
+                        $objcierres->efectivo_guardado = floatval($req->guardar_usd);
+                        $objcierres->efectivo_guardado_cop = floatval($req->guardar_cop);
+                        $objcierres->efectivo_guardado_bs = floatval($req->guardar_bs);
+                        $objcierres->tasa = $bs;
+                        $objcierres->nota = $req->notaCierre;
+                        $objcierres->id_usuario = $id_usuario;
+                        $objcierres->fecha = $req->fechaCierre;
+
+                        $objcierres->precio = floatval($req->precio);
+                        $objcierres->precio_base = floatval($req->precio_base);
+                        $objcierres->ganancia = floatval($req->ganancia);
+                        $objcierres->porcentaje = floatval($req->porcentaje);
+                        $objcierres->numventas = intval($req->numventas);
+                        $objcierres->desc_total = floatval($req->desc_total);
+
+                        $objcierres->efectivo_actual = floatval($req->caja_usd);
+                        $objcierres->efectivo_actual_cop = floatval($req->caja_cop);
+                        $objcierres->efectivo_actual_bs = floatval($req->caja_bs);
+                        $objcierres->puntodeventa_actual_bs = floatval($req->caja_punto);
+                        $objcierres->save();
+                     
+
+                    }else if($req->tipo_accionCierre=="editar"){
+                        
+                        cierres::updateOrCreate(
+                            ["fecha"=>$req->fechaCierre, "id_usuario" => $id_usuario],
+                            [
+                                "debito" => floatval($req->total_punto),
+                                "efectivo" => floatval($req->efectivo),
+                                "transferencia" => floatval($req->transferencia),
+                                "dejar_dolar" => floatval($req->dejar_usd),
+                                "dejar_peso" => floatval($req->dejar_cop),
+                                "dejar_bss" => floatval($req->dejar_bs),
+            
+                                "efectivo_guardado" => floatval($req->guardar_usd),
+                                "efectivo_guardado_cop" => floatval($req->guardar_cop),
+                                "efectivo_guardado_bs" => floatval($req->guardar_bs),
+                                "tasa" => $bs,
+                                "nota" => $req->notaCierre,
+                                "id_usuario" => $id_usuario,
+            
+                                "precio" => floatval($req->precio),
+                                "precio_base" => floatval($req->precio_base),
+                                "ganancia" => floatval($req->ganancia),
+                                "porcentaje" => floatval($req->porcentaje),
+                                "numventas" => intval($req->numventas),
+                                "desc_total" => floatval($req->desc_total),
+
+                                "efectivo_actual" => floatval($req->caja_usd),
+                                "efectivo_actual_cop" => floatval($req->caja_cop),
+                                "efectivo_actual_bs" => floatval($req->caja_bs),
+                                "puntodeventa_actual_bs" => floatval($req->caja_punto),
+                                
+                            ]
+            
+                        );
+                    }
+
+
                 }else{
                     throw new \Exception("Cierre sin montos.", 1);
                 }
