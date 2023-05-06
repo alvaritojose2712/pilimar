@@ -106,6 +106,7 @@ toggleImprimirTicket,
 						<span className={(filterMetodoPagoToggle==2?"btn-secondary":"")+(" btn")} data-type="2" onClick={filterMetodoPago}>Deb.</span>
 						<span className={(filterMetodoPagoToggle==3?"btn-success":"")+(" btn")} data-type="3" onClick={filterMetodoPago}>Efec.</span>
 						<span className={(filterMetodoPagoToggle==4?"btn-warning":"")+(" btn")} data-type="4" onClick={filterMetodoPago}>Cred.</span>
+						<span className={(filterMetodoPagoToggle==5?"btn-info":"")+(" btn")} data-type="5" onClick={filterMetodoPago}>Biopago.</span>
 						<span className={(filterMetodoPagoToggle==6?"btn-danger":"")+(" btn")} data-type="6" onClick={filterMetodoPago}>Vuel.</span>															
 					</div>
 				</div>
@@ -204,7 +205,7 @@ toggleImprimirTicket,
 						    						:null}
 
 						    						{ee.monto!=0&&ee.tipo==5?
-						    							<span className="btn btn-primary btn-sm">Otr. {ee.monto}</span>
+						    							<span className="btn btn-primary btn-sm">Biopago {ee.monto}</span>
 						    						:null}
 
 						    						{ee.monto!=0&&ee.tipo==6?

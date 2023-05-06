@@ -3,7 +3,7 @@ import '../../css/modal.css'
 import { useHotkeys } from 'react-hotkeys-hook';
 
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Component } from 'react';
 import {cloneDeep} from 'lodash';
 import db from '../database/database';
 
@@ -45,7 +45,7 @@ import ViewPedidoVendedor from '../components/viewPedidoVendedor';
 
 export default function Facturar({user,notificar,setLoading}) {
 
-    
+  
   const [selectprinter, setselectprinter] = useState(null)
   
   const [dropprintprice, setdropprintprice] = useState(false)
@@ -134,6 +134,14 @@ export default function Facturar({user,notificar,setLoading}) {
   const [efectivo,setEfectivo] = useState("")
   const [transferencia,setTransferencia] = useState("")
   const [credito, setCredito] = useState("")
+  const [vuelto,setVuelto] = useState("")
+  const [biopago,setBiopago] = useState("")
+  const [tipo_referenciapago,settipo_referenciapago] = useState("")
+  const [descripcion_referenciapago,setdescripcion_referenciapago] = useState("")
+  const [monto_referenciapago,setmonto_referenciapago] = useState("")
+  const [banco_referenciapago,setbanco_referenciapago] = useState("")
+  const [togglereferenciapago,settogglereferenciapago] = useState("")
+  
 
   const [viewconfigcredito,setviewconfigcredito] = useState(false)
   const [fechainiciocredito,setfechainiciocredito] = useState("")
@@ -141,7 +149,8 @@ export default function Facturar({user,notificar,setLoading}) {
   const [formatopagocredito,setformatopagocredito] = useState(1)
   const [datadeudacredito,setdatadeudacredito] = useState({})
   
-  const [vuelto,setVuelto] = useState("")
+  
+
   
   const [descuento,setDescuento] = useState(0)
 
@@ -168,6 +177,8 @@ export default function Facturar({user,notificar,setLoading}) {
   const [caja_cop,setCaja_cop] = useState("")
   const [caja_bs,setCaja_bs] = useState("")
   const [caja_punto,setCaja_punto] = useState("")
+  const [caja_biopago,setcaja_biopago] = useState("")
+  
 
   const [dejar_usd,setDejar_usd] = useState("")
   const [dejar_cop,setDejar_cop] = useState("")
@@ -707,7 +718,20 @@ useHotkeys("tab",()=>{
     enableOnTags:["INPUT", "SELECT"],
     filter:false,
   },[view]);
+
   
+  useHotkeys('b', () => {
+    if (view=="pagar") {
+      getBio() 
+      
+
+    }
+  },{
+    enableOnTags:["INPUT", "SELECT"],
+    filter:false,
+  },[view]);
+
+
   useHotkeys('e', () => {
     if (view=="pagar") {
       getEfectivo() 
@@ -857,6 +881,8 @@ useHotkeys("tab",()=>{
             }
           }
         }
+      }else if(togglereferenciapago){
+        addRefPago("enviar")
       }else{
         if (viewconfigcredito) {
           setPagoPedido()
@@ -905,24 +931,40 @@ useHotkeys("tab",()=>{
   }, [showinputaddCarritoFast])
 
   const [refPago, setrefPago] = useState([])
-  const addRefPago = e => {
+  const addRefPago = (tipo,montoTraido="",tipoTraido="") => {
     
-    let tipo = e.currentTarget.attributes["data-type"].value
-    let descripcion = window.prompt("Referencia")
+    /* let descripcion = window.prompt("Referencia")
     let monto = window.prompt("Monto")
-    let banco = window.prompt("Banco")
-    if (pedidoData.id&&descripcion&&monto){
-      db.addRefPago({
-        tipo,
-        descripcion,
-        monto,
-        banco,
-        id_pedido: pedidoData.id,
-      }).then(res=>{
-        getPedido(null,null,false)
-        notificar(res)
-      })
+    let banco = window.prompt("Banco") */
+    if (tipo=="toggle") {
+      settogglereferenciapago(!togglereferenciapago)
+      
+      settipo_referenciapago(tipoTraido)
+      setmonto_referenciapago((montoTraido*dolar))
     }
+    if (tipo=="enviar") {
+      
+      if (pedidoData.id&&descripcion_referenciapago&&monto_referenciapago){
+        db.addRefPago({
+          tipo:tipo_referenciapago,
+          descripcion:descripcion_referenciapago,
+          monto:monto_referenciapago,
+          banco:banco_referenciapago,
+          id_pedido: pedidoData.id,
+        }).then(res=>{
+          getPedido(null,null,false)
+          notificar(res)
+          settogglereferenciapago(false)
+          
+          settipo_referenciapago("")
+          setdescripcion_referenciapago("")
+          setmonto_referenciapago("")
+          setbanco_referenciapago("")
+
+        })
+      }
+    }
+
 
 
 
@@ -1257,6 +1299,8 @@ orderByColumEstaInv])
   let total_dejar_caja_neto = !total_dejar_caja_calc||total_dejar_caja_calc=="NaN"?0:total_dejar_caja_calc
 
   let total_punto = dolar&&caja_punto?(caja_punto/dolar).toFixed(2):0
+  let total_biopago = dolar&&caja_biopago?(caja_biopago/dolar).toFixed(2):0
+  
 
 const getSucursalFun = () => {
   db.getSucursal({}).then(res=>{
@@ -1375,6 +1419,7 @@ const cerrar_dia = (e=null) => {
   dejar_cop,
   dejar_bs,
   totalizarcierre,
+  total_biopago,
 }).then(res=>{
 
     let cierreData = res.data
@@ -1470,15 +1515,25 @@ const getDebito = () =>{
   setEfectivo("")
   setTransferencia("")
   setCredito("")
+  setBiopago("")
 }
 const getCredito = () =>{
   setCredito(pedidoData.clean_total)
   setEfectivo("")
   setDebito("")
   setTransferencia("")
+  setBiopago("")
 }
 const getTransferencia = () =>{
   setTransferencia(pedidoData.clean_total)
+  setEfectivo("")
+  setDebito("")
+  setCredito("")
+  setBiopago("")
+}
+const getBio = () =>{
+  setBiopago(pedidoData.clean_total)
+  setTransferencia("")
   setEfectivo("")
   setDebito("")
   setCredito("")
@@ -1488,6 +1543,7 @@ const getEfectivo = () =>{
   setDebito("")
   setTransferencia("")
   setCredito("")
+  setBiopago("")
 }
 const getToday = () =>{
   db.today({}).then(res=>{
@@ -1588,6 +1644,10 @@ const onchangecaja = e => {
     case 'qDeudores':
       setQDeudores(val)
     break;
+    case 'caja_biopago':
+      setcaja_biopago(val)
+    break;
+    
 
 
 
@@ -1791,6 +1851,29 @@ const getPersona = q => {
   setTypingTimeout(time)
 
 }
+const setPersonaFastDevolucion = e => {
+  e.preventDefault()
+  db.setClienteCrud({
+    id:null,
+    clienteInpidentificacion,
+    clienteInpnombre,
+    clienteInpdireccion,
+    clienteInptelefono,
+  }).then(res=>{
+    notificar(res)
+    if (res.data) {
+      if (res.data.estado) {
+        if (res.data.id) {
+          setPersonas(res.data.id)
+        }
+
+      }
+      
+    }
+    setLoading(false)
+  })
+}
+
 const setPersonaFast = e => {
   e.preventDefault()
   db.setClienteCrud({
@@ -1856,6 +1939,7 @@ const getPedidosList = (callback=null)=>{
         setEfectivo("")
         setCredito("")
         setVuelto("")
+        setBiopago("")
       }
       setrefPago([])
       
@@ -1912,6 +1996,18 @@ const getPedidosList = (callback=null)=>{
   
           }else{
             setCredito(d.filter(e=>e.tipo==4)[0].monto)
+  
+          }
+  
+        }
+
+        if (d.filter(e=>e.tipo==5)[0]) {
+          let var_setBiopago = d.filter(e=>e.tipo==5)[0].monto
+          if (var_setBiopago=="0.00") {
+            if(clearPagosPedido){setBiopago("")}
+  
+          }else{
+            setBiopago(d.filter(e=>e.tipo==5)[0].monto)
   
           }
   
@@ -2201,33 +2297,38 @@ const facturar_e_imprimir = () => {
   facturar_pedido();
 }
 const setPagoPedido = () => {
-  setLoading(true)
-
-  db.setPagoPedido({
-    id:pedidoData.id,
-    debito,
-    efectivo,
-    transferencia,
-    credito,
-    vuelto,
-  }).then(res=>{
-    notificar(res)
-    setLoading(false)
-    
-    if (res.data.estado) {
-      if(showinputaddCarritoFast){
-        setshowinputaddCarritoFast(false)
+  
+  if (transferencia&&!refPago.filter(e=>e.tipo==1).length) {
+    alert("Error: Debe cargar referencia de transferencia electrónica.")
+  }else{
+    setLoading(true)
+    db.setPagoPedido({
+      id:pedidoData.id,
+      debito,
+      efectivo,
+      transferencia,
+      biopago,
+      credito,
+      vuelto,
+    }).then(res=>{
+      notificar(res)
+      setLoading(false)
+      
+      if (res.data.estado) {
+        if(showinputaddCarritoFast){
+          setshowinputaddCarritoFast(false)
+        }
+        setView("seleccionar")
+        // getPedidos()
+        getPedidosList()
+        getProductos()
+  
+        setSelectItem(null)
+        setviewconfigcredito(false)
+  
       }
-      setView("seleccionar")
-      // getPedidos()
-      getPedidosList()
-      getProductos()
-
-      setSelectItem(null)
-      setviewconfigcredito(false)
-
-    }
-  })
+    })
+  }
 }
 
 
@@ -2301,6 +2402,7 @@ const guardar_cierre = (e,callback=null) => {
   
       total_dejar_caja_neto,
       total_punto,
+      total_biopago,
   
       guardar_usd,
       guardar_cop,
@@ -2310,6 +2412,7 @@ const guardar_cierre = (e,callback=null) => {
       caja_cop,
       caja_bs,
       caja_punto,
+      caja_biopago,
       
       efectivo: cierre["total_caja"],
       transferencia: cierre[1],
@@ -2484,12 +2587,10 @@ const delMov = e =>{
 
   }
 }
-const setDevolucion = e => {
+const setDevolucion = (tipo, id) => {
   setLoading(true)
-  let id = e.currentTarget.attributes["data-id"].value
-  let type = e.currentTarget.attributes["data-type"].value
 
-  let cantidad = window.prompt("Cantidad")
+  let categoria = window.prompt("1=Garantía 2=Cambio ",2)
 
   if (cantidad) {
     db.setDevolucion({
@@ -2517,6 +2618,7 @@ const getTotalizarCierre = () => {
         setCaja_cop(d.caja_cop)
         setCaja_bs(d.caja_bs)
         setCaja_punto(d.caja_punto)
+        setcaja_biopago(d.caja_biopago)
         
         setDejar_usd(d.dejar_dolar)
         setDejar_cop(d.dejar_peso)
@@ -3725,6 +3827,10 @@ const printTickedPrecio = id => {
   db.printTickedPrecio({id})
 }
 
+
+
+
+
   return (
     <>
       
@@ -3771,7 +3877,7 @@ const printTickedPrecio = id => {
               getMovimientos={getMovimientos}
               setShowModalMovimientos={setShowModalMovimientos}
               showModalMovimientos={showModalMovimientos}
-
+              
               setBuscarDevolucion={setBuscarDevolucion}
               buscarDevolucion={buscarDevolucion}
               setTipoMovMovimientos={setTipoMovMovimientos}
@@ -3786,7 +3892,41 @@ const printTickedPrecio = id => {
               delMov={delMov}
               setFechaMovimientos={setFechaMovimientos}
               fechaMovimientos={fechaMovimientos}
+              
+              setPersonaFastDevolucion={setPersonaFastDevolucion}
+              setToggleAddPersona={setToggleAddPersona}
+              getPersona={getPersona}
+              personas={personas}
+              setPersonas={setPersonas}
+              clienteInpidentificacion={clienteInpidentificacion}
+              setclienteInpidentificacion={setclienteInpidentificacion}
+              clienteInpnombre={clienteInpnombre}
+              setclienteInpnombre={setclienteInpnombre}
+              clienteInptelefono={clienteInptelefono}
+              setclienteInptelefono={setclienteInptelefono}
+              clienteInpdireccion={clienteInpdireccion}
+              setclienteInpdireccion={setclienteInpdireccion}
 
+
+              debito={debito}
+              efectivo={efectivo}
+              transferencia={transferencia}
+              biopago={biopago}
+              credito={credito}
+              vuelto={vuelto}
+              setVuelto={setVuelto}
+              getDebito={getDebito}
+              getEfectivo={getEfectivo}
+              getTransferencia={getTransferencia}
+              getBio={getBio}
+              getCredito={getCredito}
+              syncPago={syncPago}
+              debitoBs={debitoBs}
+              editable={editable}
+              vuelto_entregado={vuelto_entregado}
+              entregarVuelto={entregarVuelto}
+              number={number}
+              addRefPago={addRefPago}
 
               
             />}
@@ -3995,6 +4135,9 @@ const printTickedPrecio = id => {
           setcaja_bs={setCaja_bs}
           caja_punto={caja_punto}
           setcaja_punto={setCaja_punto}
+          
+          setcaja_biopago={setcaja_biopago}
+          caja_biopago={caja_biopago}
 
           dejar_usd={dejar_usd}
           dejar_cop={dejar_cop}
@@ -4008,6 +4151,8 @@ const printTickedPrecio = id => {
           cerrar_dia={cerrar_dia}
           total_caja_neto={total_caja_neto}
           total_punto={total_punto}
+          total_biopago={total_biopago}
+          
 
           total_dejar_caja_neto={total_dejar_caja_neto}
 
@@ -4307,6 +4452,18 @@ const printTickedPrecio = id => {
           setCtxBultoCarrito={setCtxBultoCarrito}
           setPrecioAlternoCarrito={setPrecioAlternoCarrito}
           addRefPago={addRefPago}
+          settogglereferenciapago={settogglereferenciapago}
+
+          settipo_referenciapago={settipo_referenciapago}
+          tipo_referenciapago={tipo_referenciapago}
+          setdescripcion_referenciapago={setdescripcion_referenciapago}
+          descripcion_referenciapago={descripcion_referenciapago}
+          setmonto_referenciapago={setmonto_referenciapago}
+          monto_referenciapago={monto_referenciapago}
+          setbanco_referenciapago={setbanco_referenciapago}
+          banco_referenciapago={banco_referenciapago}
+
+          togglereferenciapago={togglereferenciapago}
           delRefPago={delRefPago}
           refPago={refPago}
           setrefPago={setrefPago}
@@ -4333,6 +4490,8 @@ const printTickedPrecio = id => {
           setTransferencia={setTransferencia}
           vuelto={vuelto}
           setVuelto={setVuelto}
+          setBiopago={setBiopago}
+          biopago={biopago}
           number={number}
           credito={credito}
           inputmodaladdpersonacarritoref={inputmodaladdpersonacarritoref}
@@ -4404,6 +4563,7 @@ const printTickedPrecio = id => {
           getCredito={getCredito}
           getTransferencia={getTransferencia}
           getEfectivo={getEfectivo}
+          getBio={getBio}
           auth={auth}
           />
         :null}

@@ -16,18 +16,11 @@ class CreateDevolucionesTable extends Migration
         Schema::create('devoluciones', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->integer("id_producto")->unsigned();
-            $table->foreign('id_producto')->references('id')->on('inventarios')
-            ->onDelete("cascade")
-            ->onUpdate("cascade");
-
-            $table->string("motivo");
-            $table->string("cantidad",10);
-            $table->integer("tipo"); //1 Entrada | 0 Salida | 2 interno
-            $table->string("categoria"); //1 Garantia | 2 Cambio
-
             $table->integer("id_vendedor")->unsigned();
             $table->foreign('id_vendedor')->references('id')->on('usuarios');
+
+            $table->integer("id_cliente")->unsigned();
+            $table->foreign('id_cliente')->references('id')->on('clientes');
             
             $table->timestamps();
 

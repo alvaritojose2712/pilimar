@@ -191,7 +191,7 @@ class PedidosController extends Controller
     {
         
 
-        $arr = $this->cerrarFun($fechaventas,0,0,[],true,false);
+        $arr = $this->cerrarFun($fechaventas,0,0,0,[],true,false);
 
         if ($fechaventas) {
             // code...
@@ -465,7 +465,7 @@ class PedidosController extends Controller
                    if($v->tipo==2){$pagos .= "Debito ";}  
                    if($v->tipo==3){$pagos .= "Efectivo ";}  
                    if($v->tipo==4){$pagos .= "Credito ";}   
-                   if($v->tipo==5){$pagos .= "Otros ";} 
+                   if($v->tipo==5){$pagos .= "Biopago ";} 
                    if($v->tipo==6){$pagos .= "vuelto ";} 
                }
                 
@@ -744,7 +744,7 @@ class PedidosController extends Controller
             return [session("id_usuario")];
         } 
     }
-    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$dejar=[],$grafica=false,$totalizarcierre=false)
+    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$total_biopago,$dejar=[],$grafica=false,$totalizarcierre=false)
     {   
         if (!$fecha) {return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);}
 
@@ -843,6 +843,8 @@ class PedidosController extends Controller
 
             "total_caja" => 0,
             "total_punto" => 0,
+            "total_biopago" => 0,
+            
 
             "estado_efec" => 0,
             "msj_efec" => "",
@@ -906,6 +908,10 @@ class PedidosController extends Controller
             $this->msj_cuadre($total_punto,$arr_pagos[2],"punto",$arr_pagos);
             $arr_pagos["total_punto"] = round($total_punto,3); 
         }
+        if (isset($arr_pagos[5])) {
+            $this->msj_cuadre($total_biopago,$arr_pagos[5],"biopago",$arr_pagos);
+            $arr_pagos["total_biopago"] = round($total_biopago,3); 
+        }
         if (isset($arr_pagos[3])) {
             $total_caja = ($total_caja_neto - $caja_inicial) + $entregadomenospend;
             $arr_pagos["total_caja"] = round($total_caja,3); 
@@ -950,6 +956,8 @@ class PedidosController extends Controller
             "debito" => number_format($cierres->sum("debito"),2),
             "efectivo" => number_format($cierres->sum("efectivo"),2),
             "transferencia" => number_format($cierres->sum("transferencia"),2),
+            "caja_biopago" => number_format($cierres->sum("caja_biopago"),2),
+            
 
             "precio" => number_format($cierres->sum("precio"),2),
             "precio_base" => number_format($cierres->sum("precio_base"),2),
@@ -982,6 +990,8 @@ class PedidosController extends Controller
             $today,
             $req->total_caja_neto,
             $req->total_punto,
+            $req->total_biopago,
+            
             ["dejar_bs"=>$req->dejar_bs, "dejar_usd"=>$req->dejar_usd, "dejar_cop"=>$req->dejar_cop],
             false,
             filter_var($req->totalizarcierre, FILTER_VALIDATE_BOOLEAN),
@@ -1035,11 +1045,12 @@ class PedidosController extends Controller
 
             $id_usuario = session("id_usuario");
             if ($check===null || $fecha_ultimo_cierre==$today) {
-                if ($req->total_punto || $req->efectivo || $req->transferencia) {
+                if ($req->total_biopago || $req->total_punto || $req->efectivo || $req->transferencia) {
                     
                     if ($req->tipo_accionCierre=="guardar") {
                         $objcierres = new cierres;
-
+                        
+                        $objcierres->caja_biopago = floatval($req->total_biopago);
                         $objcierres->debito = floatval($req->total_punto);
                         $objcierres->efectivo = floatval($req->efectivo);
                         $objcierres->transferencia = floatval($req->transferencia);
@@ -1068,6 +1079,7 @@ class PedidosController extends Controller
                         $objcierres->efectivo_actual_bs = floatval($req->caja_bs);
                         $objcierres->puntodeventa_actual_bs = floatval($req->caja_punto);
                         
+                        
                         $objcierres->tipo_cierre = $tipo_cierre;
                         $objcierres->save();
 
@@ -1076,6 +1088,7 @@ class PedidosController extends Controller
                         cierres::updateOrCreate(
                             ["fecha"=>$today, "id_usuario" => $id_usuario],
                             [
+                                "caja_biopago" => floatval($req->total_biopago),
                                 "debito" => floatval($req->total_punto),
                                 "efectivo" => floatval($req->efectivo),
                                 "transferencia" => floatval($req->transferencia),
@@ -1101,6 +1114,7 @@ class PedidosController extends Controller
                                 "efectivo_actual_cop" => floatval($req->caja_cop),
                                 "efectivo_actual_bs" => floatval($req->caja_bs),
                                 "puntodeventa_actual_bs" => floatval($req->caja_punto),
+                                
                                 
                             ]
             
@@ -1170,13 +1184,13 @@ class PedidosController extends Controller
             $q->with("producto");
         }])->where("created_at","LIKE",$req->fecha."%")->get();
 
-        $facturado = $this->cerrarFun($req->fecha,0,0,[],false,$totalizarcierre);
+        $facturado = $this->cerrarFun($req->fecha,0,0,0,[],false,$totalizarcierre);
 
 
         $arr_send = [
             "referencias"=>$pagos_referencias,
             "cierre" => $cierre,
-            "cierre_tot" => number_format($cierre->debito+$cierre->efectivo+$cierre->transferencia,2,",","."),
+            "cierre_tot" => number_format($cierre->debito+$cierre->efectivo+$cierre->transferencia+$cierre->caja_biopago,2,",","."),
            
             "total_inventario" =>($total_inventario),
             "total_inventario_format" =>number_format($total_inventario,2,",","."),
@@ -1192,7 +1206,7 @@ class PedidosController extends Controller
             "porcentaje"=> number_format($facturado["porcentaje"],2,",","."),
             "desc_total"=> number_format(round($facturado["desc_total"],2),2,",","."),
             "facturado" => $facturado,
-            "facturado_tot" => number_format($facturado[2]+$facturado[3]+$facturado[1],2,",","."),
+            "facturado_tot" => number_format($facturado[2]+$facturado[3]+$facturado[1]+$facturado[5],2,",","."),
             "sucursal"=>$sucursal,
             "movimientos"=>$movimientos,
         ];
@@ -1201,6 +1215,9 @@ class PedidosController extends Controller
         $arr_send["cierre"]["debito"] = number_format($arr_send["cierre"]["debito"],2,",",".");
         $arr_send["cierre"]["efectivo"] = number_format($arr_send["cierre"]["efectivo"],2,",",".");
         $arr_send["cierre"]["transferencia"] = number_format($arr_send["cierre"]["transferencia"],2,",",".");
+        $arr_send["cierre"]["caja_biopago"] = number_format($arr_send["cierre"]["caja_biopago"],2,",",".");
+        
+
         $arr_send["cierre"]["dejar_dolar"] = number_format($arr_send["cierre"]["dejar_dolar"],2,",",".");
         $arr_send["cierre"]["dejar_peso"] = number_format($arr_send["cierre"]["dejar_peso"],2,",",".");
         $arr_send["cierre"]["dejar_bss"] = number_format($arr_send["cierre"]["dejar_bss"],2,",",".");
@@ -1216,6 +1233,7 @@ class PedidosController extends Controller
         $arr_send["facturado"]["pendiente"] = number_format($arr_send["facturado"]["pendiente"],2,",",".");
         $arr_send["facturado"]["total_caja"] = number_format($arr_send["facturado"]["total_caja"],2,",",".");
         $arr_send["facturado"]["total_punto"] = number_format($arr_send["facturado"]["total_punto"],2,",",".");
+        $arr_send["facturado"]["total_biopago"] = number_format($arr_send["facturado"]["total_biopago"],2,",",".");
 
         $arr_send["facturado"]["1"] = number_format($arr_send["facturado"]["1"],2,",",".");
         $arr_send["facturado"]["2"] = number_format($arr_send["facturado"]["2"],2,",",".");
@@ -1240,6 +1258,8 @@ class PedidosController extends Controller
             $arr_send["cierre"]["debito"] = toLetras($arr_send["cierre"]["debito"]); 
             $arr_send["cierre"]["efectivo"] = toLetras($arr_send["cierre"]["efectivo"]); 
             $arr_send["cierre"]["transferencia"] = toLetras($arr_send["cierre"]["transferencia"]); 
+            $arr_send["cierre"]["caja_biopago"] = toLetras($arr_send["cierre"]["caja_biopago"]); 
+            
 
             $arr_send["cierre"]["dejar_dolar"] = toLetras($arr_send["cierre"]["dejar_dolar"]);
             $arr_send["cierre"]["dejar_peso"] = toLetras($arr_send["cierre"]["dejar_peso"]);
@@ -1259,6 +1279,8 @@ class PedidosController extends Controller
             $arr_send["facturado"]["pendiente"] = toLetras($arr_send["facturado"]["pendiente"]);
             $arr_send["facturado"]["total_caja"] = toLetras($arr_send["facturado"]["total_caja"]);
             $arr_send["facturado"]["total_punto"] = toLetras($arr_send["facturado"]["total_punto"]);
+            $arr_send["facturado"]["total_biopago"] = toLetras($arr_send["facturado"]["total_biopago"]);
+            
 
             $arr_send["facturado"]["1"] = toLetras($arr_send["facturado"]["1"]);
             $arr_send["facturado"]["2"] = toLetras($arr_send["facturado"]["2"]);

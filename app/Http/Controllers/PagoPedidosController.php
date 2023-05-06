@@ -99,14 +99,13 @@ class PagoPedidosController extends Controller
         $ped = (new PedidosController)->getPedido($req);
 
         $total_real = $ped->clean_total;
-        $total_ins = floatval($req->debito)+floatval($req->efectivo)+floatval($req->transferencia)+floatval($req->credito);
+        $total_ins = floatval($req->debito)+floatval($req->efectivo)+floatval($req->transferencia)+floatval($req->biopago)+floatval($req->credito);
 
         //Excepciones
         if ($req->credito!=0&&$ped->id_cliente==1) {
             return Response::json(["msj"=>"Error: En caso de crédito, debe registrar los datos del cliente","estado"=>false]);
         }
         if ($req->vuelto!=0&&$ped->id_cliente==1) {
-            // code...
             return Response::json(["msj"=>"Error: En caso de vuelto, debe registrar los datos del cliente","estado"=>false]);
         }
 
@@ -115,7 +114,7 @@ class PagoPedidosController extends Controller
                // 2 Debito 
                // 3 Efectivo 
                // 4 Credito  
-               // 5 Otros
+               // 5 Biopago
                // 6 vuelto
             try {
                 (new PedidosController)->checkPedidoAuth($req->id);
@@ -132,7 +131,7 @@ class PagoPedidosController extends Controller
                 pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>2],["cuenta"=>$cuenta,"monto"=>floatval($req->debito)]);
                 pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>3],["cuenta"=>$cuenta,"monto"=>floatval($req->efectivo)]);
                 pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>4],["cuenta"=>$cuenta,"monto"=>floatval($req->credito)]);
-                //5 es Otros
+                pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>5],["cuenta"=>$cuenta,"monto"=>floatval($req->biopago)]);
                 pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>6],["cuenta"=>$cuenta,"monto"=>floatval($req->vuelto)]);
 
                 $pedido = pedidos::find($req->id);

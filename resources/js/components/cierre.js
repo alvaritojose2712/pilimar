@@ -6,6 +6,8 @@ function Cierre({
 	caja_cop,
 	caja_bs,
 	caja_punto,
+	setcaja_biopago,
+	caja_biopago,
 
 	notaCierre,
 
@@ -22,6 +24,7 @@ function Cierre({
 	cerrar_dia,
 	total_caja_neto,
 	total_punto,
+	total_biopago,
 	fechaCierre,
 	setFechaCierre,
 
@@ -156,12 +159,12 @@ function Cierre({
 										<div className='btn-group mt-2 mb-2'>
 
 											{auth(1)?
-											<button className={"btn "+(totalizarcierre?"btn-success":"btn-outline-success")+" btn-lg"} onClick={()=>getTotalizarCierre()}>Totalizar</button>
+											<button className={"btn "+(totalizarcierre?"btn-success":"")+" btn-lg"} onClick={()=>getTotalizarCierre()}>Totalizar</button>
 											
 											:null}
 
 
-											{totalizarcierre?<button className="btn btn-warning" onClick={guardar_cierre} type="button" data-type="enviar">Enviar Cierre</button>:null}
+											{totalizarcierre?<button className="btn btn-warning" onClick={veryenviarcierrefun} type="button" data-type="enviar">Enviar Cierre</button>:null}
 											{/*<button className="btn btn-warning" onClick={sendCuentasporCobrar} type="button" data-type="enviar">Enviar Cuentas por Cobrar</button>*/}
 										</div>
 										<span>
@@ -243,6 +246,13 @@ function Cierre({
 														<input type="text" className="form-control" placeholder="Punto de venta Bs." name="caja_punto" value={caja_punto} onChange={onchangecaja}/>
 													</div>
 												</div>
+												<div className="row mb-2">
+													<div className="col-2 text-success text-right">Total Biopago en Bs</div>
+
+													<div className="col align-middle text-center" >
+														<input type="text" className="form-control" placeholder="Biopago Bs." name="caja_biopago" value={caja_biopago} onChange={onchangecaja}/>
+													</div>
+												</div>
 											</div>	
 
 											<div className="p-3 card shadow-card mb-2">
@@ -318,6 +328,23 @@ function Cierre({
 														<div className={(cierre["estado_punto"]==1?"text-success":"text-danger")}>
 															<span className="fst-italic fs-2">
 																{cierre["msj_punto"]?cierre["msj_punto"]:null}
+															</span>
+														</div>
+													</div>
+												</div>
+												<div className="row p-2 border-bottom">
+													<div className={(cierre["estado_biopago"]==1?"text-success":"text-danger")+(" col-2 text-right h5")}>Biopago</div>
+													<div className="col">
+														{total_biopago}
+														
+													</div>
+													<div className="col align-middle">
+														{cierre[5]?cierre[5].toFixed(2):null}
+													</div>
+													<div className="col text-right">
+														<div className={(cierre["estado_biopago"]==1?"text-success":"text-danger")}>
+															<span className="fst-italic fs-2">
+																{cierre["msj_biopago"]?cierre["msj_biopago"]:null}
 															</span>
 														</div>
 													</div>

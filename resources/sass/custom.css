@@ -155,6 +155,12 @@ td,th{
 .shadow-card{
   box-shadow: 5px 10px 40px -20px rgba(0,0,0,1);
 }
+.w125px{
+  width: 165px;
+}
+.scale05{
+  scale: 0.5;
+}
 .card-pedidos{
   width: 100%;
   box-shadow: 5px 5px 3px -1px #e3e3e2;

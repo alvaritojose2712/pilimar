@@ -497,7 +497,7 @@ class sendCentral extends Controller
             $fecha = $PedidosController->today();
             $bs = $PedidosController->get_moneda()["bs"];
 
-            $cierre_fun = $PedidosController->cerrarFun($fecha,0,0);
+            $cierre_fun = $PedidosController->cerrarFun($fecha,0,0,0);
 
                   // 1 Transferencia
                    // 2 Debito 
@@ -510,6 +510,7 @@ class sendCentral extends Controller
                 "debito"=> $cierre_fun[2],
                 "efectivo"=>$cierre_fun[3],
                 "transferencia"=> $cierre_fun[1],
+                "biopago"=> $cierre_fun[5],
                 "tasa"=>$bs,
                 "fecha"=>$cierre_fun["fecha"],
                 "num_ventas"=>$cierre_fun["numventas"],

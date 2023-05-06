@@ -6,6 +6,7 @@ import Modalconfigcredito from '../components/Modalconfigcredito';
 
 
 
+
 export default function Pagar({
 changeEntregado,
 setPagoPedido,
@@ -108,6 +109,10 @@ getTransferencia,
 getEfectivo,
 onClickEditPedido,
 
+setBiopago,
+biopago,
+getBio,
+
 facturar_e_imprimir,
 
 moneda,
@@ -118,317 +123,235 @@ peso,
 showinputaddCarritoFast,
 setshowinputaddCarritoFast,
 qProductosMain,
-auth
+auth,
+
+settogglereferenciapago,
+togglereferenciapago,
+
+tipo_referenciapago,
+settipo_referenciapago,
+descripcion_referenciapago,
+setdescripcion_referenciapago,
+monto_referenciapago,
+setmonto_referenciapago,
+banco_referenciapago,
+setbanco_referenciapago,
+
+
 }) {
 
-  const [vuelto_penddolar,setvuelto_penddolar] = useState(0)
-  const [vuelto_pendbs,setvuelto_pendbs] = useState(0)
-  const [vuelto_pendcop,setvuelto_pendcop] = useState(0)
 
-  const [recibido_dolar, setrecibido_dolar] = useState("")
-  const [recibido_bs, setrecibido_bs] = useState("")
-  const [recibido_cop, setrecibido_cop] = useState("")
-  const [cambio_dolar, setcambio_dolar] = useState("")
-  const [cambio_bs, setcambio_bs] = useState("")
-  const [cambio_cop, setcambio_cop] = useState("")
 
-  const [cambio_tot, setcambio_tot] = useState("")
-  const [cambio_tot_result, setcambio_tot_result] = useState("")
-  const [recibido_tot, setrecibido_tot] = useState("")
+const showTittlePrice = (pu,total) => {
+  try{
+    return "P/U. Bs."+moneda(number(pu)*dolar)+"\n"+"Total Bs."+moneda(number(total)*dolar)
 
-  const [pagoefec_dolar, setpagoefec_dolar] = useState("")
-  const [pagoefec_bs, setpagoefec_bs] = useState("")
-  const [pagoefec_cop, setpagoefec_cop] = useState("")
+  }catch(err){
+    return ""
+  }
+}
 
-   useEffect(()=>{
+
+const [recibido_dolar, setrecibido_dolar] = useState("")
+const [recibido_bs, setrecibido_bs] = useState("")
+const [recibido_cop, setrecibido_cop] = useState("")
+const [cambio_dolar, setcambio_dolar] = useState("")
+const [cambio_bs, setcambio_bs] = useState("")
+const [cambio_cop, setcambio_cop] = useState("")
+
+const [cambio_tot_result, setcambio_tot_result] = useState("")
+const [recibido_tot, setrecibido_tot] = useState("")
+const changeRecibido = (val,type) => {
+  switch(type){
+    case "recibido_dolar":
+      setrecibido_dolar(number(val))
+
+    break;
+    case "recibido_bs":
+      setrecibido_bs(number(val))
+    break;
+    case "recibido_cop":
+      setrecibido_cop(number(val))
+    break;
+  }
+
+}
+const sumRecibido = () => {
+  let vuel_dolar = parseFloat(recibido_dolar?recibido_dolar:0)
+  let vuel_bs = parseFloat(recibido_bs?recibido_bs:0) / parseFloat(dolar)
+  let vuel_cop = parseFloat(recibido_cop?recibido_cop:0) / parseFloat(peso)
+
+  let t =  (vuel_dolar + vuel_bs + vuel_cop)
+  let cambio_dolar = t-pedidoData.clean_total 
+  setrecibido_tot((t).toFixed(2)) 
+  setcambio_dolar(cambio_dolar.toFixed(2))
+  setcambio_bs("")
+  setcambio_cop("")
+  setcambio_tot_result(cambio_dolar.toFixed(2)) 
+}
+const setVueltobs = () => {
+  setcambio_bs((cambio_tot_result*dolar).toFixed(2))
+  setcambio_dolar("")
+  setcambio_cop("")
+}
+const setVueltodolar = () => {
+  setcambio_bs("")
+  setcambio_dolar(cambio_tot_result)
+  setcambio_cop("")
+}
+const setVueltocop = () => {
+  setcambio_bs("")
+  setcambio_dolar("")
+  setcambio_cop((cambio_tot_result*peso).toFixed(2))
+}
+const syncCambio = (val,type) => {
+  val = number(val)
+  let valC = 0
+  if (type=="Dolar") {
+    setcambio_dolar(val)
+    valC = val
+  }
+  else if (type=="Bolivares") {
+    setcambio_bs(val) 
+    valC = parseFloat(val?val:0) / parseFloat(dolar)
+
+  }
+  else if (type=="Pesos") {
+    setcambio_cop(val)
+    valC = parseFloat(val?val:0) / parseFloat(peso)
+  }
+  
+
+
+  let divisor=0;
+
+  let inputs = [
+    {key:"Dolar", val:cambio_dolar, set:(val)=>setcambio_dolar(val)},
+    {key:"Bolivares", val:cambio_bs, set:(val)=>setcambio_bs(val)},
+    {key:"Pesos", val:cambio_cop, set:(val)=>setcambio_cop(val)},
+  ]
+
+  inputs.map(e => {
+    if (e.key!=type) {
+      if (e.val) {divisor++}
+    }
+  })
+  let cambio_tot_resultvalC = 0
+  if (cambio_bs&&cambio_dolar&&type=="Pesos") {
+    let bs = parseFloat(cambio_bs) / parseFloat(dolar)
+    setcambio_dolar((cambio_tot_result-bs-valC).toFixed(2))
+  }else{
+    inputs.map(e => {
+      if (e.key!=type) {
+        if (e.val) {
+          cambio_tot_resultvalC = (cambio_tot_result-valC)/divisor
+          if (e.key=="Dolar") {
+            e.set((cambio_tot_resultvalC).toFixed(2))
+          }else if (e.key=="Bolivares") {
+            e.set((cambio_tot_resultvalC*dolar).toFixed(2))
+          }else if (e.key=="Pesos") {
+            e.set((cambio_tot_resultvalC*peso).toFixed(2))
+          }
+        }
+      }
+    })
+
+  }
+
+  
+}
+const sumCambio = () => {
+  let vuel_dolar = parseFloat(cambio_dolar?cambio_dolar:0)
+  let vuel_bs = parseFloat(cambio_bs?cambio_bs:0) / parseFloat(dolar)
+  let vuel_cop = parseFloat(cambio_cop?cambio_cop:0) / parseFloat(peso)
+  return (vuel_dolar + vuel_bs + vuel_cop).toFixed(2)
+}
+const debitoBs = (met) =>{
+  try{
+    if (met=="debito") {
+      if (debito=="") {
+        return ""
+      }
+     return "Bs."+moneda(dolar*debito)
+
+    }
+
+    if (met=="transferencia") {
+      if (transferencia=="") {
+        return ""
+      }
+     return "Bs."+moneda(dolar*transferencia)
+      
+    }
+    if (met=="biopago") {
+      if (biopago=="") {
+        return ""
+      }
+     return "Bs."+moneda(dolar*biopago)
+      
+    }
+    if (met=="efectivo") {
+      if (efectivo=="") {
+        return ""
+      }
+     return "Bs."+moneda(dolar*efectivo)
+      
+    }
+
+  }catch(err){
+    return ""
+    console.log()
+  }
+}
+const syncPago = (val,type)=>{
+  val = number(val)
+  if (type=="Debito") {
+
+    setDebito(val)
+  }
+  else if (type=="Efectivo") {
+    setEfectivo(val) 
+  }
+  else if (type=="Transferencia") {
+    setTransferencia(val)
+  }
+  else if (type=="Credito") {
+    setCredito(val)
+  }
+  else if (type=="Biopago") {
+    setBiopago(val)
+  }
+
+
+  let divisor=0;
+
+  let inputs = [
+    {key:"Debito", val:debito, set:(val)=>setDebito(val)},
+    {key:"Efectivo", val:efectivo, set:(val)=>setEfectivo(val)},
+    {key:"Transferencia", val:transferencia, set:(val)=>setTransferencia(val)},
+    {key:"Credito", val:credito, set:(val)=>setCredito(val)},
+    {key:"Biopago", val:biopago, set:(val)=>setBiopago(val)},
+  ]
+
+  inputs.map(e => {
+    if (e.key!=type) {
+      if (e.val) {divisor++}
+    }
+  })
+
+  if (autoCorrector) {
+    inputs.map(e => {
+      if (e.key!=type) {
+        if (e.val) {
+          e.set(((pedidoData.clean_total-val)/divisor).toFixed(2))
+        }
+      }
+    })
+  }
+}
+  useEffect(()=>{
     sumRecibido()
   },[recibido_bs,recibido_cop,recibido_dolar])
-
-  
-
-
-
-  const changeRecibido = (val,type) => {
-    switch(type){
-      case "recibido_dolar":
-        setrecibido_dolar(number(val))
-      break;
-      case "recibido_bs":
-        setrecibido_bs(number(val))
-      break;
-      case "recibido_cop":
-        setrecibido_cop(number(val))
-      break;
-    }
-
-  }
-
-  const sumRecibido = () => {
-    let vuel_dolar = parseFloat(recibido_dolar?recibido_dolar:0)
-    let vuel_bs = parseFloat(recibido_bs?recibido_bs:0) / parseFloat(dolar)
-    let vuel_cop = parseFloat(recibido_cop?recibido_cop:0) / parseFloat(peso)
-
-    let t =  (vuel_dolar + vuel_bs + vuel_cop)
-    let cambio_dolar = t-pedidoData.clean_total 
-    setrecibido_tot((t).toFixed(2)) 
-    setcambio_dolar(cambio_dolar.toFixed(2))
-    setcambio_bs("")
-    setcambio_cop("")
-    setcambio_tot_result(cambio_dolar.toFixed(2)) 
-  }
-  
-  const setSubEfecbs = () => {
-    setpagoefec_bs((efectivo*dolar).toFixed(2))
-    setpagoefec_dolar("")
-    setpagoefec_cop("")
-  }
-  const setSubEfecdolar = () => {
-    setpagoefec_bs("")
-    setpagoefec_dolar(efectivo)
-    setpagoefec_cop("")
-  }
-  const setSubEfeccop = () => {
-    setpagoefec_bs("")
-    setpagoefec_dolar("")
-    setpagoefec_cop((efectivo*peso).toFixed(2))
-  }
-
-  const setVueltobs = () => {
-    setcambio_bs((cambio_tot_result*dolar).toFixed(2))
-    setcambio_dolar("")
-    setcambio_cop("")
-  }
-  const setVueltodolar = () => {
-    setcambio_bs("")
-    setcambio_dolar(cambio_tot_result)
-    setcambio_cop("")
-  }
-  const setVueltocop = () => {
-    setcambio_bs("")
-    setcambio_dolar("")
-    setcambio_cop((cambio_tot_result*peso).toFixed(2))
-  }
-
-
-  const changeCambio = (val,type) => {
-    switch(type){
-      case "cambio_dolar":
-        setcambio_dolar(number(val))
-      break;
-      case "cambio_bs":
-        setcambio_bs(number(val))
-      break;
-      case "cambio_cop":
-        setcambio_cop(number(val))
-      break;
-    }
-  }
-
-
-  const syncCambio = (val,type) => {
-    val = number(val)
-    let valC = 0
-    if (type=="Dolar") {
-      setcambio_dolar(val)
-      valC = val
-    }
-    else if (type=="Bolivares") {
-      setcambio_bs(val) 
-      valC = parseFloat(val?val:0) / parseFloat(dolar)
-
-    }
-    else if (type=="Pesos") {
-      setcambio_cop(val)
-      valC = parseFloat(val?val:0) / parseFloat(peso)
-    }
-    
-
-
-    let divisor=0;
-
-    let inputs = [
-      {key:"Dolar", val:cambio_dolar, set:(val)=>setcambio_dolar(val)},
-      {key:"Bolivares", val:cambio_bs, set:(val)=>setcambio_bs(val)},
-      {key:"Pesos", val:cambio_cop, set:(val)=>setcambio_cop(val)},
-    ]
-
-    inputs.map(e => {
-      if (e.key!=type) {
-        if (e.val) {divisor++}
-      }
-    })
-    let cambio_tot_resultvalC = 0
-    if (cambio_bs&&cambio_dolar&&type=="Pesos") {
-      let bs = parseFloat(cambio_bs) / parseFloat(dolar)
-      setcambio_dolar((cambio_tot_result-bs-valC).toFixed(2))
-    }else{
-      inputs.map(e => {
-        if (e.key!=type) {
-          if (e.val) {
-            cambio_tot_resultvalC = (cambio_tot_result-valC)/divisor
-            if (e.key=="Dolar") {
-              e.set((cambio_tot_resultvalC).toFixed(2))
-            }else if (e.key=="Bolivares") {
-              e.set((cambio_tot_resultvalC*dolar).toFixed(2))
-            }else if (e.key=="Pesos") {
-              e.set((cambio_tot_resultvalC*peso).toFixed(2))
-            }
-          }
-        }
-      })
-
-    }
-
-    
-  }
-
-
-  const syncPagoEfec = (val,type) => {
-    val = number(val)
-    let valC = 0
-    if (type=="Dolar") {
-      setpagoefec_dolar(val)
-      valC = val
-    }
-    else if (type=="Bolivares") {
-      setpagoefec_bs(val) 
-      valC = parseFloat(val?val:0) / parseFloat(dolar)
-
-    }
-    else if (type=="Pesos") {
-      setpagoefec_cop(val)
-      valC = parseFloat(val?val:0) / parseFloat(peso)
-    }
-    
-
-
-    let divisor=0;
-
-    let inputs = [
-      {key:"Dolar", val:pagoefec_dolar, set:(val)=>setpagoefec_dolar(val)},
-      {key:"Bolivares", val:pagoefec_bs, set:(val)=>setpagoefec_bs(val)},
-      {key:"Pesos", val:pagoefec_cop, set:(val)=>setpagoefec_cop(val)},
-    ]
-
-    inputs.map(e => {
-      if (e.key!=type) {
-        if (e.val) {divisor++}
-      }
-    })
-
-    let efectivovalC = 0
-    if (pagoefec_bs&&pagoefec_dolar&&type=="Pesos") {
-      let bs = parseFloat(pagoefec_bs) / parseFloat(dolar)
-      setpagoefec_dolar((efectivo-bs-valC).toFixed(2))
-      console.log("is pesos")
-    }else{
-      inputs.map(e => {
-        if (e.key!=type) {
-          if (e.val) {
-            efectivovalC = (efectivo-valC)/divisor
-            if (e.key=="Dolar") {
-              e.set((efectivovalC).toFixed(2))
-            }else if (e.key=="Bolivares") {
-              e.set((efectivovalC*dolar).toFixed(2))
-            }else if (e.key=="Pesos") {
-              e.set((efectivovalC*peso).toFixed(2))
-            }
-          }
-        }
-      })
-
-    }
-
-    
-  }
-
-
-  
-  const sumCambio = () => {
-    let vuel_dolar = parseFloat(cambio_dolar?cambio_dolar:0)
-    let vuel_bs = parseFloat(cambio_bs?cambio_bs:0) / parseFloat(dolar)
-    let vuel_cop = parseFloat(cambio_cop?cambio_cop:0) / parseFloat(peso)
-    return (vuel_dolar + vuel_bs + vuel_cop).toFixed(2)
-  }
-
-
-  const debitoBs = (met) =>{
-    try{
-      if (met=="debito") {
-        if (debito=="") {
-          return ""
-        }
-       return "Bs."+moneda(dolar*debito)
-
-      }
-
-      if (met=="transferencia") {
-        if (transferencia=="") {
-          return ""
-        }
-       return "Bs."+moneda(dolar*transferencia)
-        
-      }
-
-    }catch(err){
-      return ""
-      console.log()
-    }
-  }
-
-  const showTittlePrice = (pu,total) => {
-    try{
-      return "P/U. Bs."+moneda(number(pu)*dolar)+"\n"+"Total Bs."+moneda(number(total)*dolar)
-
-    }catch(err){
-      return ""
-    }
-  }
-  
-  const syncPago = (val,type)=>{
-    val = number(val)
-    if (type=="Debito") {
-
-      setDebito(val)
-    }
-    else if (type=="Efectivo") {
-      setEfectivo(val) 
-    }
-    else if (type=="Transferencia") {
-      setTransferencia(val)
-    }
-    else if (type=="Credito") {
-      setCredito(val)
-    }
-
-
-    let divisor=0;
-
-    let inputs = [
-      {key:"Debito", val:debito, set:(val)=>setDebito(val)},
-      {key:"Efectivo", val:efectivo, set:(val)=>setEfectivo(val)},
-      {key:"Transferencia", val:transferencia, set:(val)=>setTransferencia(val)},
-      {key:"Credito", val:credito, set:(val)=>setCredito(val)},
-    ]
-
-    inputs.map(e => {
-      if (e.key!=type) {
-        if (e.val) {divisor++}
-      }
-    })
-
-    if (autoCorrector) {
-      inputs.map(e => {
-        if (e.key!=type) {
-          if (e.val) {
-            e.set(((pedidoData.clean_total-val)/divisor).toFixed(2))
-          }
-        }
-      })
-    }
-  }
-
-  
   useEffect(()=>{
     if (refinputaddcarritofast.current) {
       refinputaddcarritofast.current.value = ""
@@ -463,40 +386,7 @@ auth
       monto_iva,
     } = pedidoData
 
-    const setvueltopend = e => {
-    let type = e.currentTarget.attributes["data-type"].value
-    let billete = window.prompt("Billete")
-
-    if (billete) {
-      if (parseFloat(billete)) {
-        let valorbillete = 0
-        switch(type){
-          case "dolar":
-              valorbillete = moneda((billete-total))
-              setvuelto_penddolar(valorbillete)
-                        
-          break;
-
-          case "bs":
-              valorbillete = moneda((billete-bs_clean))
-              setvuelto_pendbs(valorbillete)
-            
-          break;
-
-          case "cop":
-
-            valorbillete = moneda((billete-cop_clean))
-            setvuelto_pendcop(valorbillete)
-            
-          
-          break;
-        }
-      }
-    }
-
-
-    return;
-  }
+    
     return (
       <>
         {viewconfigcredito?
@@ -580,6 +470,10 @@ auth
                 clienteInpdireccion={clienteInpdireccion}
                 setclienteInpdireccion={setclienteInpdireccion}
               />}
+              <div className={(estado?"bg-success-light":"bg-sinapsis")+(" d-flex justify-content-between p-2 rounded")}>
+                <span className='h4'>Pedido #{id}</span>
+                <span className='pull-right'>{created_at}</span>
+              </div>
               <table className="table table-striped text-center">
                 <thead>
                   <tr>
@@ -655,132 +549,164 @@ auth
           
             
             <div className="col-5">
-              <div className={(estado?"bg-success":"bg-sinapsis")+(" d-flex justify-content-between p-3")}>
-                <span className='h3'>Pedido #{id}</span>
-                <span className='pull-right'>{created_at}</span>
-              </div>
-              <div className="mt-2 mb-2 container-fluid">
-                
+              <div className="mb-1 container-fluid pt-2">
                 <div className="row">
-                  
                   <div className="col p-0">
-                    {editable?
-                      <div className={(debito!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                        <div className="card-body">
-                          <div className="card-title pointer" onClick={getDebito}>Déb.</div>
-                          <div className="card-text pago-numero"><input type="text" value={debito} onChange={(e)=>syncPago(e.target.value,"Debito")} placeholder="D"/></div>
-                          <small className="text-muted fs-4">{debitoBs("debito")}</small>
-                          <span className='ref pointer' data-type="2" onClick={addRefPago}>Ref. <i className="fa fa-plus"></i></span>
-                        </div>
-                      </div>
-                    :
-                    <div className={(debito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                      <div className="card-body">
-                        <div className="card-title pointer">Déb.</div>
-                        <div className="card-text pago-numero">{debito}</div>
-                        
-                      </div>
-                    </div>
-                    }
-                    
-                  </div>
-                  <div className="col p-0">
-                    {editable?
-                    
-                    <div className={(efectivo!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                      <div className="card-body">
-                        <div className="card-title pointer" onClick={getEfectivo}>Efec.</div>
-                        <div className="card-text pago-numero"><input type="text" value={efectivo} onChange={(e)=>syncPago(e.target.value,"Efectivo")} placeholder="E"/></div>
-                      </div>
-                    </div>
-                    :
-                    <div className={(efectivo!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                      <div className="card-body">
-                        <div className="card-title pointer">Efec.</div>
-                        <div className="card-text pago-numero">{efectivo}</div>
-                        
-                      </div>
-                    </div>
-                    } 
-
-                  </div>
-
-                  <div className="col p-0">
-                    {editable?
-                    
-                    <div className={(transferencia!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                      <div className="card-body">
-                        <div className="card-title pointer" onClick={getTransferencia}>Tran.</div>
-                        <div className="card-text pago-numero"><input type="text" value={transferencia} onChange={(e)=>syncPago(e.target.value,"Transferencia")} placeholder="T"/></div>
-                        <small className="text-muted fs-4">{debitoBs("transferencia")}</small>
-                        <span className='ref pointer' data-type="1" onClick={addRefPago}>Ref. <i className="fa fa-plus"></i></span>
-                      </div>
-                    </div>
-
-                    :
-                    <div className={(transferencia!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                      <div className="card-body">
-                        <div className="card-title pointer">Tran.</div>
-                        <div className="card-text pago-numero">{transferencia}</div>
-                        
-                      </div>
-                    </div>
-                    } 
-
-                  </div>
-
-                  <div className="col p-0">
-                    {editable?
-                    
-                    <div className={(credito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                      <div className="card-body">
-                        <div className="card-title pointer" onClick={getCredito}>Créd.</div>
-                        <div className="card-text pago-numero"><input type="text" value={credito} onChange={(e)=>syncPago(e.target.value,"Credito")} placeholder="C"/></div>
-                        
-                      </div>
-                    </div>
-                    :
-
-                    <div className={(credito!=""?"bg-success-light card-sinapsis":"t-5")+(" card")}>
-                      <div className="card-body">
-                        <div className="card-title pointer">Créd.</div>
-                        <div className="card-text pago-numero">{credito}</div>
-                        
-                      </div>
-                    </div>
-                    }
-                  </div>
-                    
-                  <div className="col p-0">
-                    
-                    <div className={(vuelto!=""?"card-danger-pago":"t-5")+(" card pointer")}>
-                      <div className="card-body">
-                        <div className="card-title">Vuel.</div>
-                        {
-                          editable?
-                          <div className="card-text pago-numero">
-                            <input type="text" value={vuelto} onChange={(e)=>setVuelto(number(e.target.value))} placeholder="V"/>
-                          </div>
-                          :
-                          <div onClick={entregarVuelto}>
-                            <div className="card-text pago-numero">                
-                              {vuelto}
+                    <div className="container-fluid p-0">
+                      
+                      <div className="row">
+                      
+                        <div className="col p-0">
+                            {editable?
+                            <div className={(debito!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card w125px")}>
+                                <div className="card-body">
+                                <div className="card-title pointer" onClick={getDebito}>Déb.</div>
+                                <div className="card-text pago-numero"><input type="text" value={debito} onChange={(e)=>syncPago(e.target.value,"Debito")} placeholder="D"/></div>
+                                <small className="text-muted fs-4">{debitoBs("debito")}</small>
+                                <span className='ref pointer' data-type="toggle" onClick={()=>addRefPago("toggle")}>Ref. <i className="fa fa-plus"></i></span>
+                                </div>
                             </div>
-                              <small className="text-success fst-italic pointer">Entregar</small><br/>
-                            {vuelto_entregado?vuelto_entregado.map(e=><div title={e.created_at} key={e.id}>
-                              Entregado = <b>{e.monto}</b>
-                              
-                            </div>):null}
-                          </div>
-                        }
+                            :
+                            <div className={(debito!=""?"bg-success-light card-sinapsis":"t-5")+(" card w125px")}>
+                            <div className="card-body">
+                                <div className="card-title pointer">Déb.</div>
+                                <div className="card-text pago-numero">{debito}</div>
+                                
+                            </div>
+                            </div>
+                            }
+                            
+                        </div>
+                        <div className="col p-0">
+                            {editable?
+                            
+                            <div className={(efectivo!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card w125px")}>
+                            <div className="card-body">
+                                <div className="card-title pointer" onClick={getEfectivo}>Efec.</div>
+                                <div className="card-text pago-numero"><input type="text" value={efectivo} onChange={(e)=>syncPago(e.target.value,"Efectivo")} placeholder="E"/></div>
+                                <small className="text-muted fs-4">{debitoBs("efectivo")}</small>
+            
+                            </div>
+                            </div>
+                            :
+                            <div className={(efectivo!=""?"bg-success-light card-sinapsis":"t-5")+(" card w125px")}>
+                            <div className="card-body">
+                                <div className="card-title pointer">Efec.</div>
+                                <div className="card-text pago-numero">{efectivo}</div>
+                                
+                            </div>
+                            </div>
+                            } 
+            
+                        </div>
+            
+                        <div className="col p-0">
+                            {editable?
+                            
+                            <div className={(transferencia!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card w125px")}>
+                            <div className="card-body">
+                                <div className="card-title pointer" onClick={getTransferencia}>Tran.</div>
+                                <div className="card-text pago-numero"><input type="text" value={transferencia} onChange={(e)=>syncPago(e.target.value,"Transferencia")} placeholder="T"/></div>
+                                <small className="text-muted fs-4">{debitoBs("transferencia")}</small>
+                                <span className='ref pointer' data-type="toggle" onClick={()=>addRefPago("toggle",transferencia,"1")}>Ref. <i className="fa fa-plus"></i></span>
+                            </div>
+                            </div>
+            
+                            :
+                            <div className={(transferencia!=""?"bg-success-light card-sinapsis":"t-5")+(" card w125px")}>
+                            <div className="card-body">
+                                <div className="card-title pointer">Tran.</div>
+                                <div className="card-text pago-numero">{transferencia}</div>
+                                
+                            </div>
+                            </div>
+                            } 
+            
+                        </div>
+            
+                        <div className="col p-0">
+                            {editable?
+                            
+                            <div className={(biopago!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card w125px")}>
+                                <div className="card-body">
+                                <div className="card-title pointer" onClick={getBio}>Biopago</div>
+                                <div className="card-text pago-numero"><input type="text" value={biopago} onChange={(e)=>syncPago(e.target.value,"Biopago")} placeholder="B"/></div>
+                                <small className="text-muted fs-4">{debitoBs("biopago")}</small>
+                                <span className='ref pointer' data-type="toggle" onClick={()=>addRefPago("toggle",biopago,"5")}>Ref. <i className="fa fa-plus"></i></span>
+                                </div>
+                            </div>
+            
+                            :
+                            <div className={(biopago!=""?"bg-success-light card-sinapsis":"t-5")+(" card w125px")}>
+                                <div className="card-body">
+                                <div className="card-title pointer">Biopago.</div>
+                                <div className="card-text pago-numero">{biopago}</div>
+                                
+                                </div>
+                            </div>
+                            } 
+                        </div>
+            
+                        <div className="col p-0">
+                            {editable?
+                            
+                            <div className={(credito!=""?"bg-success-light card-sinapsis":"t-5")+(" card w125px")}>
+                            <div className="card-body">
+                                <div className="card-title pointer" onClick={getCredito}>Créd.</div>
+                                <div className="card-text pago-numero"><input type="text" value={credito} onChange={(e)=>syncPago(e.target.value,"Credito")} placeholder="C"/></div>
+                                
+                            </div>
+                            </div>
+                            :
+            
+                            <div className={(credito!=""?"bg-success-light card-sinapsis":"t-5")+(" card w125px")}>
+                            <div className="card-body">
+                                <div className="card-title pointer">Créd.</div>
+                                <div className="card-text pago-numero">{credito}</div>
+                                
+                            </div>
+                            </div>
+                            }
+                        </div>
+                        
+                        <div className="col p-0">
+                        </div>
+                        <div className="col p-0">
+                        </div>
+                        <div className="col p-0">
+                            
+                            <div className={(vuelto!=""?"card-danger-pago":"t-5")+(" card pointer w125px")}>
+                            <div className="card-body">
+                                <div className="card-title">Vuel.</div>
+                                {
+                                editable?
+                                <div className="card-text pago-numero">
+                                    <input type="text" value={vuelto} onChange={(e)=>setVuelto(number(e.target.value))} placeholder="V"/>
+                                </div>
+                                :
+                                <div onClick={entregarVuelto}>
+                                    <div className="card-text pago-numero">                
+                                    {vuelto}
+                                    </div>
+                                    <small className="text-success fst-italic pointer">Entregar</small><br/>
+                                    {vuelto_entregado?vuelto_entregado.map(e=><div title={e.created_at} key={e.id}>
+                                    Entregado = <b>{e.monto}</b>
+                                    
+                                    </div>):null}
+                                </div>
+                                }
+                            </div>
+                            </div>
+                        </div>
+                        
+            
                       </div>
                     </div>
                   </div>
-
-                  <div className="p-0 col-md-auto d-flex align-items-center">
+                  <div className="p-1 col-md-auto d-flex align-items-center">
                     {autoCorrector?
-                      <button className="btn btn-outline-success btn-sm" onClick={()=>setautoCorrector(false)}>On</button>:
-                      <button className="btn btn-outline-danger btn-sm" onClick={()=>setautoCorrector(true)}>Off</button>
+                      <button className="btn btn-outline-success btn-sm scale05" onClick={()=>setautoCorrector(false)}>On</button>:
+                      <button className="btn btn-outline-danger btn-sm scale05" onClick={()=>setautoCorrector(true)}>Off</button>
                     }
                     
                   </div>
@@ -789,14 +715,82 @@ auth
               </div>
               {editable?
                 <div className="container p-0 m-0">
-                  <div className="row">
+                  {togglereferenciapago?
+                    <div className="modal-custom">
+                      <div className="text-danger" onClick={()=>addRefPago("toggle")} data-type="toggle"><span className="closeModal">&#10006;</span></div>
+
+                      <div className="modal-content-sm shadow">
+                        <div className="col p-4">
+                          <h4>Agregar Referencia Bancaria</h4>
+                            <div className="form-group">
+                              <label className="form-label">Referencia</label>
+                              <input type="text" placeholder='Referencia completa de la transacción...' value={descripcion_referenciapago} onChange={e=>setdescripcion_referenciapago(e.target.value)} className="form-control" />
+                            </div>
+
+                            <div className="form-group">
+                              <label className="form-label">Banco</label>
+                              <select className="form-control" value={banco_referenciapago} onChange={e=>setbanco_referenciapago(e.target.value)}>
+                                <option value="">--Seleccione Banco--</option>
+                                <option value="0102">0102 Banco de Venezuela, S.A. Banco Universal</option>	
+                                <option value="0108">0108 Banco Provincial, S.A. Banco Universal</option>	
+                                <option value="0105">0105 Banco Mercantil C.A., Banco Universal</option>	
+                                <option value="0134">0134 Banesco Banco Universal, C.A.</option>	
+                                <option value="0175">0175 Banco Bicentenario del Pueblo, Banco Universal C.A.</option>	
+                                <option value="0191">0191 Banco Nacional de Crédito C.A., Banco Universal</option>	
+                                <option value="0104">0104 Banco Venezolano de Crédito, S.A. Banco Universal</option>	
+                                <option value="0114">0114 Banco del Caribe C.A., Banco Universal</option>	
+                                <option value="0115">0115 Banco Exterior C.A., Banco Universal</option>	
+                                <option value="0128">0128 Banco Caroní C.A., Banco Universal</option>	
+                                <option value="0137">0137 Banco Sofitasa Banco Universal, C.A.</option>	
+                                <option value="0138">0138 Banco Plaza, Banco universal</option>	
+                                <option value="0146">0146 Banco de la Gente Emprendedora C.A.</option>	
+                                <option value="0151">0151 Banco Fondo Común, C.A Banco Universal</option>	
+                                <option value="0156">0156 100% Banco, Banco Comercial, C.A</option>	
+                                <option value="0157">0157 DelSur, Banco Universal C.A.</option>	
+                                <option value="0163">0163 Banco del Tesoro C.A., Banco Universal</option>	
+                                <option value="0166">0166 Banco Agrícola de Venezuela C.A., Banco Universal</option>	
+                                <option value="0168">0168 Bancrecer S.A., Banco Microfinanciero</option>	
+                                <option value="0169">0169 Mi Banco, Banco Microfinanciero, C.A.</option>	
+                                <option value="0171">0171 Banco Activo C.A., Banco Universal</option>	
+                                <option value="0172">0172 Bancamiga Banco Universal, C.A.</option>	
+                                <option value="0173">0173 Banco Internacional de Desarrollo C.A., Banco Universal</option>	
+                                <option value="0174">0174 Banplus Banco Universal, C.A.</option>	
+                                <option value="0177">0177 Banco de la Fuerza Armada Nacional Bolivariana, B.U.</option>	
+                              </select>
+                            </div>
+
+                            <div className="form-group">
+                              <label className="form-label">Monto en Bs</label>
+                              <input type="text" disabled={true} value={monto_referenciapago} onChange={e=>setmonto_referenciapago(e.target.value)} className="form-control" />
+                            </div>
+
+                            <div className="form-group">
+                              <label className="form-label">Tranferencia/Biopago/Débito</label>
+                              <select className="form-control" value={tipo_referenciapago} onChange={e=>settipo_referenciapago(e.target.value)}>
+                                <option value="">--Seleccione Banco--</option>
+                                <option value="1">Transferencia</option>
+                                <option value="2">Debito</option> 
+                                <option value="5">BioPago</option>
+                              </select>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    :null
+                  }
+                  <div className="row mb-4">
                     <div className="col">
+                      {refPago ? refPago.length ?<h4 className='text-center'>Referencias Bancarias</h4>:null:null}
+
                       <ul className="list-group">
+                      
                         {refPago ? refPago.length ? refPago.map(e=>
                           <li key={e.id} className='list-group-item d-flex justify-content-between align-items-start'>
                             <span className='cell45'>Ref.{e.descripcion}</span>
                             {e.tipo==1&&e.monto!=0?<span className="cell45 btn-sm btn-info btn">Trans. Bs.{moneda(e.monto)} </span>:null}
 	                          {e.tipo==2&&e.monto!=0?<span className="cell45 btn-sm btn-secondary btn">Deb. Bs.{moneda(e.monto)} </span>:null}
+	                          {e.tipo==5&&e.monto!=0?<span className="cell45 btn-sm btn-secondary btn">Biopago. Bs.{moneda(e.monto)} </span>:null}
                             <span className="cell1 text-danger text-right" data-id={e.id} onClick={delRefPago}>
                               <i className="fa fa-times"></i>
                             </span>
@@ -807,13 +801,11 @@ auth
 
                     </div>
                   </div>
-                  
-
-
                 </div>:null
               }
 
               <div className="mt-1 mb-1">
+                
                 <table className="table table-sm">
                   <tbody>
                     <tr className='hover text-center'>
@@ -850,7 +842,7 @@ auth
               </div>
 
               <div className="d-flex justify-content-center">
-                <table className="table">
+                <table className="table-sm">
                   <tbody>
                     <tr>
                       <td>
@@ -858,7 +850,7 @@ auth
                           <div className="row">
                             <div className="col p-0">
                               <div className={(recibido_dolar!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                                <div className="card-body">
+                                <div className="card-body p-2">
                                   <div className="card-title pointer" >$</div>
                                   <div className="card-text pago-numero"><input type="text" className="fs-3" value={recibido_dolar} onChange={(e)=>changeRecibido(e.target.value,"recibido_dolar")} placeholder="$"/></div>
                                 </div>
@@ -867,7 +859,7 @@ auth
 
                             <div className="col p-0">
                               <div className={(recibido_bs!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                                <div className="card-body">
+                                <div className="card-body p-2">
                                   <div className="card-title pointer" >BS</div>
                                   <div className="card-text pago-numero"><input type="text" className="fs-3" value={recibido_bs} onChange={(e)=>changeRecibido(e.target.value,"recibido_bs")} placeholder="BS"/></div>
                                 </div>
@@ -876,7 +868,7 @@ auth
 
                             <div className="col p-0">
                               <div className={(recibido_cop!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                                <div className="card-body">
+                                <div className="card-body p-2">
                                   <div className="card-title pointer" >COP</div>
                                   <div className="card-text pago-numero"><input type="text" className="fs-3" value={recibido_cop} onChange={(e)=>changeRecibido(e.target.value,"recibido_cop")} placeholder="COP"/></div>
                                 </div>
@@ -900,7 +892,7 @@ auth
                           <div className="row">
                             <div className="col p-0">
                               <div className={(cambio_dolar!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                                <div className="card-body">
+                                <div className="card-body p-2">
                                   <div className="card-title pointer " onClick={setVueltodolar} >$</div>
                                   <div className="card-text pago-numero"><input type="text" className="fs-3" value={cambio_dolar} onChange={(e)=>syncCambio(e.target.value,"Dolar")} placeholder="$"/></div>
                                 </div>
@@ -909,7 +901,7 @@ auth
 
                             <div className="col p-0">
                               <div className={(cambio_bs!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                                <div className="card-body">
+                                <div className="card-body p-2">
                                   <div className="card-title pointer " onClick={setVueltobs} >BS</div>
                                   <div className="card-text pago-numero"><input type="text" className="fs-3" value={cambio_bs} onChange={(e)=>syncCambio(e.target.value,"Bolivares")} placeholder="BS"/></div>
                                 </div>
@@ -918,7 +910,7 @@ auth
 
                             <div className="col p-0">
                               <div className={(cambio_cop!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card")}>
-                                <div className="card-body">
+                                <div className="card-body p-2">
                                   <div className="card-title pointer " onClick={setVueltocop} >COP</div>
                                   <div className="card-text pago-numero"><input type="text" className="fs-3" value={cambio_cop} onChange={(e)=>syncCambio(e.target.value,"Pesos")} placeholder="COP"/></div>
                                 </div>
@@ -939,7 +931,6 @@ auth
                 </table>
               </div>
               <div className="d-flex justify-content-center p-2">
-                
                 <div className="">
                   {editable?
                     <>

@@ -60,7 +60,7 @@ class CreateInventariosTable extends Migration
         });
 
         
-        $arrinsert = [];
+        /* $arrinsert = [];
         
         $con = new Mysqli("localhost","root","","administrativo2");
         
@@ -91,7 +91,7 @@ class CreateInventariosTable extends Migration
             
             $i++;
                 
-        }
+        } */
 
         
         

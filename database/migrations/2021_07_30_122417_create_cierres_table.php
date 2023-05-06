@@ -19,19 +19,21 @@ class CreateCierresTable extends Migration
             $table->decimal("debito",10,2); 
             $table->decimal("efectivo",10,2); 
             $table->decimal("transferencia",10,2); 
-
+            
             $table->decimal("dejar_dolar",10,2); 
             $table->decimal("dejar_peso",10,2); 
             $table->decimal("dejar_bss",10,2);
-
-
+            
+            
             $table->decimal("efectivo_guardado",10,2);
             $table->decimal("efectivo_guardado_cop",10,2);
             $table->decimal("efectivo_guardado_bs",10,2);
-
+            
             $table->decimal("efectivo_actual",10,2)->default(0);
             $table->decimal("efectivo_actual_cop",10,2)->default(0);
             $table->decimal("efectivo_actual_bs",10,2)->default(0);
+            $table->decimal("caja_biopago",10,2)->default(0);
+            
 
             $table->decimal("puntodeventa_actual_bs",10,2)->default(0);
 
@@ -92,6 +94,7 @@ class CreateCierresTable extends Migration
                 "porcentaje" =>0,
                 "desc_total" =>0,
                 "push" =>0,
+                "caja_biopago" =>0,
             ],
         ]);
     }

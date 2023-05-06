@@ -39,7 +39,7 @@ class CreateClientesTable extends Migration
         ]);
 
 
-            $arrinsert = [];
+         /*    $arrinsert = [];
         
         $con = new Mysqli("localhost","root","","administrativo2");
         
@@ -63,7 +63,7 @@ class CreateClientesTable extends Migration
             
             $i++;
                 
-        }
+        } */
 
         
             // [

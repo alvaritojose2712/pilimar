@@ -149,7 +149,7 @@
 				<tr>
 					<th>DÉBITO</th>
 					<th>EFECTIVO</th>
-					<th>TRANSFERENCIA</th>
+					<th>TRANSFERENCIA / BIOPAGO</th>
 					<th>CRÉDITO</th>
 					<th>ENTREG / PEND</th>
 
@@ -157,7 +157,7 @@
 				<tr>
 					<td>{{($facturado[2])}}</td>
 					<td>{{($facturado[3])}}</td>
-					<td>{{($facturado[1])}}</td>
+					<td>{{($facturado[1])}} / {{($facturado[5])}}</td>
 					<td>{{($facturado[4])}}</td>
 					<td>{{($facturado["entregado"])}} - {{($facturado["pendiente"])}} = {{($facturado["entregadomenospend"])}}</td>
 				</tr>
@@ -251,6 +251,12 @@
 				<tr>
 					<th class="right sin-borde">TRANSFERENCIA</th>
 					<td class="sin-borde">{{($cierre->transferencia)}}</td>
+					
+
+				</tr>
+				<tr>
+					<th class="right sin-borde">BIOPAGO</th>
+					<td class="sin-borde">{{($cierre->caja_biopago)}}</td>
 					
 
 				</tr>

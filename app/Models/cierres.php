@@ -24,6 +24,7 @@ class cierres extends Model
         "debito",
         "efectivo",
         "transferencia",
+        "caja_biopago",
         "dejar_dolar",
         "dejar_peso",
         "dejar_bss",
