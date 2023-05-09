@@ -38,6 +38,10 @@ const db = {
   setpersonacarrito: data=>axios.post(host+"setpersonacarrito",data),
 
   setPagoPedido: data=>axios.post(host+"setPagoPedido",data),
+  createDevolucion: data=>axios.post(host+"createDevolucion",data),
+  setDevolucion: data=>axios.post(host+"setDevolucion",data),
+  setpagoDevolucion: data=>axios.post(host+"setpagoDevolucion",data),
+  
   
   delpedido: data=>axios.post(host+"delpedido",data),
 
@@ -71,8 +75,9 @@ const db = {
   getMovimientos: data=>axios.post(host+"getMovimientos",data),
   
   getBuscarDevolucion: data=>axios.post(host+"getBuscarDevolucion",data),
+  getBuscarDevolucionhistorico: data=>axios.post(host+"getBuscarDevolucionhistorico",data),
+  
 
-  setDevolucion: data=>axios.post(host+"setDevolucion",data),
   delMov: data=>axios.post(host+"delMov",data),
 
   
@@ -105,7 +110,8 @@ const db = {
   getTotalizarCierre: data=>axios.post(host+"getTotalizarCierre",data),
   
   sendCierre: data=>axios.get(host+"verCierre",{params:data}),
-  printTickedPrecio: data=>axios.get(host+"printTickedPrecio",{params:data}),
+  printTickedPrecio: ({ id }) => window.open(host + "/printTickedPrecio?id=" + id, "targed=blank"),
+
   
 
   saveMontoFactura: data=>axios.post(host+"saveMontoFactura",data),

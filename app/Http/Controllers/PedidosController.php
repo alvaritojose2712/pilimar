@@ -748,6 +748,10 @@ class PedidosController extends Controller
     {   
         if (!$fecha) {return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);}
 
+        $pedido_pendientes_check = pedidos::where("created_at","LIKE",$fecha."%")->where("estado",0)->get();
+        if (count($pedido_pendientes_check)) {return Response::json(["msj"=>"Error: Hay pedidos pendientes","estado"=>false]);}
+
+
         $id_vendedor = $this->selectUsersTotalizar($totalizarcierre); 
 
         $usuariosget = usuarios::whereIn("id",$id_vendedor)->get(["id","usuario","tipo_usuario","nombre"]);

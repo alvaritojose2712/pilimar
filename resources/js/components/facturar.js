@@ -45,7 +45,9 @@ import ViewPedidoVendedor from '../components/viewPedidoVendedor';
 
 export default function Facturar({user,notificar,setLoading}) {
 
-  
+  const [buscarDevolucionhistorico,setbuscarDevolucionhistorico] = useState("")
+  const [productosDevolucionSelecthistorico,setproductosDevolucionSelecthistorico] = useState([])
+
   const [selectprinter, setselectprinter] = useState(null)
   
   const [dropprintprice, setdropprintprice] = useState(false)
@@ -256,7 +258,7 @@ export default function Facturar({user,notificar,setLoading}) {
   const [buscarDevolucion,setBuscarDevolucion] = useState("")
   const [tipoMovMovimientos,setTipoMovMovimientos] = useState("1")
   const [tipoCatMovimientos,setTipoCatMovimientos] = useState("2")
-  const [productosDevulucionSelect,setProductosDevulucionSelect] = useState([])
+  const [productosDevolucionSelect,setProductosDevolucionSelect] = useState([])
 
   const [idMovSelect,setIdMovSelect] = useState("nuevo")
 
@@ -1179,6 +1181,10 @@ useHotkeys("tab",()=>{
   useEffect(()=>{
     getBuscarDevolucion()
   },[buscarDevolucion])
+
+
+  
+
   useEffect(()=>{
     buscarInventario()
   },[
@@ -1195,10 +1201,10 @@ useHotkeys("tab",()=>{
   },[viewCaja,movCajaFecha])
   useEffect(()=>{
     if (showModalMovimientos) {
-      getMovimientos()
+      getBuscarDevolucionhistorico()
 
     }
-  },[showModalMovimientos,fechaMovimientos])
+  },[buscarDevolucionhistorico,showModalMovimientos,fechaMovimientos])
   
 
   useEffect(()=>{
@@ -1431,7 +1437,11 @@ const cerrar_dia = (e=null) => {
       setFechaCierre(cierreData["fecha"])
     }
     setCierre(cierreData)
+    if(res.data.estado==false){
+      notificar(res)
 
+    }
+    console.log(res.data.estado)
     setLoading(false)
   })
 }
@@ -1456,7 +1466,7 @@ function getBuscarDevolucion() {
       orderColumn:"descripcion",
       orderBy:"asc"
     }).then(res=>{
-      setProductosDevulucionSelect(res.data)
+      setProductosDevolucionSelect(res.data)
       setLoading(false)
     })
   },150)
@@ -1851,6 +1861,102 @@ const getPersona = q => {
   setTypingTimeout(time)
 
 }
+
+const [devolucionselect,setdevolucionselect] = useState(null)
+const [menuselectdevoluciones,setmenuselectdevoluciones] = useState("cliente")
+
+const [clienteselectdevolucion,setclienteselectdevolucion] = useState(null)
+const [productosselectdevolucion,setproductosselectdevolucion] = useState([])
+
+const [pagosselectdevolucion,setpagosselectdevolucion] = useState([])
+const [pagosselectdevoluciontipo,setpagosselectdevoluciontipo] = useState("")
+const [pagosselectdevolucionmonto,setpagosselectdevolucionmonto] = useState("")
+
+const getSum = (total, num) => {
+  return total + (number(num.cantidad)*number(num.precio));
+}
+
+let devolucionsumentrada = () => {
+  let val = productosselectdevolucion.filter(e=>e.tipo==1).reduce(getSum, 0);
+  return val;
+}
+let devolucionsumsalida = () => {
+  let val = productosselectdevolucion.filter(e=>e.tipo==0).reduce(getSum, 0);
+  return val;
+}
+let devolucionsumdiferencia = () => {
+  let val = devolucionsumsalida() - devolucionsumentrada();
+  return {
+    dolar: val,
+    bs: val*dolar,
+  }
+}
+
+
+
+
+
+
+const sethandlepagosselectdevolucion = () => {
+  if (!pagosselectdevolucion.filter(e=>e.tipo==pagosselectdevoluciontipo).length && ( pagosselectdevoluciontipo || pagosselectdevolucionmonto)) {
+    setpagosselectdevolucion(pagosselectdevolucion.concat({
+      tipo:pagosselectdevoluciontipo,
+      monto:pagosselectdevolucionmonto,
+    }))
+  }
+}
+const delpagodevolucion = (id) => {
+  setpagosselectdevolucion(pagosselectdevolucion.filter(e=>e.tipo!=id))
+}
+const delproductodevolucion = (id) => {
+  setproductosselectdevolucion(productosselectdevolucion.filter(e=>e.idproducto!=id))
+  
+}
+
+
+const getBuscarDevolucionhistorico = () => {
+  setLoading(true)
+
+
+    db.getBuscarDevolucionhistorico({
+      q:buscarDevolucionhistorico,
+      num:10,
+      orderColumn:"id",
+      orderBy:"desc"
+    }).then(res=>{
+      setproductosDevolucionSelecthistorico(res.data)
+      setLoading(false)
+    })
+}
+
+const sethandleproductosselectdevolucion = (e) => {
+  let type = e.currentTarget
+  
+  let id = type.attributes["data-id"].value 
+  let tipo = type.attributes["data-tipo"].value 
+  let precio = type.attributes["data-precio"].value 
+  
+  let cantidad = number(window.prompt("Cantidad",1))
+  let categoria = number(window.prompt("2=Cambio  1=Garantía",2))
+
+  if((categoria==1 ||categoria==2) && cantidad){
+    
+    if (!productosselectdevolucion.filter(e=>e.idproducto==id&&e.tipo==tipo).length) {
+
+      setproductosselectdevolucion(productosselectdevolucion.concat({
+        idproducto:id,
+        tipo,
+        precio,
+        categoria,
+        cantidad,
+      }))
+    }
+
+  }
+
+ 
+}
+
 const setPersonaFastDevolucion = e => {
   e.preventDefault()
   db.setClienteCrud({
@@ -1864,7 +1970,8 @@ const setPersonaFastDevolucion = e => {
     if (res.data) {
       if (res.data.estado) {
         if (res.data.id) {
-          setPersonas(res.data.id)
+          setclienteselectdevolucion(res.data.id)
+          setmenuselectdevoluciones("inventario")
         }
 
       }
@@ -1873,6 +1980,68 @@ const setPersonaFastDevolucion = e => {
     setLoading(false)
   })
 }
+
+const createDevolucion = (id) =>{
+  setLoading(true)
+  
+  if (devolucionselect) {
+    alert("Error: Devolución pendiente")
+  }else{
+    db.createDevolucion({
+      idcliente:id
+    }).then(res=>{
+      notificar(res)
+      if (res.data) {
+        let data = res.data
+        setdevolucionselect(data.id_devolucion)
+      }
+      setLoading(false)
+    })
+  }
+}
+
+const setDevolucion = () => {
+  if (confirm("¿Está seguro de guardar la información? Ésta acción no se puede deshacer")) {
+    
+    pagosselectdevolucion.map(e=>{
+      db.setPagoCredito({
+        id_cliente:clienteselectdevolucion,
+        tipo_pago_deudor: e.tipo,
+        monto_pago_deudor: e.monto,
+      }).then(res=>{
+        notificar(res)
+        setpagosselectdevolucion([])
+      })
+    })
+  
+  
+    db.setDevolucion({
+      productosselectdevolucion,
+      id_cliente:clienteselectdevolucion,
+  
+    }).then(res=>{
+      notificar(res)
+      setproductosselectdevolucion([])
+    })
+  }
+  
+}
+
+const setpagoDevolucion = (id_producto) =>{
+  
+  db.setpagoDevolucion({
+    devolucionselect,
+    id_producto
+  }).then(res=>{
+    notificar(res)
+    if (res.data) {
+      let data = res.data
+    }
+    setLoading(false)
+  })
+}
+
+
 
 const setPersonaFast = e => {
   e.preventDefault()
@@ -2587,28 +2756,7 @@ const delMov = e =>{
 
   }
 }
-const setDevolucion = (tipo, id) => {
-  setLoading(true)
 
-  let categoria = window.prompt("1=Garantía 2=Cambio ",2)
-
-  if (cantidad) {
-    db.setDevolucion({
-      id,
-      idMovSelect,
-      cantidad,
-      tipoMovMovimientos:type,
-      tipoCatMovimientos,
-      fechaMovimientos,
-    }).then(res=>{
-      setLoading(false)
-      getMovimientos()
-      setBuscarDevolucion("")
-      notificar(res)
-    })
-
-  }
-}
 const getTotalizarCierre = () => {
   if (!totalizarcierre) {
     db.getTotalizarCierre({}).then(res=>{
@@ -3884,8 +4032,7 @@ const printTickedPrecio = id => {
               tipoMovMovimientos={tipoMovMovimientos}
               setTipoCatMovimientos={setTipoCatMovimientos}
               tipoCatMovimientos={tipoCatMovimientos}
-              productosDevulucionSelect={productosDevulucionSelect}
-              setDevolucion={setDevolucion}
+              productosDevolucionSelect={productosDevolucionSelect}
               idMovSelect={idMovSelect}
               setIdMovSelect={setIdMovSelect}
               movimientos={movimientos}
@@ -3894,6 +4041,39 @@ const printTickedPrecio = id => {
               fechaMovimientos={fechaMovimientos}
               
               setPersonaFastDevolucion={setPersonaFastDevolucion}
+              
+              setpagoDevolucion={setpagoDevolucion}
+              setDevolucion={setDevolucion}
+              createDevolucion={createDevolucion}
+              devolucionselect={devolucionselect}
+              menuselectdevoluciones={menuselectdevoluciones}
+              setmenuselectdevoluciones={setmenuselectdevoluciones}
+
+              clienteselectdevolucion={clienteselectdevolucion}
+              setclienteselectdevolucion={setclienteselectdevolucion}
+              productosselectdevolucion={productosselectdevolucion}
+              setproductosselectdevolucion={setproductosselectdevolucion}
+              pagosselectdevolucion={pagosselectdevolucion}
+              setpagosselectdevolucion={setpagosselectdevolucion}
+              sethandleproductosselectdevolucion={sethandleproductosselectdevolucion}
+
+              setbuscarDevolucionhistorico={setbuscarDevolucionhistorico}
+              buscarDevolucionhistorico={buscarDevolucionhistorico}
+              productosDevolucionSelecthistorico={productosDevolucionSelecthistorico}
+
+              devolucionsumentrada={devolucionsumentrada}
+              devolucionsumsalida={devolucionsumsalida}
+              devolucionsumdiferencia={devolucionsumdiferencia}
+
+              delpagodevolucion={delpagodevolucion}
+              delproductodevolucion={delproductodevolucion}
+
+              pagosselectdevolucionmonto={pagosselectdevolucionmonto}
+              setpagosselectdevolucionmonto={setpagosselectdevolucionmonto}
+              pagosselectdevoluciontipo={pagosselectdevoluciontipo}
+              setpagosselectdevoluciontipo={setpagosselectdevoluciontipo}
+              sethandlepagosselectdevolucion={sethandlepagosselectdevolucion}
+              
               setToggleAddPersona={setToggleAddPersona}
               getPersona={getPersona}
               personas={personas}
@@ -3906,29 +4086,9 @@ const printTickedPrecio = id => {
               setclienteInptelefono={setclienteInptelefono}
               clienteInpdireccion={clienteInpdireccion}
               setclienteInpdireccion={setclienteInpdireccion}
-
-
-              debito={debito}
-              efectivo={efectivo}
-              transferencia={transferencia}
-              biopago={biopago}
-              credito={credito}
-              vuelto={vuelto}
-              setVuelto={setVuelto}
-              getDebito={getDebito}
-              getEfectivo={getEfectivo}
-              getTransferencia={getTransferencia}
-              getBio={getBio}
-              getCredito={getCredito}
-              syncPago={syncPago}
-              debitoBs={debitoBs}
-              editable={editable}
-              vuelto_entregado={vuelto_entregado}
-              entregarVuelto={entregarVuelto}
               number={number}
-              addRefPago={addRefPago}
 
-              
+
             />}
             <div className="input-group mb-3">
                 <input type="text" 

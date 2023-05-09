@@ -27,6 +27,13 @@ class CreateItemsDevolucionesTable extends Migration
             ->onDelete("cascade")
             ->onUpdate("cascade");
 
+            $table->integer("id_devolucion")->unsigned();
+            $table->foreign('id_devolucion')->references('id')->on('devoluciones')
+            ->onDelete("cascade")
+            ->onUpdate("cascade");
+
+            
+
 
             $table->timestamps();
         });

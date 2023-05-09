@@ -7,5 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class items_devoluciones extends Model
 {
-    use HasFactory;
+    public function producto() { 
+        return $this->hasOne('App\Models\inventario',"id","id_producto"); 
+    }
 }

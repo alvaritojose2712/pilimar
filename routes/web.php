@@ -29,6 +29,8 @@ use App\Http\Controllers\PagosReferenciasController;
 use App\Http\Controllers\GastosController;
 use App\Http\Controllers\tickeprecioController;
 use App\Http\Controllers\CierresController;
+use App\Http\Controllers\DevolucionesController;
+
 
 
 
@@ -98,7 +100,8 @@ Route::group(['middleware' => ['login']], function () {
 		
 		Route::post('getMovimientos', [MovimientosController::class,"getMovimientos"]);
 		Route::post('getBuscarDevolucion', [InventarioController::class,"index"]);
-		Route::post('setDevolucion', [MovimientosController::class,"setDevolucion"]);
+		Route::post('getBuscarDevolucionhistorico', [DevolucionesController::class,"getBuscarDevolucionhistorico"]);
+		
 		
 		Route::post('setClienteCrud', [ClientesController::class,"setClienteCrud"]);
 		Route::post('getClienteCrud', [ClientesController::class,"getpersona"]);
@@ -186,8 +189,9 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('getStatusCierre', [CierresController::class,"getStatusCierre"]);
 		Route::post('getTotalizarCierre', [CierresController::class,"getTotalizarCierre"]);
 		
-
-		
+		Route::post('createDevolucion', [DevolucionesController::class,"createDevolucion"]);
+		Route::post('setDevolucion', [DevolucionesController::class,"setDevolucion"]);
+		Route::post('setpagoDevolucion', [DevolucionesController::class,"setpagoDevolucion"]);
 		
 	});
 		Route::post('delMov', [MovimientosController::class,"delMov"]);

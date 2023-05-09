@@ -721,7 +721,7 @@ const syncPago = (val,type)=>{
 
                       <div className="modal-content-sm shadow">
                         <div className="col p-4">
-                          <h4>Agregar Referencia Bancaria</h4>
+                          <h4>Agregar Referencia Bancaria (Enter dentro de un campo para guardar)</h4>
                             <div className="form-group">
                               <label className="form-label">Referencia</label>
                               <input type="text" placeholder='Referencia completa de la transacción...' value={descripcion_referenciapago} onChange={e=>setdescripcion_referenciapago(e.target.value)} className="form-control" />
