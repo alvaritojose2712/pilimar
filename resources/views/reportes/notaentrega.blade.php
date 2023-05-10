@@ -82,7 +82,7 @@
 							Descuento
 						</th>
 						<th class="text-right">
-							TOTAL VENTA / BASE
+							SubTotal BASE / VENTA  
 						</th>
 					</tr>
 					@foreach ($pedido->items as $val)
@@ -97,14 +97,23 @@
 								{{$val->cantidad}}
 							</td>
 							<td>
-								{{$val->producto->precio_base}} / 
-								{{$val->producto->precio}}
+								@if ($bs)
+									{{moneda($val->producto->precio_base*$bs)}} / 
+									{{moneda($val->producto->precio*$bs)}}
+								@endif
+								<br>
+								REF: {{moneda($val->producto->precio_base)}} / 
+								{{moneda($val->producto->precio)}}
 							</td>
 							<td>
 								{{$val->total_des}} ({{$val->descuento}}%)
 							</td>
 							<td class="text-right">
-								{{$val->cantidad*$val->producto->precio_base}} / {{$val->total}}
+								@if ($bs)
+									{{moneda($val->cantidad*$val->producto->precio_base*$bs)}} / {{moneda($val->cantidad*$val->producto->precio*$bs)}} 
+								@endif
+								<br>
+								REF: {{moneda($val->cantidad*$val->producto->precio_base)}} / {{moneda($val->cantidad*$val->producto->precio)}}
 							</td>
 						</tr>
 
@@ -112,29 +121,50 @@
 					@endforeach
 						
 					<tr class='hover'>
-                      <th colspan="5" class="text-right">Sub-Total</th>
-                      <td class="text-right">{{$pedido->subtotal}}</td>
+                      <th colspan="5" class="text-right">SubTotal Venta</th>
+                      <td class="text-right">
+						
+						REF: {{$pedido->subtotal}}
+					  </td>
                     </tr>
                     <tr class='hover'>
                       <th colspan="5" class="text-right pointer clickme">Desc. {{$pedido->total_porciento}}%
                       </th>
-                      <td class="text-right">{{$pedido->total_des}}</td>
+                      <td class="text-right">
+						
+						REF: {{$pedido->total_des}}
+					  </td>
                     </tr>
                     <tr class='hover'>
                       <th colspan="5" class="text-right">Monto Exento</th>
-                      <td class="text-right">{{$pedido->exento}}</td>
+                      <td class="text-right">
+						
+						REF: {{$pedido->exento}}
+					  </td>
                     </tr>
                     <tr class='hover'>
                       <th colspan="5" class="text-right">Monto Gravable</th>
-                      <td class="text-right">{{$pedido->gravable}}</td>
+                      <td class="text-right">
+						
+						REF: {{$pedido->gravable}}
+					  </td>
                     </tr>
                     <tr class='hover'>
                       <th colspan="5" class="text-right">IVA <span>({{$pedido->ivas}})</span></th>
-                      <td class="text-right">{{$pedido->monto_iva}}</td>
+                      <td class="text-right">
+						
+						REF: {{$pedido->monto_iva}}
+					  </td>
                     </tr>
                     <tr class="hover h4">
                       <th colspan="5" class="text-right">Total BASE / VENTA</th>
-                      <td class="text-right">{{$t_base}} / {{$pedido->total}}</td>
+                      <td class="text-right">
+						@if ($bs)
+							{{moneda($t_base*$bs)}} / {{moneda(removemoneda($pedido->total)*$bs)}}
+						@endif
+						<br>
+						REF: {{moneda($t_base)}} / {{$pedido->total}}
+					  </td>
                     </tr>
 				</tbody>
 

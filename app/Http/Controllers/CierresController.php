@@ -35,6 +35,7 @@ class CierresController extends Controller
             "dejar_dolar" => $c->sum("dejar_dolar"),
             "dejar_peso" => $c->sum("dejar_peso"),
             "dejar_bss" => $c->sum("dejar_bss"),
+            "caja_biopago" => $c->sum("caja_biopago"),
         ];
     }
 }

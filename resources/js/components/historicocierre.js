@@ -34,6 +34,7 @@ export default function Historicocierre({
 						<th>Actual $</th>
 						<th>Actual COP</th>
 						<th>Actual BS</th>
+						<th>Actual Biopago BS</th>
 						<th>Actual Punto BS</th>
 
 						<th>Tasa</th>
@@ -57,6 +58,7 @@ export default function Historicocierre({
 							<td>{e.efectivo_actual}</td>
 							<td>{e.efectivo_actual_cop}</td>
 							<td>{e.efectivo_actual_bs}</td>
+							<td>{e.caja_biopago}</td>
 							<td>{e.puntodeventa_actual_bs}</td>
 							
 							
@@ -87,6 +89,7 @@ export default function Historicocierre({
 						<th>{cierres.efectivo_actual}</th>
 						<th>{cierres.efectivo_actual_cop}</th>
 						<th>{cierres.efectivo_actual_bs}</th>
+						<th>{cierres.caja_biopago}</th>
 						<th>{cierres.puntodeventa_actual_bs}</th>
 						
 					</tr>

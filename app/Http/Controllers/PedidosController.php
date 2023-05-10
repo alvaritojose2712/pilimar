@@ -191,29 +191,24 @@ class PedidosController extends Controller
     {
         
 
-        $arr = $this->cerrarFun($fechaventas,0,0,0,[],true,false);
+        $arr = $this->cerrarFun($fechaventas,0,0,0,[],true,false,false);
+
+        
 
         if ($fechaventas) {
-            // code...
-           
-
             // foreach ($this->letras as $key => $value) {
                 if (isset($arr["total"])) {
                     $arr["total"] = toLetras(number_format($arr["total"],2));
-                    // code...
                 }
                 if (isset($arr["3"])) {
-                    // code...
                     $arr["3"] = toLetras(number_format($arr["3"],2));
                 }
                 if (isset($arr["2"])) {
                     $arr["2"] = toLetras(number_format($arr["2"],2));
-                    // code...
                 }
 
                 if (isset($arr["1"])) {
                     $arr["1"] = toLetras(number_format($arr["1"],2));
-                    // code...
                 }
             // }
         }
@@ -571,6 +566,7 @@ class PedidosController extends Controller
                     $item->producto["precio"] = ($item->producto["precio"])*$factor;
                     $subtotal = ($item->producto["precio"]*$item->cantidad);
                     $iva_val = $item->producto["iva"];
+                    $item->producto["precio_base"] = $item->producto["precio_base"]*$factor;
                     $iva_m = $iva_val/100;
 
                 }
@@ -649,9 +645,7 @@ class PedidosController extends Controller
         }
 
         if ($clean) {
-            // code...
             return $pedido->makeHidden("items");
-            // return $pedido;
         }else{
             return $pedido;
         }
@@ -684,8 +678,14 @@ class PedidosController extends Controller
     public function notaentregapedido(Request $req)
     {
         $sucursal = sucursal::all()->first();
+        $bs = $this->get_moneda()["bs"];
+        
 
-        return view("reportes.notaentrega",["sucursal"=>$sucursal,"pedido"=>$this->getPedido($req)]);
+        return view("reportes.notaentrega",[
+            "sucursal"=>$sucursal,
+            "pedido"=>$this->getPedido($req,1),
+            "bs"=>$bs,
+        ]);
     }
 
     public function setpersonacarrito(Request $req)
@@ -744,12 +744,14 @@ class PedidosController extends Controller
             return [session("id_usuario")];
         } 
     }
-    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$total_biopago,$dejar=[],$grafica=false,$totalizarcierre=false)
+    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$total_biopago,$dejar=[],$grafica=false,$totalizarcierre=false,$check_pendiente=true)
     {   
         if (!$fecha) {return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);}
 
-        $pedido_pendientes_check = pedidos::where("created_at","LIKE",$fecha."%")->where("estado",0)->get();
-        if (count($pedido_pendientes_check)) {return Response::json(["msj"=>"Error: Hay pedidos pendientes","estado"=>false]);}
+        if ($check_pendiente) {
+            $pedido_pendientes_check = pedidos::where("created_at","LIKE",$fecha."%")->where("estado",0)->get();
+            if (count($pedido_pendientes_check)) {return Response::json(["msj"=>"Error: Hay pedidos pendientes","estado"=>false]);}
+        }
 
 
         $id_vendedor = $this->selectUsersTotalizar($totalizarcierre); 
