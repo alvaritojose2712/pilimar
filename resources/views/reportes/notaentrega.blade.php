@@ -160,7 +160,7 @@
                       <th colspan="5" class="text-right">Total BASE / VENTA</th>
                       <td class="text-right">
 						@if ($bs)
-							{{moneda($t_base*$bs)}} / {{moneda(removemoneda($pedido->total)*$bs)}}
+							Bs. {{moneda($t_base*$bs)}} / {{moneda(removemoneda($pedido->total)*$bs)}}
 						@endif
 						<br>
 						REF: {{moneda($t_base)}} / {{$pedido->total}}

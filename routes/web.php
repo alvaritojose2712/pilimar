@@ -115,6 +115,10 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('verCierre', [PedidosController::class,"verCierre"]);
 		Route::post('cerrar', [PedidosController::class,"cerrar"]);
 		Route::get('sendCuentasporCobrar', [PedidosController::class,"sendCuentasporCobrar"]);
+
+		Route::post('createDevolucion', [DevolucionesController::class,"createDevolucion"]);
+		Route::post('setDevolucion', [DevolucionesController::class,"setDevolucion"]);
+		Route::post('setpagoDevolucion', [DevolucionesController::class,"setpagoDevolucion"]);
 		
 		
 	});
@@ -189,9 +193,7 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('getStatusCierre', [CierresController::class,"getStatusCierre"]);
 		Route::post('getTotalizarCierre', [CierresController::class,"getTotalizarCierre"]);
 		
-		Route::post('createDevolucion', [DevolucionesController::class,"createDevolucion"]);
-		Route::post('setDevolucion', [DevolucionesController::class,"setDevolucion"]);
-		Route::post('setpagoDevolucion', [DevolucionesController::class,"setpagoDevolucion"]);
+		
 		
 	});
 		Route::post('delMov', [MovimientosController::class,"delMov"]);
