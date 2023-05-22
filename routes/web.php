@@ -47,8 +47,8 @@ Route::get('/update', function () {
 		c:\\xampp\mysql\bin\mysqldump -u root -p --no-create-db --no-create-info --complete-insert --extended-insert sinapsis > sinapsisData.sql <br/>
 		git stash <br/>
 		git pull https://github.com/alvaritojose2712/arabitofacturacion.git <br/>
-		php artisan optimize:clear <br/>
 		php artisan optimize <br/>
+		php artisan optimize:clear <br/>
 	';
 
 });

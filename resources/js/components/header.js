@@ -9,6 +9,10 @@ function Header({
     <header className="mb-3">
       <div className="container-fluid">
         <div className="row">
+          <div className="col-5 d-flex align-items-center">
+          <span className="fst-weight-bold h2">{user.sucursal}</span>
+            
+          </div>
           <div className="col">
             <div className="d-flex header-justify-content-end flex-wrap align-items-center">
               <div className="p-3">
@@ -88,7 +92,7 @@ function Header({
               :null
             }
               {
-                !auth(1) ?
+                auth(1) && !user.iscentral ?
                   view == "seleccionar" ?
                     <>
                       <span className={(view == "pedidosCentral" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("pedidosCentral")}>Central</span>
@@ -98,7 +102,7 @@ function Header({
               }
               
               {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Administración</span>:null}
-              {auth(1) ? <span className={(view == "panelcentrodeacopio" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("panelcentrodeacopio")}>Centro de acopio</span> : null}
+              {auth(1) && user.iscentral ? <span className={(view == "panelcentrodeacopio" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("panelcentrodeacopio")}>Centro de acopio</span> : null}
           </div>
         </div>
       </div>

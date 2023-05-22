@@ -131,7 +131,7 @@ export default function Facturar({ user, notificar, setLoading }) {
     const [descripcion_referenciapago, setdescripcion_referenciapago] =
         useState("");
     const [monto_referenciapago, setmonto_referenciapago] = useState("");
-    const [banco_referenciapago, setbanco_referenciapago] = useState("");
+    const [banco_referenciapago, setbanco_referenciapago] = useState("0108");
     const [togglereferenciapago, settogglereferenciapago] = useState("");
 
     const [viewconfigcredito, setviewconfigcredito] = useState(false);
@@ -2466,7 +2466,7 @@ export default function Facturar({ user, notificar, setLoading }) {
                 setNumero_factura("nuevo");
             }
             if (callback) {
-                callback();
+                callback(res.data[0].id);
             }
         });
     };
@@ -2622,7 +2622,8 @@ export default function Facturar({ user, notificar, setLoading }) {
     const addCarritoRequest = (
         e,
         id_direct = null,
-        id_pedido_direct = null
+        id_pedido_direct = null,
+        cantidad_direct = null
     ) => {
         try {
             setLoading(true);
@@ -2634,17 +2635,13 @@ export default function Facturar({ user, notificar, setLoading }) {
                 type = e;
             }
             let id = null;
-            if (productos[selectItem]) {
-                id = productos[selectItem].id;
-            }
-            if (id_direct) {
-                id = id_direct;
-            }
+            if (productos[selectItem]) {id = productos[selectItem].id;}
+            if (id_direct) {id = id_direct;}
 
             db.setCarrito({
                 id,
                 type,
-                cantidad,
+                cantidad: cantidad_direct? cantidad_direct: cantidad,
                 numero_factura: id_pedido_direct
                     ? id_pedido_direct
                     : numero_factura,
@@ -3703,6 +3700,76 @@ export default function Facturar({ user, notificar, setLoading }) {
             setSelectItem(null);
         });
     };
+    const [presupuestocarrito, setpresupuestocarrito] = useState([])
+    const delitempresupuestocarrito = index => {
+        setpresupuestocarrito(presupuestocarrito.filter((e,i)=>i!=index))
+    }
+    const setpresupuestocarritotopedido = () => {
+
+        if (presupuestocarrito.length===1) {
+            
+            presupuestocarrito.map(e=>{
+                addCarritoRequest(
+                    "agregar",
+                    e.id,
+                    "nuevo",
+                    e.cantidad
+                )
+            })
+        }else if(presupuestocarrito.length>1){
+            let clone = cloneDeep(presupuestocarrito)
+            let first = clone[0]
+
+            db.setCarrito({
+                id: first.id,
+                cantidad: first.cantidad,
+                type:"agregar",
+                numero_factura: "nuevo",
+                loteIdCarrito,
+            }).then((res) => {
+                delete clone[0];
+                getPedidosList(lastpedido=>{
+                    clone.map(e=>{
+                        db.setCarrito({
+                            id: e.id,
+                            cantidad: e.cantidad,
+                            type:"agregar",
+                            numero_factura:lastpedido,
+                            loteIdCarrito,
+                        }).then((res) => {
+                            notificar(res);
+                            
+                        });
+                    })
+                });
+            });
+        }
+    }
+    const setPresupuesto = e =>{
+        let id_producto = e.currentTarget.attributes["data-id"].value;
+        let findpr = productos.filter(e=>e.id==id_producto)
+        if (findpr.length) {
+            let pro = findpr[0]
+            
+            let copypresupuestocarrito = cloneDeep(presupuestocarrito)
+            if (copypresupuestocarrito.filter(e=>e.id==id_producto).length) {
+                copypresupuestocarrito = copypresupuestocarrito.filter(e=>e.id!=id_producto)
+            }
+            let ct = (cantidad?cantidad:1)
+            let subtotalpresu = parseFloat(pro.precio)*ct 
+            copypresupuestocarrito = copypresupuestocarrito.concat({
+                id: pro.id,
+                precio: pro.precio,
+                cantidad:ct,
+                descripcion: pro.descripcion,
+                subtotal: subtotalpresu
+            })
+            
+            setpresupuestocarrito(copypresupuestocarrito)
+            setSelectItem(null);
+        }
+
+    }
     const delFalla = (e) => {
         if (confirm("¿Desea Eliminar?")) {
             let id = e.currentTarget.attributes["data-id"].value;
@@ -4467,6 +4534,13 @@ export default function Facturar({ user, notificar, setLoading }) {
     const printTickedPrecio = (id) => {
         db.printTickedPrecio({ id });
     };
+    let sumsubtotalespresupuesto = ()=>{
+        let sum = 0;
+        presupuestocarrito.map(e=>{
+            sum += parseFloat(e.subtotal)
+        })
+        return sum
+    } 
 
     return (
         <>
@@ -4491,206 +4565,264 @@ export default function Facturar({ user, notificar, setLoading }) {
                 setView={setView}
             />
             {view == "seleccionar" ? (
-                <div className="container p-0">
-                    {typeof selectItem == "number" ? (
-                        productos[selectItem] ? (
-                            <ModalAddCarrito
-                                dolar={dolar}
-                                producto={productos[selectItem]}
-                                setSelectItem={setSelectItem}
-                                cantidad={cantidad}
-                                setCantidad={setCantidad}
-                                numero_factura={numero_factura}
-                                setNumero_factura={setNumero_factura}
-                                pedidoList={pedidoList}
-                                setFalla={setFalla}
-                                number={number}
-                                moneda={moneda}
-                                inputCantidadCarritoref={
-                                    inputCantidadCarritoref
-                                }
-                                addCarritoRequest={addCarritoRequest}
-                            />
-                        ) : null
-                    ) : null}
+                <div className={(presupuestocarrito.length?"container-fluid":"container")+(" p-0")}>
+                    <div className="row">
+                        
+                        <div className="col">
 
-                    {showModalMovimientos && (
-                        <ModalMovimientos
-                            getMovimientos={getMovimientos}
-                            setShowModalMovimientos={setShowModalMovimientos}
-                            showModalMovimientos={showModalMovimientos}
-                            setBuscarDevolucion={setBuscarDevolucion}
-                            buscarDevolucion={buscarDevolucion}
-                            setTipoMovMovimientos={setTipoMovMovimientos}
-                            tipoMovMovimientos={tipoMovMovimientos}
-                            setTipoCatMovimientos={setTipoCatMovimientos}
-                            tipoCatMovimientos={tipoCatMovimientos}
-                            productosDevolucionSelect={
-                                productosDevolucionSelect
-                            }
-                            idMovSelect={idMovSelect}
-                            setIdMovSelect={setIdMovSelect}
-                            movimientos={movimientos}
-                            delMov={delMov}
-                            setFechaMovimientos={setFechaMovimientos}
-                            fechaMovimientos={fechaMovimientos}
-                            setPersonaFastDevolucion={setPersonaFastDevolucion}
-                            setpagoDevolucion={setpagoDevolucion}
-                            setDevolucion={setDevolucion}
-                            createDevolucion={createDevolucion}
-                            devolucionselect={devolucionselect}
-                            menuselectdevoluciones={menuselectdevoluciones}
-                            setmenuselectdevoluciones={
-                                setmenuselectdevoluciones
-                            }
-                            clienteselectdevolucion={clienteselectdevolucion}
-                            setclienteselectdevolucion={
-                                setclienteselectdevolucion
-                            }
-                            productosselectdevolucion={
-                                productosselectdevolucion
-                            }
-                            setproductosselectdevolucion={
-                                setproductosselectdevolucion
-                            }
-                            pagosselectdevolucion={pagosselectdevolucion}
-                            setpagosselectdevolucion={setpagosselectdevolucion}
-                            sethandleproductosselectdevolucion={
-                                sethandleproductosselectdevolucion
-                            }
-                            setbuscarDevolucionhistorico={
-                                setbuscarDevolucionhistorico
-                            }
-                            buscarDevolucionhistorico={
-                                buscarDevolucionhistorico
-                            }
-                            productosDevolucionSelecthistorico={
-                                productosDevolucionSelecthistorico
-                            }
-                            devolucionsumentrada={devolucionsumentrada}
-                            devolucionsumsalida={devolucionsumsalida}
-                            devolucionsumdiferencia={devolucionsumdiferencia}
-                            delpagodevolucion={delpagodevolucion}
-                            delproductodevolucion={delproductodevolucion}
-                            pagosselectdevolucionmonto={
-                                pagosselectdevolucionmonto
-                            }
-                            setpagosselectdevolucionmonto={
-                                setpagosselectdevolucionmonto
-                            }
-                            pagosselectdevoluciontipo={
-                                pagosselectdevoluciontipo
-                            }
-                            setpagosselectdevoluciontipo={
-                                setpagosselectdevoluciontipo
-                            }
-                            sethandlepagosselectdevolucion={
-                                sethandlepagosselectdevolucion
-                            }
-                            setToggleAddPersona={setToggleAddPersona}
-                            getPersona={getPersona}
-                            personas={personas}
-                            setPersonas={setPersonas}
-                            clienteInpidentificacion={clienteInpidentificacion}
-                            setclienteInpidentificacion={
-                                setclienteInpidentificacion
-                            }
-                            clienteInpnombre={clienteInpnombre}
-                            setclienteInpnombre={setclienteInpnombre}
-                            clienteInptelefono={clienteInptelefono}
-                            setclienteInptelefono={setclienteInptelefono}
-                            clienteInpdireccion={clienteInpdireccion}
-                            setclienteInpdireccion={setclienteInpdireccion}
-                            number={number}
-                        />
-                    )}
-                    <div className="input-group mb-3">
-                        <input
-                            type="text"
-                            className="form-control"
-                            ref={inputbusquedaProductosref}
-                            placeholder="Buscar... Presiona (ESC)"
-                            onChange={(e) => getProductos(e.target.value)}
-                        />
-                        {/*<button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"sinapsis")}>Agg. rápido</button>*/}
-
-                        {showOptionQMain ? (
-                            <>
-                                <span
-                                    className="input-group-text pointer"
-                                    onClick={() => setshowOptionQMain(false)}
-                                >
-                                    <i className="fa fa-arrow-right"></i>
-                                </span>
-                                <span
-                                    className="input-group-text pointer"
-                                    onClick={() => {
-                                        let num = window.prompt(
-                                            "Número de resultados a mostrar"
-                                        );
-                                        if (num) {
-                                            setNum(num);
+                            {typeof selectItem == "number" ? (
+                                productos[selectItem] ? (
+                                    <ModalAddCarrito
+                                        setPresupuesto={setPresupuesto}
+                                        dolar={dolar}
+                                        producto={productos[selectItem]}
+                                        setSelectItem={setSelectItem}
+                                        cantidad={cantidad}
+                                        setCantidad={setCantidad}
+                                        numero_factura={numero_factura}
+                                        setNumero_factura={setNumero_factura}
+                                        pedidoList={pedidoList}
+                                        setFalla={setFalla}
+                                        number={number}
+                                        moneda={moneda}
+                                        inputCantidadCarritoref={
+                                            inputCantidadCarritoref
                                         }
-                                    }}
-                                >
-                                    Num.({num})
-                                </span>
-                                <span
-                                    className="input-group-text pointer"
-                                    onClick={() => setItemCero(!itemCero)}
-                                >
-                                    En cero: {itemCero ? "Sí" : "No"}
-                                </span>
-                            </>
-                        ) : (
-                            <span
-                                className="input-group-text pointer"
-                                onClick={() => setshowOptionQMain(true)}
-                            >
-                                <i className="fa fa-arrow-left"></i>
-                            </span>
-                        )}
-                    </div>
-                    <ProductosList
-                        moneda={moneda}
-                        auth={auth}
-                        productos={productos}
-                        addCarrito={addCarrito}
-                        clickSetOrderColumn={clickSetOrderColumn}
-                        orderColumn={orderColumn}
-                        orderBy={orderBy}
-                        counterListProductos={counterListProductos}
-                        setCounterListProductos={setCounterListProductos}
-                        tbodyproductosref={tbodyproductosref}
-                        focusCtMain={focusCtMain}
-                        selectProductoFast={selectProductoFast}
-                    />
-                    {productos.length == 0 ? (
-                        <div className="text-center p-2">
-                            <small className="mr-2">Nada para mostrar...</small>
-                        </div>
-                    ) : null}
+                                        addCarritoRequest={addCarritoRequest}
+                                    />
+                                ) : null
+                            ) : null}
 
-                    {viewCaja ? (
-                        <Cajagastos
-                            setMovimientoCaja={setMovimientoCaja}
-                            movCajadescripcion={movCajadescripcion}
-                            setMovCajadescripcion={setMovCajadescripcion}
-                            movCajamonto={movCajamonto}
-                            setMovCajamonto={setMovCajamonto}
-                            number={number}
-                            setMovCajacategoria={setMovCajacategoria}
-                            movCajacategoria={movCajacategoria}
-                            setMovCajatipo={setMovCajatipo}
-                            movimientosCaja={movimientosCaja}
-                            delMovCaja={delMovCaja}
-                            movCajatipo={movCajatipo}
-                            movCajaFecha={movCajaFecha}
-                            viewCaja={viewCaja}
-                            setViewCaja={setViewCaja}
-                            setMovCajaFecha={setMovCajaFecha}
-                        />
-                    ) : null}
+                            {showModalMovimientos && (
+                                <ModalMovimientos
+                                    getMovimientos={getMovimientos}
+                                    setShowModalMovimientos={setShowModalMovimientos}
+                                    showModalMovimientos={showModalMovimientos}
+                                    setBuscarDevolucion={setBuscarDevolucion}
+                                    buscarDevolucion={buscarDevolucion}
+                                    setTipoMovMovimientos={setTipoMovMovimientos}
+                                    tipoMovMovimientos={tipoMovMovimientos}
+                                    setTipoCatMovimientos={setTipoCatMovimientos}
+                                    tipoCatMovimientos={tipoCatMovimientos}
+                                    productosDevolucionSelect={
+                                        productosDevolucionSelect
+                                    }
+                                    idMovSelect={idMovSelect}
+                                    setIdMovSelect={setIdMovSelect}
+                                    movimientos={movimientos}
+                                    delMov={delMov}
+                                    setFechaMovimientos={setFechaMovimientos}
+                                    fechaMovimientos={fechaMovimientos}
+                                    setPersonaFastDevolucion={setPersonaFastDevolucion}
+                                    setpagoDevolucion={setpagoDevolucion}
+                                    setDevolucion={setDevolucion}
+                                    createDevolucion={createDevolucion}
+                                    devolucionselect={devolucionselect}
+                                    menuselectdevoluciones={menuselectdevoluciones}
+                                    setmenuselectdevoluciones={
+                                        setmenuselectdevoluciones
+                                    }
+                                    clienteselectdevolucion={clienteselectdevolucion}
+                                    setclienteselectdevolucion={
+                                        setclienteselectdevolucion
+                                    }
+                                    productosselectdevolucion={
+                                        productosselectdevolucion
+                                    }
+                                    setproductosselectdevolucion={
+                                        setproductosselectdevolucion
+                                    }
+                                    pagosselectdevolucion={pagosselectdevolucion}
+                                    setpagosselectdevolucion={setpagosselectdevolucion}
+                                    sethandleproductosselectdevolucion={
+                                        sethandleproductosselectdevolucion
+                                    }
+                                    setbuscarDevolucionhistorico={
+                                        setbuscarDevolucionhistorico
+                                    }
+                                    buscarDevolucionhistorico={
+                                        buscarDevolucionhistorico
+                                    }
+                                    productosDevolucionSelecthistorico={
+                                        productosDevolucionSelecthistorico
+                                    }
+                                    devolucionsumentrada={devolucionsumentrada}
+                                    devolucionsumsalida={devolucionsumsalida}
+                                    devolucionsumdiferencia={devolucionsumdiferencia}
+                                    delpagodevolucion={delpagodevolucion}
+                                    delproductodevolucion={delproductodevolucion}
+                                    pagosselectdevolucionmonto={
+                                        pagosselectdevolucionmonto
+                                    }
+                                    setpagosselectdevolucionmonto={
+                                        setpagosselectdevolucionmonto
+                                    }
+                                    pagosselectdevoluciontipo={
+                                        pagosselectdevoluciontipo
+                                    }
+                                    setpagosselectdevoluciontipo={
+                                        setpagosselectdevoluciontipo
+                                    }
+                                    sethandlepagosselectdevolucion={
+                                        sethandlepagosselectdevolucion
+                                    }
+                                    setToggleAddPersona={setToggleAddPersona}
+                                    getPersona={getPersona}
+                                    personas={personas}
+                                    setPersonas={setPersonas}
+                                    clienteInpidentificacion={clienteInpidentificacion}
+                                    setclienteInpidentificacion={
+                                        setclienteInpidentificacion
+                                    }
+                                    clienteInpnombre={clienteInpnombre}
+                                    setclienteInpnombre={setclienteInpnombre}
+                                    clienteInptelefono={clienteInptelefono}
+                                    setclienteInptelefono={setclienteInptelefono}
+                                    clienteInpdireccion={clienteInpdireccion}
+                                    setclienteInpdireccion={setclienteInpdireccion}
+                                    number={number}
+                                />
+                            )}
+                            <div className="input-group mb-3">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    ref={inputbusquedaProductosref}
+                                    placeholder="Buscar... Presiona (ESC)"
+                                    onChange={(e) => getProductos(e.target.value)}
+                                />
+                                {/*<button onClick={()=>setshowinputaddCarritoFast(!showinputaddCarritoFast)} className={("btn btn-outline-")+(showinputaddCarritoFast?"success":"sinapsis")}>Agg. rápido</button>*/}
+
+                                {showOptionQMain ? (
+                                    <>
+                                        <span
+                                            className="input-group-text pointer"
+                                            onClick={() => setshowOptionQMain(false)}
+                                        >
+                                            <i className="fa fa-arrow-right"></i>
+                                        </span>
+                                        <span
+                                            className="input-group-text pointer"
+                                            onClick={() => {
+                                                let num = window.prompt(
+                                                    "Número de resultados a mostrar"
+                                                );
+                                                if (num) {
+                                                    setNum(num);
+                                                }
+                                            }}
+                                        >
+                                            Num.({num})
+                                        </span>
+                                        <span
+                                            className="input-group-text pointer"
+                                            onClick={() => setItemCero(!itemCero)}
+                                        >
+                                            En cero: {itemCero ? "Sí" : "No"}
+                                        </span>
+                                    </>
+                                ) : (
+                                    <span
+                                        className="input-group-text pointer"
+                                        onClick={() => setshowOptionQMain(true)}
+                                    >
+                                        <i className="fa fa-arrow-left"></i>
+                                    </span>
+                                )}
+                            </div>
+                            <ProductosList
+                                moneda={moneda}
+                                auth={auth}
+                                productos={productos}
+                                addCarrito={addCarrito}
+                                clickSetOrderColumn={clickSetOrderColumn}
+                                orderColumn={orderColumn}
+                                orderBy={orderBy}
+                                counterListProductos={counterListProductos}
+                                setCounterListProductos={setCounterListProductos}
+                                tbodyproductosref={tbodyproductosref}
+                                focusCtMain={focusCtMain}
+                                selectProductoFast={selectProductoFast}
+                            />
+                            {productos.length == 0 ? (
+                                <div className="text-center p-2">
+                                    <small className="mr-2">Nada para mostrar...</small>
+                                </div>
+                            ) : null}
+
+                            {viewCaja ? (
+                                <Cajagastos
+                                    setMovimientoCaja={setMovimientoCaja}
+                                    movCajadescripcion={movCajadescripcion}
+                                    setMovCajadescripcion={setMovCajadescripcion}
+                                    movCajamonto={movCajamonto}
+                                    setMovCajamonto={setMovCajamonto}
+                                    number={number}
+                                    setMovCajacategoria={setMovCajacategoria}
+                                    movCajacategoria={movCajacategoria}
+                                    setMovCajatipo={setMovCajatipo}
+                                    movimientosCaja={movimientosCaja}
+                                    delMovCaja={delMovCaja}
+                                    movCajatipo={movCajatipo}
+                                    movCajaFecha={movCajaFecha}
+                                    viewCaja={viewCaja}
+                                    setViewCaja={setViewCaja}
+                                    setMovCajaFecha={setMovCajaFecha}
+                                />
+                            ) : null}
+
+                        </div>
+                        {presupuestocarrito.length?
+                            <div className="col-4">
+
+                                <div className="modalpresupuesto">
+                                    <table className="table">
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                <button className="btn btn-outline-danger" onClick={()=>setpresupuestocarrito([])}><i className="fa fa-times"></i></button>
+                                                </td>
+                                                <td className="text-center">
+                                                    <h1>Presupuesto</h1>
+                                                </td>
+                                                <td className="text-right">
+                                                    <button className="btn btn-outline-success" onClick={setpresupuestocarritotopedido}><i className="fa fa-save"></i></button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table className="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Item</th>
+                                                <th>Descripción</th>
+                                                <th>Ct.</th>
+                                                <th>Precio</th>
+                                                <th className="text-right">Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {presupuestocarrito.map((e,i)=>
+                                                <tr key={i} className="pointer" onClick={() => delitempresupuestocarrito(i)}>
+                                                    <td>{i+1}</td>
+                                                    <td>{e.descripcion}</td>
+                                                    <td>{e.cantidad}</td>
+                                                    <td>{e.precio}</td>
+                                                    <td className="text-right">{e.subtotal}</td>
+                                                </tr>
+                                            )}
+                                            <tr>
+                                                <td colSpan="4" className="h4 text-right">
+                                                    Total
+                                                </td>
+                                                <td className="text-right text-success h3">{sumsubtotalespresupuesto()}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        :null}
+                    </div>
                 </div>
             ) : null}
             {view == "pedidosCentral" ? (
@@ -4916,6 +5048,7 @@ export default function Facturar({ user, notificar, setLoading }) {
 
             {view == "inventario" ? (
                 <Inventario
+                    user={user}
                     setStockMin={setStockMin}
                     datamodalhistoricoproducto={datamodalhistoricoproducto}
                     setdatamodalhistoricoproducto={setdatamodalhistoricoproducto}

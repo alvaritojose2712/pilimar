@@ -53,7 +53,8 @@ export default function InventarioForzado({
 
     datamodalhistoricoproducto,
     setdatamodalhistoricoproducto,
-    getmovientoinventariounitario
+    getmovientoinventariounitario,
+    user,
     
 }){
     const getPorGanacia = (precio,base) => {
@@ -219,11 +220,16 @@ export default function InventarioForzado({
                                 <option value="desc">Orden Desc</option>
                             </select>
                             <button className="btn btn-warning ms-2" onClick={reporteInventario}>Reporte General <i className="fa fa-print"></i></button>
-                            <button className="btn btn-outline-success" onClick={() => changeInventario(null, null, null, "add")}>Nuevo (f2) <i className="fa fa-plus"></i></button>
+                            {user.iscentral?
+                                <button className="btn btn-outline-success" onClick={() => changeInventario(null, null, null, "add")}>Nuevo (f2) <i className="fa fa-plus"></i></button>
+                            :null}
+                            
                             {busquedaAvanazadaInv?
                                 <button className="btn btn-success" onClick={buscarInvAvanz}><i className="fa fa-search"></i></button>
                             :null}
-                            <button className="btn btn-success text-light" onClick={guardarNuevoProductoLote}>Guardar (f1)</button>
+                            {user.iscentral?
+                                <button className="btn btn-success text-light" onClick={guardarNuevoProductoLote}>Guardar (f1)</button>
+                            :null}
 
                         </div>
                     </div>
@@ -236,7 +242,7 @@ export default function InventarioForzado({
                 <table className="table">
                     <thead>
                         <tr>
-                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("id")}>ID</span></th>
+                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("id")}>{!user.iscentral?"ID VINCULACION":null} ID</span></th>
                             <th className="cell1 pointer"><span onClick={() => setInvorderColumn("codigo_proveedor")}>C. Alterno</span></th>
                             <th className="cell1 pointer"><span onClick={() => setInvorderColumn("codigo_barras")}>C. Barras</span></th>
                             <th className="cell05 pointer"><span onClick={() => setInvorderColumn("unidad")}>Unidad</span></th>
@@ -285,7 +291,7 @@ export default function InventarioForzado({
                         {productosInventario.length?productosInventario.map((e,i)=>
                             <tr key={i} className="pointer" onDoubleClick={() => changeInventario(null, i, e.id, "update")}>
                                 <td className="cell05">
-                                    {e.id}
+                                    <b>{!user.iscentral?e.id_vinculacion:null}</b> / {e.id}
                                 </td>
                                 {type(e.type)?
                                 <>
@@ -452,6 +458,9 @@ export default function InventarioForzado({
                                 }
                                     <td className="cell1">
                                         <div className='d-flex justify-content-between'>
+
+                                        {user.iscentral?
+                                        <>
                                             {!e.type ?
                                                 <>
                                                     <span className="btn-sm btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delMode")}><i className="fa fa-trash"></i></span>
@@ -467,6 +476,8 @@ export default function InventarioForzado({
                                             {e.type === "delete" ?
                                                 <span className="btn-sm btn btn-danger" onClick={() => changeInventario(null, i, e.id, "delModeUpdateDelete")}><i className="fa fa-arrow-left"></i></span>
                                                 : null}
+                                        </>
+                                        :null}
 
                                             <span className="btn-sm btn btn-warning" onClick={() => printTickedPrecio(e.id)}><i className="fa fa-print"></i></span>
 

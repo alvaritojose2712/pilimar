@@ -14,9 +14,10 @@ import React, { useEffect } from 'react';
 
 
 function Inventario({
+  user,
   printTickedPrecio,
   setdropprintprice,
-dropprintprice,
+  dropprintprice,
   printPrecios,
   setCtxBulto,
   setStockMin,
@@ -277,8 +278,9 @@ dropprintprice,
         <div className="col mb-2 d-flex justify-content-between">
           <div className="btn-group">              
               <button className={("btn ")+(subViewInventario=="inventario"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewInventario("inventario")}>Inventario</button>
-              
-              <button className={("btn ")+(subViewInventario=="proveedores"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewInventario("proveedores")}>Proveedores</button>
+              {user.iscentral?
+                <button className={("btn ")+(subViewInventario=="proveedores"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewInventario("proveedores")}>Proveedores</button>
+              :null}
               <>
                 <button className={("btn ") + (subViewInventario=="facturas"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewInventario("facturas")}>Facturas</button>
               </>
@@ -557,6 +559,7 @@ dropprintprice,
 
             {modViewInventario=="list"?
               <InventarioForzado
+                user={user}
                 setStockMin={setStockMin}
                 getmovientoinventariounitario={getmovientoinventariounitario}
                 datamodalhistoricoproducto={datamodalhistoricoproducto}

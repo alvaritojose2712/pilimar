@@ -117,6 +117,9 @@ class HomeController extends Controller
                 $query->orWhere('usuario', $req->usuario);
             })
             ->first();
+        
+
+            $sucursal = sucursal::all()->first();
             
             if ($d&&Hash::check($req->clave, $d->clave)) {
                 $arr_session =  [
@@ -126,6 +129,8 @@ class HomeController extends Controller
                     "role" => $this->role($d->tipo_usuario),
                     "usuario" => $d->usuario,
                     "nombre" => $d->nombre,
+                    "sucursal" => $sucursal->codigo,
+                    "iscentral" => $sucursal->iscentral,
                 ];
                 session($arr_session);
                 

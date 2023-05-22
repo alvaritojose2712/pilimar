@@ -1,4 +1,19 @@
-export default function ModalAddCarrito({dolar,moneda,number,inputCantidadCarritoref,producto,pedidoList,setSelectItem,addCarritoRequest,cantidad,numero_factura,setCantidad,setNumero_factura,setFalla}) {
+export default function ModalAddCarrito({
+  dolar,
+  moneda,
+  number,
+  inputCantidadCarritoref,
+  producto,
+  pedidoList,
+  setSelectItem,
+  addCarritoRequest,
+  cantidad,
+  numero_factura,
+  setCantidad,
+  setNumero_factura,
+  setFalla,
+  setPresupuesto
+}) {
   const setbultocarrito = bulto => {
     let insert = window.prompt("Cantidad por bulto")
     if (insert) {
@@ -54,7 +69,7 @@ export default function ModalAddCarrito({dolar,moneda,number,inputCantidadCarrit
             <div className="btn-group">
               <button className="btn btn-sinapsis agregar_carrito" type="button" onClick={addCarritoRequest} data-type="agregar">Agregar(enter)</button>
               <button className="btn btn-outline-success" type="button" onClick={addCarritoRequest} data-type="agregar_procesar">Procesar(TAB)</button>
-              <button className="btn btn-outline-secondary btn-sm" type="button" onClick={setFalla} data-id={producto.id}>Falla</button>
+              <button className="btn btn-outline-secondary btn-sm" type="button" onClick={setPresupuesto} data-id={producto.id}>Presupuesto</button>
               
             </div>
           </form>

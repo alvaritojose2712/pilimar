@@ -26,6 +26,8 @@ class CreateSucursalsTable extends Migration
             $table->string("correo");
             $table->string("nombre_registro");
             $table->string("rif");
+            $table->boolean("iscentral")->default(0);
+
 
             $table->string("tickera")->nullable();
             $table->string("fiscal")->nullable();

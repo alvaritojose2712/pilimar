@@ -80,6 +80,16 @@
 		.d-flex div{
 			display: inline-block;
 		}
+		
+		.tr-striped:nth-child(odd) {
+            background-color: #8F9AA5;
+        }
+		.bg-danger-light{
+			background-color: #fec7d1 !important; 
+		}
+		.bg-success-light{
+			background-color: #c4f7c7 !important; 
+		}
 
 	</style>
 </head>
@@ -356,18 +366,85 @@
 		<hr/>
 		
 		<table class="table">
+			<thead>
+				<tr>
+					<th colspan="9">
+						MOVIMIENTOS DE INVENTARIO
+					</th>
+				</tr>
+			  <tr>
+				<th class="pointer">Usuario</th>
+				<th class="pointer">Origen</th>
+				<th class="pointer">Alterno</th>
+				<th class="pointer">Barras</th>
+				<th class="pointer">Descripción</th>
+				<th class="pointer">Cantidad</th>
+				<th class="pointer">Base</th>
+				<th class="pointer">Venta</th>
+				<th class="pointer">Hora</th>
+			  </tr>
+			</thead>
+				@foreach ($movimientosInventario as $e)
+					<tbody>
+						<tr>
+							<td rowSpan="2" class='align-middle'>{{$e->usuario?$e->usuario->usuario:""}}</td>
+							<td rowSpan="2" class='align-middle'>{{$e->origen?$e->origen:""}}</td>
+							@if ($e->antes)
+								<td class="bg-danger-light">{{$e->antes->codigo_proveedor?$e->antes->codigo_proveedor:""}}</td>
+								<td class="bg-danger-light">{{$e->antes->codigo_barras?$e->antes->codigo_barras:""}}</td>
+								<td class="bg-danger-light">{{$e->antes->descripcion?$e->antes->descripcion:""}}</td>
+								<td class="bg-danger-light">{{$e->antes->cantidad?$e->antes->cantidad:""}}</td>
+								<td class="bg-danger-light">{{$e->antes->precio_base?$e->antes->precio_base:""}}</td>
+								<td class="bg-danger-light">{{$e->antes->precio?$e->antes->precio:""}}</td>
+							@else
+								<td colSpan="6" class='text-center h4'>
+								Producto nuevo
+								</td>
+							@endif
+							
+							<td>{{$e->created_at?$e->created_at:""}}</td>
+						</tr>
+						<tr>
+							@if ($e->despues)
+								<td class="bg-success-light">{{$e->despues->codigo_proveedor?$e->despues->codigo_proveedor:""}}</td>
+								<td class="bg-success-light">{{$e->despues->codigo_barras?$e->despues->codigo_barras:""}}</td>
+								<td class="bg-success-light">{{$e->despues->descripcion?$e->despues->descripcion:""}}</td>
+								<td class="bg-success-light">{{$e->despues->cantidad?$e->despues->cantidad:""}}</td>
+								<td class="bg-success-light">{{$e->despues->precio_base?$e->despues->precio_base:""}}</td>
+								<td class="bg-success-light">{{$e->despues->precio?$e->despues->precio:""}}</td>
+							@else
+								<td colSpan="6" class='text-center h4'>
+								Producto Eliminado
+								</td>
+							@endif
+							<td>{{$e->created_at?$e->created_at:""}}</td>
+						</tr>
+					</tbody>
+				@endforeach
+		  </table>
+		<table class="table">
 			<tbody>
 				<tr>
-					<th colspan="6">MOVIMIENTOS</th>
+					<th colspan="7">MOVIMIENTOS DE PEDIDOS</th>
 				</tr>
 					@foreach($movimientos as $val)
 						@if ($val->motivo)
 							<tr>
+								<td>{{$val->usuario->usuario}}</td>
 								<td>{{$val->tipo}}</td>
 								<td><b>Motivo</b><br/>{{$val->motivo}}</td>
-								<td><b>Pago</b><br/>{{$val->tipo_pago}}</td>
+								<td><b>{{$val->tipo_pago?"MétodoDePago":"Sin pago"}}</b><br/>{{$val->tipo_pago}}</td>
 								<td><b>Monto</b><br/>{{$val->monto}}</td>
-								<td><b>Items</b><br/>{{count($val->items)}}</td>
+								<td>
+									<b>Items {{count($val->items)}}</b>
+									
+									<br/>
+									@foreach ($val->items as $item)
+										@if ($item->producto)
+											{{$item->producto->codigo_barras}} <br>
+										@endif
+									@endforeach
+								</td>
 								<td>{{$val->created_at}}</td>
 							</tr>
 

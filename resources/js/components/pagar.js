@@ -151,7 +151,7 @@ const showTittlePrice = (pu,total) => {
   }
 }
 
-
+const [isrefbanbs, setisrefbanbs] = useState(true)
 const [recibido_dolar, setrecibido_dolar] = useState("")
 const [recibido_bs, setrecibido_bs] = useState("")
 const [recibido_cop, setrecibido_cop] = useState("")
@@ -756,11 +756,20 @@ const syncPago = (val,type)=>{
                                 <option value="0173">0173 Banco Internacional de Desarrollo C.A., Banco Universal</option>	
                                 <option value="0174">0174 Banplus Banco Universal, C.A.</option>	
                                 <option value="0177">0177 Banco de la Fuerza Armada Nacional Bolivariana, B.U.</option>	
+                                <option value="ZELLE">ZELLE</option>	
+                                <option value="BINANCE">Binance</option>	
+                                <option value="AirTM">AirTM</option>	
                               </select>
                             </div>
 
                             <div className="form-group">
-                              <label className="form-label">Monto en Bs</label>
+                              <label className="form-label mt-2">Monto en {isrefbanbs
+                                  ? 
+                                  <button className="btn btn-outline-sinapsis btn-sm" onClick={()=>{setisrefbanbs(false);setmonto_referenciapago(transferencia)}}>Bs</button>
+                                  : 
+                                  <button className="btn btn-outline-success btn-sm" onClick={()=>{setisrefbanbs(true);setmonto_referenciapago(transferencia*dolar)}}>$</button>
+                                }  
+                              </label>
                               <input type="text" disabled={true} value={monto_referenciapago} onChange={e=>setmonto_referenciapago(e.target.value)} className="form-control" />
                             </div>
 
@@ -787,8 +796,8 @@ const syncPago = (val,type)=>{
                       
                         {refPago ? refPago.length ? refPago.map(e=>
                           <li key={e.id} className='list-group-item d-flex justify-content-between align-items-start'>
-                            <span className='cell45'>Ref.{e.descripcion}</span>
-                            {e.tipo==1&&e.monto!=0?<span className="cell45 btn-sm btn-info btn">Trans. Bs.{moneda(e.monto)} </span>:null}
+                            <span className='cell45'>Ref.{e.descripcion} ({e.banco})</span>
+                            {e.tipo==1&&e.monto!=0?<span className="cell45 btn-sm btn-info btn">Trans. {moneda(e.monto)} </span>:null}
 	                          {e.tipo==2&&e.monto!=0?<span className="cell45 btn-sm btn-secondary btn">Deb. Bs.{moneda(e.monto)} </span>:null}
 	                          {e.tipo==5&&e.monto!=0?<span className="cell45 btn-sm btn-secondary btn">Biopago. Bs.{moneda(e.monto)} </span>:null}
                             <span className="cell1 text-danger text-right" data-id={e.id} onClick={delRefPago}>

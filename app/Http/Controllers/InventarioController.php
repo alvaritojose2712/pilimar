@@ -749,6 +749,7 @@ class InventarioController extends Controller
     public function setMovimientoNotCliente($id_pro,$des,$ct,$precio,$cat)
     {   
         $mov = new movimientos;
+        $mov->id_usuario = session("id_usuario");
             
             if ($mov->save()) {
                $items_mov = new items_movimiento;
@@ -897,6 +898,11 @@ class InventarioController extends Controller
 
     public function guardarProducto($arrproducto){
         try {
+
+            if (!session("iscentral")) {
+                throw new \Exception("No tiene permisos para gestionar Inventario", 1);
+                
+            }
             $id_factura = $arrproducto["id_factura"];
             $req_inpInvcantidad = $arrproducto["cantidad"];
             $req_inpInvbarras = $arrproducto["codigo_barras"];

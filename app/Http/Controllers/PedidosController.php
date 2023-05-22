@@ -18,6 +18,8 @@ use App\Models\sucursal;
 use App\Models\movimientos;
 use App\Models\items_movimiento;
 use App\Models\pagos_referencias;
+use App\Models\movimientosInventario;
+
 
 
 use Illuminate\Support\Facades\Cache;
@@ -454,8 +456,6 @@ class PedidosController extends Controller
     }
     public function delpedido(Request $req)
     {
-
-
         try {
             if (session("tipo_usuario")!=1) {
                 throw new \Exception("¡No tiene permisos para eliminar! Contacte con un Administrador.", 1);
@@ -466,6 +466,7 @@ class PedidosController extends Controller
             $this->checkPedidoAuth($id);
             if ($id) {
                 $mov = new movimientos;
+                $mov->id_usuario = session("id_usuario");
 
                $items = items_pedidos::where("id_pedido",$id)->get();
                $monto_pedido = pago_pedidos::where("id_pedido",$id)->where("monto","<>",0)->get();
@@ -493,7 +494,7 @@ class PedidosController extends Controller
                    
 
                    $items_mov = new items_movimiento;
-                   $items_mov->id_producto = $value->id;
+                   $items_mov->id_producto = $value->id_producto;
                    $items_mov->cantidad = $value->cantidad;
                    $items_mov->tipo = 2;
                    $items_mov->categoria = "Eliminación de pedido - Item";
@@ -514,7 +515,7 @@ class PedidosController extends Controller
     {
         
         $pedido = pedidos::with(["referencias"=>function($q){
-            $q->select(["id","tipo","descripcion","monto","id_pedido"]);
+            $q->select(["id","tipo","descripcion","monto","id_pedido","banco"]);
         },"vendedor"=>function($q){
             $q->select(["id","usuario","tipo_usuario","nombre"]);
         },"cliente"=>function($q){
@@ -1203,13 +1204,35 @@ class PedidosController extends Controller
 
         
         
-        $movimientos = movimientos::with(["items"=>function($q){
+        $movimientos = movimientos::with(["usuario"=>function($q){
+            $q->select(["id","nombre","usuario"]);
+        },"items"=>function($q){
             $q->with("producto");
         }])->where("created_at","LIKE",$req->fecha."%")->get();
 
+        $movimientosInventario = movimientosInventario::with(["usuario"=>function($q){
+            $q->select(["id","nombre","usuario"]);
+        }])->where("created_at","LIKE",$req->fecha."%")
+        ->get()
+        ->map(function($q){
+            if ($q->antes) {
+                $q->antes = json_decode($q->antes);
+            }
+            if ($q->despues) {
+                $q->despues = json_decode($q->despues);
+            }
+            return $q;
+        });
+
+
+
+
         $facturado = $this->cerrarFun($req->fecha,0,0,0,[],false,$totalizarcierre);
 
-
+        
+        if (is_object($facturado)) {
+            return $facturado;
+        }
         $arr_send = [
             "referencias"=>$pagos_referencias,
             "cierre" => $cierre,
@@ -1221,7 +1244,7 @@ class PedidosController extends Controller
             "total_inventario_base_format" =>number_format($total_inventario_base,2,",","."),
            
             "vueltos_totales" =>number_format($vueltos_totales,2,",","."),
-            "vueltos_des" =>$facturado["vueltos_des"],
+            "vueltos_des" => $facturado["vueltos_des"],
 
             "precio"=> number_format($facturado["precio"],2,",","."),
             "precio_base"=> number_format($facturado["precio_base"],2,",","."),
@@ -1232,6 +1255,7 @@ class PedidosController extends Controller
             "facturado_tot" => number_format($facturado[2]+$facturado[3]+$facturado[1]+$facturado[5],2,",","."),
             "sucursal"=>$sucursal,
             "movimientos"=>$movimientos,
+            "movimientosInventario"=>$movimientosInventario,
         ];
 
         
@@ -1358,6 +1382,7 @@ class PedidosController extends Controller
             $from = $sucursal->sucursal;
             $subject = $sucursal->sucursal." | CIERRE DIARIO | ".$req->fecha;
             try {
+                \Artisan::call('database:backup');
                 $sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
                 //Mail::to($this->sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
                 

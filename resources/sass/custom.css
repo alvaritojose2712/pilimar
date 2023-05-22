@@ -173,6 +173,20 @@ td,th{
 .fs-10px{
  font-size: 10px !important;
 }
+.modalpresupuesto{
+  background-color: white;
+  box-shadow: 6px 5px 26px -1px #0d0d0c;
+  padding: 10px;
+  border-radius: 5px;
+  border: solid darkgray 2px;
+  /* width: 500px;
+  height: 500px;
+  top: 200px;
+  right: 0px;
+  z-index: 99999;
+  position: fixed; */
+  overflow-y: auto;
+}
 .modalmovil{
   background-color: white;
   box-shadow: 6px 5px 26px -1px #0d0d0c;
