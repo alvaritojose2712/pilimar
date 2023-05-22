@@ -38,6 +38,20 @@ class CreateSucursalsTable extends Migration
 
             $table->timestamps();
         });
+
+        DB::table("sucursals")->insert([
+            [
+                "sucursal" => "aaa",
+                "codigo" => "ARAMCAL",
+                "direccion_registro" => "aaa",
+                "direccion_sucursal" => "aaa",
+                "telefono1" => "aaa",
+                "telefono2" => "aaa",
+                "correo" => "aaa",
+                "nombre_registro" => "aaa",
+                "rif" => "aaa",
+            ],
+        ]);
     }
 
     /**

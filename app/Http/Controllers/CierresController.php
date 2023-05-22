@@ -23,7 +23,9 @@ class CierresController extends Controller
         return ["tipo_accionCierre"=>$tipo_accion];
     }
     public function getTotalizarCierre(Request $req)
-    {
+    {   
+        $bs = (new PedidosController)->get_moneda()["bs"];
+
         $today = (new PedidosController)->today();
         $c = cierres::where("tipo_cierre",0)->where("fecha",$today)->get();
 
@@ -35,7 +37,7 @@ class CierresController extends Controller
             "dejar_dolar" => $c->sum("dejar_dolar"),
             "dejar_peso" => $c->sum("dejar_peso"),
             "dejar_bss" => $c->sum("dejar_bss"),
-            "caja_biopago" => $c->sum("caja_biopago"),
+            "caja_biopago" => $c->sum("caja_biopago")*$bs,
         ];
     }
 }

@@ -24,7 +24,7 @@ function Index() {
             }
         }
     } 
-    const notificar = (msj, fixed = true) => {
+    const notificar = (msj, fixed = true, simple=false) => {
         if (fixed) {
             setTimeout(() => {
                 setMsj("")
@@ -41,6 +41,8 @@ function Index() {
 
                     setMsj(JSON.stringify(msj.data))
                 }
+            }else if(typeof msj === 'string' || msj instanceof String){
+                setMsj(msj)
             }
 
         }

@@ -118,6 +118,8 @@ class PagoPedidosController extends Controller
                // 6 vuelto
             try {
                 (new PedidosController)->checkPedidoAuth($req->id);
+                
+                
 
                 $cuenta = 1;
                 $checkIfAbono = items_pedidos::where("id_producto",NULL)->where("id_pedido",$req->id)->get()->count();

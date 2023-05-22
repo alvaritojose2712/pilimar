@@ -34,21 +34,144 @@ export default function PedidosCentralComponent({
 	setinventarioModifiedCentralImport,
 	inventarioModifiedCentralImport,
 	saveChangeInvInSucurFromCentral,
+
+	getTareasCentral,
+	settareasCentral,
+	tareasCentral,
+	runTareaCentral,
 }){
 
-	const [subviewcentral, setsubviewcentral] = useState("pedidos")
+	const [subviewcentral, setsubviewcentral] = useState("tareas")
 	try {
 		return (
-			<div className="container">
+			<div className="container-fluid">
 				<div className="btn-group mb-2">
+					<button className={subviewcentral == "tareas" ? ("btn btn-outline-sinapsis") : ("btn btn-outline-secondary")} onClick={() => { setsubviewcentral("tareas") }}>Tareas</button>
 					<button className={subviewcentral == "pedidos" ? ("btn btn-outline-sinapsis") : ("btn btn-outline-secondary")} onClick={() => { getPedidosCentral(); setsubviewcentral("pedidos") }}>Recibir Pedidos</button>
-					<button className={subviewcentral == "inventario" ? ("btn btn-outline-sinapsis") : ("btn btn-outline-secondary")} onClick={() => { getInventarioFromSucursal(); setsubviewcentral("inventario") }}>Actualizar Inventario</button>
-
+					{/* <button className={subviewcentral == "inventario" ? ("btn btn-outline-sinapsis") : ("btn btn-outline-secondary")} onClick={() => { getInventarioFromSucursal(); setsubviewcentral("inventario") }}>Actualizar Inventario</button>
+ */}
 				</div>
+				{subviewcentral == "tareas" ?
+					<>
+						<h1>Tareas <button className="btn btn-outline-success btn-sm" onClick={()=>getTareasCentral([0])}> <i className="fa fa-search"></i>	</button></h1>
+						<div className="row">
 
+							<div className="col">
+								
+								<div>
+									{
+										tareasCentral.length
+											? tareasCentral.map((e,i) =>
+												e ?
+													<div
+														onClick={() => runTareaCentral(i)}
+														key={e.id}
+														className={("bg-light text-secondary") + " card mt-2 pointer"}>
+														<div className="card-body flex-row justify-content-between">
+															<div>
+																<h4>Origen <button className="btn btn-secondary">{e.origen.nombre}</button> </h4>
+																<h4>Destino <button className="btn btn-secondary">{e.destino.nombre}</button> </h4>
+																<small className="text-muted fst-italic">Acción</small> <br />
+																<small className="text-muted fst-italic"><b>{e.accion}</b> </small>
+																<br />
+																<small className="text-muted fst-italic">Parámetros</small> <br />
+																<small className="text-muted fst-italic"><b>{e.solicitud}</b> </small>
+																<br />
+																{e.respuesta&&e.estado==2?
+																<>
+
+																	<small className="text-success fst-italic">Hay respuesta por resolver</small> 
+																	<table className="table">
+																		<thead>
+																			<tr>
+																				<td>id</td>
+																				<td>id_vinculacion</td>
+																				<td>codigo_proveedor</td>
+																				<td>codigo_barras</td>
+																				<td>descripcion</td>
+																				<td>cantidad</td>
+																				<td>stockmax</td>
+																				<td>stockmin</td>
+																				<td>unidad</td>
+																				<td>id_categoria</td>
+																				<td>id_proveedor</td>
+																				<td>precio</td>
+																				<td>precio_base</td>
+																				<td>iva</td>
+																				<td>estatus</td>
+																				<td>type</td>
+																			</tr>
+																		</thead>
+																			{
+																				e.respuesta.length?
+																					e.respuesta.map(ee=>
+																						<tbody key={ee.id}>	
+																							{ee["original"]?
+																								<tr className='bg-danger-light'>
+																									<td>{ee["original"].id}</td>
+																									<td>{ee["original"].id_vinculacion}</td>
+																									<td>{ee["original"].codigo_proveedor}</td>
+																									<td>{ee["original"].codigo_barras}</td>
+																									<td>{ee["original"].descripcion}</td>
+																									<td>{ee["original"].cantidad}</td>
+																									<td>{ee["original"].stockmax}</td>
+																									<td>{ee["original"].stockmin}</td>
+																									<td>{ee["original"].unidad}</td>
+																									<td>{ee["original"].id_categoria}</td>
+																									<td>{ee["original"].id_proveedor}</td>
+																									<td>{ee["original"].precio}</td>
+																									<td>{ee["original"].precio_base}</td>
+																									<td>{ee["original"].iva}</td>
+																									<td>{ee["original"].estatus}</td>
+																									<td>{ee["original"].type}</td>
+																								</tr>
+																							:null}
+																							<tr className='bg-success-light'>
+																								<td>{ee.id}</td>
+																								<td>{ee.id_vinculacion}</td>
+																								<td>{ee.codigo_proveedor}</td>
+																								<td>{ee.codigo_barras}</td>
+																								<td>{ee.descripcion}</td>
+																								<td>{ee.cantidad}</td>
+																								<td>{ee.stockmax}</td>
+																								<td>{ee.stockmin}</td>
+																								<td>{ee.unidad}</td>
+																								<td>{ee.id_categoria}</td>
+																								<td>{ee.id_proveedor}</td>
+																								<td>{ee.precio}</td>
+																								<td>{ee.precio_base}</td>
+																								<td>{ee.iva}</td>
+																								<td>{ee.estatus}</td>
+																								<td>{ee.type}</td>
+																							</tr>
+																						</tbody>
+
+																						)
+																				:null
+																			}
+																		
+																	</table>
+
+
+																</>
+																:null}
+															</div>
+														</div>
+
+													</div>
+													: null
+											)
+											: <div className='h3 text-center text-dark mt-2'><i>¡Sin resultados!</i></div>
+
+									}
+								</div>
+							</div>
+						</div>
+					</>
+					: null}
 				{subviewcentral == "pedidos" ?
 					<>
-						<h1>Pedidos</h1>
+						<h1>Pedidos <button className="btn btn-outline-success btn-sm" onClick={()=>getPedidosCentral()}><i className="fa fa-search"></i></button></h1>
 						<div className="row">
 
 							<div className="col-3">
@@ -145,29 +268,33 @@ export default function PedidosCentralComponent({
 												pedidosCentral[indexPedidoCentral] ?
 													pedidosCentral[indexPedidoCentral].items.map((e, i) =>
 														<tr key={e.id}
-															className={(e.aprobado ? "bg-success-light" : (e.aprobado === false ? "bg-sinapsis-light" : null)) + (" pointer")}>
+															className={(e.aprobado ? "bg-success-light" : "bg-sinapsis-light" ) + (" pointer")}>
 															<td
 																onClick={selectPedidosCentral}
 																data-index={i}
 																data-tipo="select"
 															>
-																<input type="checkbox"
-																	className="form-check-input"
-																	readOnly={true}
-																	checked={typeof (e.aprobado) != "undefined" ? true : false}
-																/>
+																{typeof (e.aprobado) === "undefined"?
+																	<button className="btn btn-outline-danger"><i className="fa fa-times"></i></button>
+																:
+																	e.aprobado === true?
+																		<button className="btn btn-outline-success"><i className="fa fa-check"></i></button>
+																	:null
+																}
+
+																
 															</td>
 															<th className="align-middle">
 																<span className={(typeof (e.ct_real) != "undefined" ? "text-decoration-line-through" : null)}>{e.cantidad.toString().replace(/\.00/, "")}</span>
 																<br />
-																{typeof (e.ct_real) != "undefined" ?
+																{/* {typeof (e.ct_real) != "undefined" ?
 																	<input type="text" value={e.ct_real}
 																		data-index={i}
 																		data-tipo="changect_real"
 																		onChange={selectPedidosCentral}
 																		size="4"
 																	/>
-																	: null}
+																	: null} */}
 															</th>
 															<td className="align-middle">
 																<small className="text-muted">{e.producto.codigo_barras}</small>
@@ -213,7 +340,7 @@ export default function PedidosCentralComponent({
 						</div>
 					</>
 					: null}
-				{subviewcentral == "inventario" ?
+				{/* {subviewcentral == "inventario" ?
 					<>
 						<h1>Inventario</h1>
 						<button className="btn btn-outline-sinapsis pull-right" onClick={() => { setInventarioFromSucursal(); setsubviewcentral("") }}>Exportar inventario a Central</button>
@@ -280,7 +407,7 @@ export default function PedidosCentralComponent({
 							Guardar Cambios
 						</button> : null}
 					</>
-					: null}
+					: null} */}
 
 
 			</div>

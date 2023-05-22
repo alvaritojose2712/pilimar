@@ -76,6 +76,10 @@ const db = {
   
   getBuscarDevolucion: data=>axios.post(host+"getBuscarDevolucion",data),
   getBuscarDevolucionhistorico: data=>axios.post(host+"getBuscarDevolucionhistorico",data),
+
+  getTareasCentral: data=>axios.get(host+"getTareasCentral",{params:data}),
+  
+  runTareaCentral: data=>axios.post(host+"runTareaCentral",data),
   
 
   delMov: data=>axios.post(host+"delMov",data),
@@ -144,9 +148,18 @@ const db = {
   
   removeLote: data=>axios.post(host+"removeLote",data),
   getEstaInventario: data => axios.post(host + "getEstaInventario", data),
+  
+  getUniqueProductoById: data => axios.get(host + "getUniqueProductoById", { params: data }),
   setPagoProveedor: data => axios.post(host + "setPagoProveedor", data),
   getPagoProveedor: data => axios.post(host + "getPagoProveedor", data),
   delPagoProveedor: data => axios.post(host + "delPagoProveedor", data),
+
+  
+  getHistoricoInventario: data => axios.get(host + "getHistoricoInventario", { params: data }),
+  getmovientoinventariounitario: data => axios.get(host + "getmovientoinventariounitario", { params: data }),
+  getSyncProductosCentralSucursal: data => axios.post(host + "getSyncProductosCentralSucursal", data),
+  
+
   
   addRefPago: data => axios.post(host + "addRefPago", data),
   delRefPago: data=>axios.post(host+"delRefPago",data),
@@ -156,6 +169,8 @@ const db = {
   setGasto: data=>axios.post(host+"setGasto",data),
   
   setCtxBulto: data=>axios.post(host+"setCtxBulto",data),
+  setStockMin: data=>axios.post(host+"setStockMin",data),
+  
   setPrecioAlterno: data=>axios.post(host+"setPrecioAlterno",data),
   printPrecios: data=>axios.post(host+"printPrecios",data),
   
@@ -167,6 +182,8 @@ const db = {
   setInventarioFromSucursal: data => axios.post(host + "setInventarioFromSucursal", data),
   getSucursales: data => axios.post(host + "getSucursales", data),
   getInventarioSucursalFromCentral: data => axios.post(host + "getInventarioSucursalFromCentral", data),
+  setInventarioSucursalFromCentral: data => axios.post(host + "setInventarioSucursalFromCentral", data),
+  
   setCambiosInventarioSucursal: data => axios.post(host + "setCambiosInventarioSucursal", data),
   getInventarioFromSucursal: data => axios.post(host + "getInventarioFromSucursal", data),
   saveChangeInvInSucurFromCentral: data => axios.post(host + "saveChangeInvInSucurFromCentral", data),

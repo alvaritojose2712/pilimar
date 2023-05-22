@@ -30,15 +30,31 @@ use App\Http\Controllers\GastosController;
 use App\Http\Controllers\tickeprecioController;
 use App\Http\Controllers\CierresController;
 use App\Http\Controllers\DevolucionesController;
+use App\Http\Controllers\MovimientosInventarioController;
+use App\Http\Controllers\MovimientosInventariounitarioController;
+
+
 
 
 
 
 
 Route::get('getip', [sendCentral::class,"getip"]);
+Route::get('/update', function () {
+
+
+    return '
+		c:\\xampp\mysql\bin\mysqldump -u root -p --no-create-db --no-create-info --complete-insert --extended-insert sinapsis > sinapsisData.sql <br/>
+		git stash <br/>
+		git pull https://github.com/alvaritojose2712/arabitofacturacion.git <br/>
+		php artisan optimize:clear <br/>
+		php artisan optimize <br/>
+	';
+
+});
 Route::get('/backup', function () {
 
-    \Illuminate\Support\Facades\Artisan::call('backup:run');
+    \Illuminate\Support\Facades\Artisan::call('database:backup');
 
     return 'Successful backup!';
 
@@ -129,6 +145,11 @@ Route::group(['middleware' => ['login']], function () {
 	
 	Route::group(['middleware' => ['admin']], function () {
 		
+		Route::get('getHistoricoInventario', [MovimientosInventarioController::class,"getHistoricoInventario"]);
+		Route::get('getmovientoinventariounitario', [MovimientosInventariounitarioController::class,"getmovientoinventariounitario"]);
+		Route::post('getSyncProductosCentralSucursal', [InventarioController::class,"getSyncProductosCentralSucursal"]);
+		
+		
 		
 		/* GastosController */
 		
@@ -138,6 +159,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('guardarNuevoProductoLote', [InventarioController::class,"guardarNuevoProductoLote"]);
 
 		Route::post('setCtxBulto', [InventarioController::class,"setCtxBulto"]);
+		Route::post('setStockMin', [InventarioController::class,"setStockMin"]);
+		
 		Route::post('setPrecioAlterno', [InventarioController::class,"setPrecioAlterno"]);
 		
 		Route::post('getProveedores', [ProveedoresController::class,"getProveedores"]);
@@ -226,12 +249,14 @@ Route::group(['middleware' => ['login']], function () {
 	
 	
 	//Update App
-	Route::get('update', [sendCentral::class,"updateApp"]);
+	//Route::get('update', [sendCentral::class,"updateApp"]);
 	
 	
 	//Central
 		Route::post('checkPedidosCentral', [InventarioController::class,"checkPedidosCentral"]);
 		Route::post('saveChangeInvInSucurFromCentral', [InventarioController::class,"saveChangeInvInSucurFromCentral"]);
+		Route::get('getUniqueProductoById', [InventarioController::class,"getUniqueProductoById"]);
+
 		
 		
 		Route::get('setVentas', [sendCentral::class,"setVentas"]);
@@ -263,9 +288,15 @@ Route::group(['middleware' => ['login']], function () {
 	Route::post('setInventarioFromSucursal', [sendCentral::class,"setInventarioFromSucursal"]);
 	Route::post('getSucursales', [sendCentral::class,"getSucursales"]);
 	Route::post('getInventarioSucursalFromCentral', [sendCentral::class,"getInventarioSucursalFromCentral"]);
+	Route::post('setInventarioSucursalFromCentral', [sendCentral::class,"setInventarioSucursalFromCentral"]);
+	
 	Route::post('getInventarioFromSucursal', [sendCentral::class,"getInventarioFromSucursal"]);
 	
 	Route::post('setCambiosInventarioSucursal', [sendCentral::class,"setCambiosInventarioSucursal"]);
+	Route::get('getTareasCentral', [sendCentral::class,"getTareasCentral"]);
+	Route::post('runTareaCentral', [sendCentral::class,"runTareaCentral"]);
+	
+	
 	
 	
 	

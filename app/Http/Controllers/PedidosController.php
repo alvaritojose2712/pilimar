@@ -409,15 +409,13 @@ class PedidosController extends Controller
             $estado = true;
         }else{
 
-            if ($tipo=="pedido") {
-                $pedido = pedidos::select(["estado","created_at"])->find($id);
-            }else{
-                $pedido = pedidos::select(["estado","created_at"])->find(items_pedidos::find($id)->id_pedido);
-            }
+            $pedido = $tipo=="pedido"? pedidos::select(["estado","created_at"])->find($id): pedidos::select(["estado","created_at"])->find(items_pedidos::find($id)->id_pedido);
+            
             $fecha_creada = date("Y-m-d",strtotime($pedido->created_at));
            
             $estado = $pedido->estado;
             $last_cierre = cierres::orderBy("fecha","desc")->first();
+
         }
 
        //Si no se ha pagado
@@ -431,6 +429,16 @@ class PedidosController extends Controller
         return false;   
        }
     }
+    public function checkPedidoPago($id,$tipo="pedido")
+    {
+        $pedidomodify = $tipo=="pedido"? pedidos::find($id): pedidos::find(items_pedidos::find($id)->id_pedido);
+        if ($pedidomodify->estado) {
+            $pedidomodify->estado = 0;
+            if ($pedidomodify->save()) {
+                pago_pedidos::where("id_pedido",$pedidomodify->id)->delete();
+            }
+        }
+    }
     public function checkPedidoAuth($id,$tipo="pedido")
     {   
         if (!$this->pedidoAuth($id,$tipo)) {
@@ -439,11 +447,20 @@ class PedidosController extends Controller
 
        
     }
+    public function checksipedidoprocesado($id, $tipo="pedido")
+    {
+        $pedidomodify = $tipo=="pedido"? pedidos::find($id): pedidos::find(items_pedidos::find($id)->id_pedido);
+        return $pedidomodify->estado;
+    }
     public function delpedido(Request $req)
     {
 
 
         try {
+            if (session("tipo_usuario")!=1) {
+                throw new \Exception("¡No tiene permisos para eliminar! Contacte con un Administrador.", 1);
+                
+            }
             $id = $req->id;
             $motivo = $req->motivo;
             $this->checkPedidoAuth($id);
@@ -1341,10 +1358,10 @@ class PedidosController extends Controller
             $from = $sucursal->sucursal;
             $subject = $sucursal->sucursal." | CIERRE DIARIO | ".$req->fecha;
             try {
+                $sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
+                //Mail::to($this->sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
                 
-                Mail::to($this->sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
-                
-                return Response::json(["msj"=>"Cierre enviado con Éxito","estado"=>true]);
+                return Response::json(["msj"=>"Cierre enviado con Éxito al correo. Envío a Central: ".$sendCierreCentral,"estado"=>true]);
             
             } catch (\Exception $e) {
 

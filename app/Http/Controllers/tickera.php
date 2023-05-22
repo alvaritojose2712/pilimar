@@ -9,49 +9,51 @@ use Mike42\Escpos;
 use Mike42\Escpos\Printer;
 use Mike42\Escpos\EscposImage;
 use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
-use Mike42\Escpos\PrintConnectors\FilePrintConnector;
-use Mike42\Escpos\PrintBuffers\ImagePrintBuffer;
-use Mike42\Escpos\CapabilityProfiles\DefaultCapabilityProfile;
-use Mike42\Escpos\CapabilityProfiles\SimpleCapabilityProfile;
+
 use Response;
 
 class tickera extends Controller
 {
     public function imprimir(Request $req)
     {
+        try {
 
-        //return gethostname();
-        function addSpaces($string = '', $valid_string_length = 0) {
-            if (strlen($string) < $valid_string_length) {
-                $spaces = $valid_string_length - strlen($string);
-                for ($index1 = 1; $index1 <= $spaces; $index1++) {
-                    $string = $string . ' ';
-                }
+            if (!(new PedidosController)->checksipedidoprocesado($req->id)) {
+                throw new \Exception("¡Debe procesar el pedido para imprimir!", 1);
+                
             }
 
-            return $string;
-        }
-        
-        $get_moneda = (new PedidosController)->get_moneda();
-        $moneda_req = $req->moneda;
-        //$
-        //bs
-        //cop
-        if ($moneda_req=="$") {
-          $dolar = 1;
-        }else if($moneda_req=="bs"){
-          $dolar = $get_moneda["bs"];
-        }else if($moneda_req=="cop"){
-          $dolar = $get_moneda["cop"];
-        }else{
-          $dolar = $get_moneda["bs"];
-        }
+            //return gethostname();
+            function addSpaces($string = '', $valid_string_length = 0) {
+                if (strlen($string) < $valid_string_length) {
+                    $spaces = $valid_string_length - strlen($string);
+                    for ($index1 = 1; $index1 <= $spaces; $index1++) {
+                        $string = $string . ' ';
+                    }
+                }
 
-        $pedido = (new PedidosController)->getPedido($req,floatval($dolar));
-        $sucursal = sucursal::all()->first();
-        $fecha_emision = date("Y-m-d H:i:s");
+                return $string;
+            }
+            
+            $get_moneda = (new PedidosController)->get_moneda();
+            $moneda_req = $req->moneda;
+            //$
+            //bs
+            //cop
+            if ($moneda_req=="$") {
+            $dolar = 1;
+            }else if($moneda_req=="bs"){
+            $dolar = $get_moneda["bs"];
+            }else if($moneda_req=="cop"){
+            $dolar = $get_moneda["cop"];
+            }else{
+            $dolar = $get_moneda["bs"];
+            }
 
-        try {
+            $pedido = (new PedidosController)->getPedido($req,floatval($dolar));
+            $sucursal = sucursal::all()->first();
+            $fecha_emision = date("Y-m-d H:i:s");
+
             $arr_printers = explode(";", $sucursal->tickera);
             $printer = 1;
 
@@ -271,16 +273,13 @@ class tickera extends Controller
 
             }
 
-
-            
-
             $printer->cut();
             $printer->pulse();
             $printer->close();
 
           return Response::json(["msj"=>"Imprimiendo...","estado",true]);
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
           return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado",false]);
             
         }

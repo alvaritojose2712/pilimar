@@ -35,7 +35,26 @@ export default function InventarioForzado({
     buscarInvAvanz,
 
     setCtxBulto,
+    setStockMin,
     setPrecioAlterno,
+    reporteInventario,
+
+    openmodalhistoricoproducto,
+
+    showmodalhistoricoproducto,
+    setshowmodalhistoricoproducto,
+    fecha1modalhistoricoproducto,
+    setfecha1modalhistoricoproducto,
+    fecha2modalhistoricoproducto,
+    setfecha2modalhistoricoproducto,
+    usuariomodalhistoricoproducto,
+    setusuariomodalhistoricoproducto,
+    usuariosData,
+
+    datamodalhistoricoproducto,
+    setdatamodalhistoricoproducto,
+    getmovientoinventariounitario
+    
 }){
     const getPorGanacia = (precio,base) => {
         try{
@@ -60,9 +79,59 @@ export default function InventarioForzado({
     } 
     return (
         <div className="container-fluid">
-            <div className="d-flex justify-content-between">
-                <div className="cell9 d-flex justify-content-between">
-                    <div className="cell8">                    
+
+            {showmodalhistoricoproducto&&<>
+                <section className="modal-custom"> 
+                    <div className="text-danger" onClick={()=>setshowmodalhistoricoproducto(false)}><span className="closeModal">&#10006;</span></div>
+                    <div className="modal-content-sm">
+                        <div className="input-group">
+                            <select
+                                className={("form-control form-control-sm ")}
+                                value={usuariomodalhistoricoproducto}
+                                onChange={e => setusuariomodalhistoricoproducto((e.target.value))}
+                            >
+                                <option value="">--Seleccione Usuario--</option>
+                                {usuariosData.map(e => <option value={e.id} key={e.id}>{e.usuario}</option>)}
+                                
+                            </select>
+                            <input type="date" className="form-control" value={fecha1modalhistoricoproducto} onChange={e=>setfecha1modalhistoricoproducto(e.target.value)}/>
+                            <input type="date" className="form-control" value={fecha2modalhistoricoproducto} onChange={e=>setfecha2modalhistoricoproducto(e.target.value)}/>
+
+                            <button className="btn btn-success" onClick={()=>getmovientoinventariounitario()}><i className="fa fa-search"></i></button>
+                        </div>
+
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Producto</th>
+                                    <th>Origen</th>
+                                    <th>Cantidad</th>
+                                    <th>Ct. LuegoDeActualizar</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {datamodalhistoricoproducto.length?datamodalhistoricoproducto.map(e=>
+                                    <tr key={e.id}>
+                                        <td>{e.usuario?e.usuario.usuario:null}</td>
+                                        <td>{e.id_producto}</td>
+                                        <td>{e.origen}</td>
+                                        <th className={("h5 ")+(e.cantidad<0?"text-danger":"text-success")}>{e.cantidad>0?"+":null} {e.cantidad}</th>
+                                        <th>{e.cantidadafter}</th>
+                                        <th>{e.created_at}</th>
+                                    </tr>    
+                                ):null}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <div className="overlay"></div>
+            </>}
+
+            <div className="d-flex">
+                <div className="d-flex flex-fill">
+                    <div className="flex-fill">                    
                         {busquedaAvanazadaInv?<>
                             <div className="input-group">
                                 <span className="input-group-text cell1">
@@ -131,13 +200,11 @@ export default function InventarioForzado({
                                
                             </div>
                         </>:null}
-                        <div className="input-group">
-                            {busquedaAvanazadaInv?null:
-                                <input type="text" ref={inputBuscarInventario} className="form-control" placeholder="Buscar...(esc)" onChange={e => setQBuscarInventario(e.target.value)} value={qBuscarInventario} />
-                            }
-                        </div>
+                        {busquedaAvanazadaInv?null:
+                            <input type="text" ref={inputBuscarInventario} className="form-control" placeholder="Buscar...(esc)" onChange={e => setQBuscarInventario(e.target.value)} value={qBuscarInventario} />
+                        }
                     </div>
-                    <div className="cell2 ps-5">
+                    <div className="flex-fill">
                         <div className="input-group">
                             <select value={Invnum} onChange={e => setInvnum(e.target.value)} className="form-control">
                                 <option value="25">Num.25</option>
@@ -151,16 +218,17 @@ export default function InventarioForzado({
                                 <option value="asc">Orden Asc</option>
                                 <option value="desc">Orden Desc</option>
                             </select>
+                            <button className="btn btn-warning ms-2" onClick={reporteInventario}>Reporte General <i className="fa fa-print"></i></button>
+                            <button className="btn btn-outline-success" onClick={() => changeInventario(null, null, null, "add")}>Nuevo (f2) <i className="fa fa-plus"></i></button>
                             {busquedaAvanazadaInv?
                                 <button className="btn btn-success" onClick={buscarInvAvanz}><i className="fa fa-search"></i></button>
-                            
                             :null}
+                            <button className="btn btn-success text-light" onClick={guardarNuevoProductoLote}>Guardar (f1)</button>
+
                         </div>
                     </div>
                 </div>
-                <div className="cell1 text-right">
-                    <button className="btn btn-success text-light" onClick={guardarNuevoProductoLote}>Guardar (f1)</button>
-                </div>
+                
             </div>
             <a href="#" onClick={() => setbusquedaAvanazadaInv(!busquedaAvanazadaInv)}>Búsqueda {busquedaAvanazadaInv ? "sencilla" :"avanazada"}</a>
             
@@ -225,10 +293,16 @@ export default function InventarioForzado({
                                     <td className="cell1">{e.codigo_barras}</td>
                                     <td className="cell05">{e.unidad}</td>
                                     <td className="cell2">{e.descripcion}</td>
-                                    <th className="cell05">{e.cantidad}
-                                        <br/><span className="btn btn-outline-success btn-sm" 
-                                        data-id={e.id} 
-                                        onClick={setCtxBulto}>CtxBulto.{e.bulto}</span>
+                                    <th className="cell05">{e.cantidad} <i className="fa fa-eye text-success pointer" onClick={()=>openmodalhistoricoproducto(e.id)}></i>
+                                        <div className="btn-group-vertical">
+                                            <span className="btn btn-outline-success btn-sm" 
+                                            data-id={e.id} 
+                                            onClick={setStockMin}>stockMin.{e.stockmin}</span>
+
+                                            <span className="btn btn-outline-success btn-sm" 
+                                            data-id={e.id} 
+                                            onClick={setCtxBulto}>CtxPaquete.{e.bulto}</span>
+                                        </div>
                                     </th>
                                     <td className="cell1">{e.precio_base}</td>
                                     <td className="cell15 text-success">

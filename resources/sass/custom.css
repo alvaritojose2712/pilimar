@@ -170,6 +170,34 @@ td,th{
   margin-bottom: 12px;
   display: flex;
 }
+.fs-10px{
+ font-size: 10px !important;
+}
+.modalmovil{
+  background-color: white;
+  box-shadow: 6px 5px 26px -1px #0d0d0c;
+  padding: 10px;
+  border-radius: 5px;
+  border: solid darkgray 2px;
+  width: 1000px;
+  height: 500px;
+  z-index: 99999;
+  position: absolute;
+  overflow-y: auto;
+}
+.pb-table2 td {
+  padding-bottom: 50px !important;
+}
+.modalmovil-sm{
+  background-color: white;
+  box-shadow: 6px 5px 26px -1px #0d0d0c;
+  padding: 10px;
+  border-radius: 5px;
+  border: solid darkgray 2px;
+  z-index: 99999;
+  position: absolute;
+  overflow-y: auto;
+}
 .card-pedidos-header{
   width: 100%;
   padding: 6px;
@@ -448,6 +476,18 @@ body{
   background-color: #ffd3d3 !important;
   text-shadow: 0 0 black;
 }
+.bg-secondary-light {
+  background-color: #dae2ea !important;
+  text-shadow: 0 0 black;
+}
+.bg-warning-light {
+  background-color: #fff8bc !important;
+  text-shadow: 0 0 black;
+}
+
+
+
+
     
 
     

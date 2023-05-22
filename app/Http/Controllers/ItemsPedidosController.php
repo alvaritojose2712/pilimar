@@ -40,6 +40,8 @@ class ItemsPedidosController extends Controller
         try {
             $iditem = $req->iditem;
             (new PedidosController)->checkPedidoAuth($iditem,"item");
+            (new PedidosController)->checkPedidoPago($iditem,"item");
+            
 
 
             $item = items_pedidos::with("producto")->find($iditem);
@@ -65,6 +67,8 @@ class ItemsPedidosController extends Controller
             $p = $req->p;
 
             (new PedidosController)->checkPedidoAuth($iditem,"item");
+            (new PedidosController)->checkPedidoPago($iditem,"item");
+            
 
             $item = items_pedidos::with("producto")->find($iditem);
             if ($p=="p1"||$p=="p2") {
@@ -110,6 +114,8 @@ class ItemsPedidosController extends Controller
 
         try {
             (new PedidosController)->checkPedidoAuth($req->index,"item");
+            (new PedidosController)->checkPedidoPago($req->index,"item");
+            
 
             $item = items_pedidos::find($req->index);
             $item->descuento = floatval($req->descuento);
@@ -132,6 +138,8 @@ class ItemsPedidosController extends Controller
     {
         try {
             (new PedidosController)->checkPedidoAuth($req->index);
+            (new PedidosController)->checkPedidoPago($req->index);
+            
             
             $item = items_pedidos::where("id_pedido",$req->index)->update(["descuento"=>floatval($req->descuento)]);
             return Response::json(["msj"=>"¡Éxito!","estado"=>true]);

@@ -41,7 +41,6 @@ class DevolucionesController extends Controller
             $new_mov->id_cliente = $req->id_cliente;
             if ($new_mov->save()) {
                 foreach ($req->productosselectdevolucion as $i => $e) {
-                    # code...
                     $id_producto = $e["idproducto"];
                     $cantidad = $e["cantidad"];
                     $tipoMovMovimientos = $e["tipo"];
@@ -50,26 +49,35 @@ class DevolucionesController extends Controller
                     $date = new \DateTime($req->fechaMovimientos);
                     $fechaMovimientos = $date->getTimestamp();
                    
-                    $restar_cantidad = inventario::find($id_producto);
+                    $restar_cantidad_query = inventario::find($id_producto);
+                    $type_mov = "";
         
                     if ($tipoMovMovimientos==0) {
                         //Salida de Producto
+                        $type_mov = "Salida";
                         
-                        $restar_cantidad->cantidad = $restar_cantidad->cantidad - $cantidad;
+                        $restar_cantidad = $restar_cantidad_query->cantidad - $cantidad;
+                        (new InventarioController)->descontarInventario($id_producto,$restar_cantidad, $restar_cantidad_query->cantidad, null, $type_mov."Devolucion");
+
                     }elseif ($tipoMovMovimientos==1) {
                         //Entrada de Producto
                         if ($tipoCatMovimientos==2) {
                             //Por Cambio
-                            $restar_cantidad->cantidad = $restar_cantidad->cantidad + $cantidad;
+                            $type_mov = "Entrada";
+                            $restar_cantidad = $restar_cantidad_query->cantidad + $cantidad;
+
+                            (new InventarioController)->descontarInventario($id_producto,$restar_cantidad, $restar_cantidad_query->cantidad, null, $type_mov."Devolucion");
+                            
                         }elseif ($tipoCatMovimientos==1) {
                             //Por Garantia
                             $exit_num = 0;
-        
+                            
                             $exi = garantia::where("id_producto",$id_producto)->first();
-        
+                            
                             if ($exi) {
                                 $exit_num = $exi->cantidad;
                             }
+
                             garantia::updateOrCreate(
                                 ["id_producto" => $id_producto],
                                 ["cantidad" => $exit_num+$cantidad]
@@ -77,17 +85,17 @@ class DevolucionesController extends Controller
                             );
                         }
                     }
-        
-                    if($restar_cantidad->save()){   
-                        $new_item_mov = new items_devoluciones;
-                        $new_item_mov->id_producto = $id_producto;
-                        $new_item_mov->cantidad = $cantidad;
-                        $new_item_mov->tipo = $tipoMovMovimientos;
-                        $new_item_mov->categoria = $tipoCatMovimientos;
-                        $new_item_mov->motivo = "Motivo";
-                        $new_item_mov->id_devolucion = $new_mov->id;
-                        $new_item_mov->save();
-                    }
+
+                    
+                    $new_item_mov = new items_devoluciones;
+                    $new_item_mov->id_producto = $id_producto;
+                    $new_item_mov->cantidad = $cantidad;
+                    $new_item_mov->tipo = $tipoMovMovimientos;
+                    $new_item_mov->categoria = $tipoCatMovimientos;
+                    $new_item_mov->motivo = "Motivo";
+                    $new_item_mov->id_devolucion = $new_mov->id;
+                    $new_item_mov->save();
+
                 }
             }   
             

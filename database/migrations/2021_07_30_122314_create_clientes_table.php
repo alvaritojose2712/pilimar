@@ -36,6 +36,62 @@ class CreateClientesTable extends Migration
                 "estado"=>"CF",
                 "ciudad"=>"CF",
             ],
+            [
+                "identificacion"=>"ARAELZ",
+                "nombre"=>"ARAELZ",
+                "correo"=>"ARAELZ",
+                "direccion"=>"CF",
+                "telefono"=>"CF",
+                "estado"=>"CF",
+                "ciudad"=>"CF",
+            ],
+
+            [
+                "identificacion"=>"ARAMCAL",
+                "nombre"=>"ARAMCAL",
+                "correo"=>"ARAMCAL",
+                "direccion"=>"CF",
+                "telefono"=>"CF",
+                "estado"=>"CF",
+                "ciudad"=>"CF",
+            ],
+            [
+                "identificacion"=>"ARAAGS",
+                "nombre"=>"ARAAGS",
+                "correo"=>"ARAAGS",
+                "direccion"=>"CF",
+                "telefono"=>"CF",
+                "estado"=>"CF",
+                "ciudad"=>"CF",
+            ],
+            [
+                "identificacion"=>"ARASMAN",
+                "nombre"=>"ARASMAN",
+                "correo"=>"ARASMAN",
+                "direccion"=>"CF",
+                "telefono"=>"CF",
+                "estado"=>"CF",
+                "ciudad"=>"CF",
+            ],
+            [
+                "identificacion"=>"ARABZAL",
+                "nombre"=>"ARABZAL",
+                "correo"=>"ARABZAL",
+                "direccion"=>"CF",
+                "telefono"=>"CF",
+                "estado"=>"CF",
+                "ciudad"=>"CF",
+            ],
+            [
+                "identificacion"=>"ARASFDO",
+                "nombre"=>"ARASFDO",
+                "correo"=>"ARASFDO",
+                "direccion"=>"CF",
+                "telefono"=>"CF",
+                "estado"=>"CF",
+                "ciudad"=>"CF",
+            ],
+       
         ]);
 
 
