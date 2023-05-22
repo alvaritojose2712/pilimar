@@ -62,7 +62,7 @@ class CreateInventariosTable extends Migration
             $table->timestamps();
         });
 
-        $inventario = [
+        /* $inventario = [
             [3,'0000-00-00 00:00:00','ALAM-001','AGRICOLA','ALAMBRE DE PUAS MOTO500 ','rollo','MANTECAL',95,10,'0',0,1,'2021-08-31 15:40:49'],
             [5,'0000-00-00 00:00:00','MOTO-2X2','AGRICOLA','MOTOBOMBA DOMOSA 5.5 ','unidad','MANTECAL',139,10,'0',0,1,'2021-08-30 11:42:53'],
             [6,'0000-00-00 00:00:00','MOTO-DOMO','AGRICOLA','MOTOBOMBA A GASOLINA KASUMI 2X2 ','unidad','MANTECAL',145,10,'0',0,1,'2021-06-15 12:39:45'],
@@ -3921,7 +3921,7 @@ class CreateInventariosTable extends Migration
             ]
         );
     }
-    DB::table("inventarios")->insert($arr);
+    DB::table("inventarios")->insert($arr); */
         
         /* $arrinsert = [];
         
