@@ -4211,8 +4211,13 @@ export default function Facturar({ user, notificar, setLoading }) {
     const reporteInventario = () => {
         db.openReporteInventario();
     };
-
+    
     const guardarNuevoProductoLote = (e) => {
+        if (!user.iscentral) {
+            alert("No tiene permisos para gestionar Inventario")
+            return;
+
+        }
         // e.preventDefault()
         let id_factura = null;
 
