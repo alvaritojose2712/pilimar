@@ -323,6 +323,7 @@ class InventarioController extends Controller
                 "id_pedido" => $id_pedido,
                 "origen" => $origen." #".$id_pedido,
             ]);
+            return true;
         };
 
         
