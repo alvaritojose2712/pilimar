@@ -15,10 +15,12 @@ class ItemsFacturaController extends Controller
             $id = $req->id;
             $items_factura = items_factura::find($id);
             $inv = inventario::find($items_factura->id_producto);
+            $ctseter = $inv->cantidad - ($items_factura->cantidad);
 
             $descontar = (new InventarioController)->descontarInventario(
                 $items_factura->id_producto,
-                $items_factura->cantidad, 
+                $ctseter, 
+
                 $inv->cantidad, 
                 null, 
                 "delItemFact#".$items_factura->id_factura
