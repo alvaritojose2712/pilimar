@@ -30,7 +30,7 @@ class sendCentral extends Controller
 
     public function path()
     {
-        return "http://phplaravel-1005858-3547176.cloudwaysapps.com/";
+        return "http://phplaravel-1005858-3547176.cloudwaysapps.com";
         //return "https://arabitonline.com";
     }
     public function getOrigen()
