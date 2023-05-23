@@ -37,10 +37,10 @@ class PedidosController extends Controller
 {   
 
     protected $sends = [
-        "omarelhenaoui@hotmail.com",           
+       /*  "omarelhenaoui@hotmail.com",           
         "yeisersalah2@gmail.com",           
         "amerelhenaoui@outlook.com",           
-        "yesers982@hotmail.com",   
+        "yesers982@hotmail.com",  */  
         "alvaroospino79@gmail.com"        
     ];
     protected  $letras = [
@@ -1383,10 +1383,11 @@ class PedidosController extends Controller
             $subject = $sucursal->sucursal." | CIERRE DIARIO | ".$req->fecha;
             try {
                 \Artisan::call('database:backup');
+                $gastosCentral = (new sendCentral)->setGastos();
                 $sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
-                //Mail::to($this->sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
+                Mail::to($this->sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
                 
-                return Response::json(["msj"=>"Cierre enviado con Éxito al correo. Envío a Central: ".$sendCierreCentral,"estado"=>true]);
+                return Response::json(["msj"=>"Cierre enviado con Éxito al correo. Envío a Central: ".$sendCierreCentral." ".$gastosCentral,"estado"=>true]);
             
             } catch (\Exception $e) {
 

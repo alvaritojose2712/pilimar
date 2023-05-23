@@ -15,6 +15,8 @@ use App\Models\proveedores;
 use App\Models\pedidos;
 use App\Models\tareas;
 use App\Models\cierres;
+use App\Models\gastos;
+
 
 
 use Illuminate\Support\Facades\Cache;
@@ -459,6 +461,44 @@ class sendCentral extends Controller
             return Response::json(["estado" => false, "msj" => "Error de sucursal: " . $e->getMessage()]);
         }
     }
+    public function setGastos()
+    {
+        try {
+            $codigo_origen = $this->getOrigen();
+            $gastos = gastos::where("created_at","LIKE",(new PedidosController)->today()."%")->get();
+
+            if ($gastos->count()) {
+                $response = Http::post($this->path() . '/setGastos', [
+                    "codigo_origen" => $codigo_origen,
+                    "gastos" => $gastos
+                ]);
+    
+                if ($response->ok()) {
+                    //Retorna respuesta solo si es Array
+                    if ($response->json()) {
+                        return Response::json([
+                            "msj"=>$response->json(),
+                            "estado"=>true,
+                        ]);
+                    } else {
+                        return Response::json([
+                            "msj"=> $response->body(),
+                            "estado"=> true,
+                        ]);
+                    }
+                } else {
+                    return Response::json([
+                        "msj"=> $response->body(),
+                        "estado"=>false,
+                    ]);
+                }
+            }
+
+
+        } catch (\Exception $e) {
+            return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+        } 
+    }
 
 
 
@@ -756,37 +796,7 @@ class sendCentral extends Controller
 
     }
 
-    public function setGastos()
-    {
-        try {
-            $sucursal = $this->getOrigen();
-            $movimientos_caja = movimientos_caja::all();
-
-            if (!$movimientos_caja->count()) {
-                return Response::json(["msj" => "Nada que enviar", "estado" => false]);
-            }
-
-
-            $response = Http::post($this->path . '/setGastos', [
-                "sucursal_code" => $sucursal->codigo,
-                "movimientos_caja" => $movimientos_caja
-            ]);
-
-            //ids_ok => id de movimiento 
-
-            if ($response->ok()) {
-                $res = $response->json();
-                if ($res["estado"]) {
-                    return $res["msj"];
-                }
-            } else {
-                return $response->body();
-            }
-        } catch (\Exception $e) {
-            return Response::json(["estado" => false, "msj" => "Error de sucursal: " . $e->getMessage()]);
-
-        }
-    }
+    
     public function setFacturasCentral()
     {
         try {

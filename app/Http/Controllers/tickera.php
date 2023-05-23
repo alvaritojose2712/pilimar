@@ -17,13 +17,6 @@ class tickera extends Controller
     public function imprimir(Request $req)
     {
         try {
-
-            if (!(new PedidosController)->checksipedidoprocesado($req->id)) {
-                throw new \Exception("¡Debe procesar el pedido para imprimir!", 1);
-                
-            }
-
-            //return gethostname();
             function addSpaces($string = '', $valid_string_length = 0) {
                 if (strlen($string) < $valid_string_length) {
                     $spaces = $valid_string_length - strlen($string);
@@ -50,13 +43,12 @@ class tickera extends Controller
             $dolar = $get_moneda["bs"];
             }
 
-            $pedido = (new PedidosController)->getPedido($req,floatval($dolar));
-            $sucursal = sucursal::all()->first();
             $fecha_emision = date("Y-m-d H:i:s");
-
+            
+            $sucursal = sucursal::all()->first();
             $arr_printers = explode(";", $sucursal->tickera);
             $printer = 1;
-
+            
             if ($req->printer) {
                 $printer = $req->printer-1;
             }
@@ -66,7 +58,7 @@ class tickera extends Controller
             //smb://computer/printer
             $printer = new Printer($connector);
             $printer->setEmphasis(true);
-
+            
             $nombres = "";
             $identificacion = "";
             if (isset($req->nombres)) {
@@ -75,92 +67,19 @@ class tickera extends Controller
             if (isset($req->identificacion)) {
                 $identificacion = $req->identificacion;
             }
+            
 
-            if ($nombres=="precio" && $identificacion=="precio") {
-                if($pedido->items){
-
-                    foreach ($pedido->items as $val) {
-
-                        if (!$val->producto) {
-                            $items[] = [
-                                'descripcion' => $val->abono,
-                                'codigo_barras' => 0,
-                                'pu' => $val->monto,
-                                'cantidad' => $val->cantidad,
-                                'totalprecio' => $val->total,
-                               
-                            ];
-                        }else{
-
-                            $items[] = [
-                                'descripcion' => $val->producto->descripcion,
-                                'codigo_barras' => $val->producto->codigo_barras,
-                                'pu' => $val->producto->precio,
-                                'cantidad' => $val->cantidad,
-                                'totalprecio' => $val->total,
-                               
-                            ];
-                        }
-                    }
-                }
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-               
-                foreach ($items as $item) {
-
-                    //Current item ROW 1
-
-                    $printer->setEmphasis(true);
-                    $printer->text("\n");
-                    $printer->text($item['codigo_barras']);
-                    $printer->setEmphasis(false);
-                   $printer->text("\n");
-                   $printer->text($item['descripcion']);
-                   $printer->text("\n");
-
-                    $printer->setEmphasis(true);
-
-                   $printer->text($item['pu']);
-                   $printer->setEmphasis(false);
-                   
-                   $printer->text("\n");
-
-                    $printer->feed();
-                }
-            }else{
-
+            if ($req->id==="presupuesto") {
                 
-               $printer->setJustification(Printer::JUSTIFY_CENTER);
-
-                // $tux = EscposImage::load(resource_path() . "/images/logo-small.jpg", false);
-                // $printer -> bitImage($tux);
-                // $printer->setEmphasis(true);
-
-                // $printer->text("\n");
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-
-                $printer -> text("\n");
-                $printer -> text($sucursal->nombre_registro);
-                $printer -> text("\n");
-                $printer -> text($sucursal->rif);
-                $printer -> text("\n");
-                $printer -> text($sucursal->telefono1." | ".$sucursal->telefono2);
-                $printer -> text("\n");
-
                 $printer -> setTextSize(1,1);
-
+    
                 $printer->setEmphasis(true);
-
-                
-               
-                $printer -> text("\n");
-                $printer->text($sucursal->sucursal);
-                $printer -> text("\n");
-                $printer->text("NOTA DE ENTREGA #".$pedido->id);
+                $printer->text("PRESUPUESTO");
                 $printer->setEmphasis(false);
 
                 $printer -> text("\n");
                 $printer -> text("\n");
-
+    
                 if ($nombres!="") {
                     $printer->setJustification(Printer::JUSTIFY_LEFT);
                     $printer -> text("Nombre y Apellido: ".$nombres);
@@ -169,118 +88,250 @@ class tickera extends Controller
                     $printer -> text("\n");
                     $printer->setJustification(Printer::JUSTIFY_LEFT);
 
-                    // $printer -> text("Teléfono: ".$tel);
-                    // $printer -> text("\n");
-                    // $printer->setJustification(Printer::JUSTIFY_LEFT);
+                }
+                $totalpresupuesto = 0;
+                foreach ($req->presupuestocarrito as $key => $e) {
 
-                    // $printer -> text("Dirección: ".$dir);
-                    // $printer -> text("\n");
-                    // $printer->setJustification(Printer::JUSTIFY_LEFT);
+                    $printer->text($e['descripcion']);
+                    $printer->text("\n");
+                    $printer->text($e['id']);
+                    $printer->text("\n");
 
+                    $printer->text(addSpaces("P/U. ",6).$e['precio']);
+                    $printer->text("\n");
+                    
+                    $printer->setEmphasis(true);
+                    $printer->text(addSpaces("Ct. ",6).$e['cantidad']);
+                    $printer->setEmphasis(false);
+                    $printer->text("\n");
 
+                    $printer->text(addSpaces("Tot. ",6).$e['subtotal']);
+                    $printer->text("\n");
+                    $printer->feed();
+
+                    $totalpresupuesto = $totalpresupuesto + $e['subtotal'];
                 }
 
-
-
-                
-                $printer->feed();
-                $printer->setPrintLeftMargin(0);
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->setEmphasis(true);
-                $printer->setEmphasis(false);
-                $items = [];
-                $monto_total = 0;
-
-                if($pedido->items){
-
-                    foreach ($pedido->items as $val) {
-
-                        if (!$val->producto) {
-                            $items[] = [
-                                'descripcion' => $val->abono,
-                                'codigo_barras' => 0,
-                                'pu' => $val->monto,
-                                'cantidad' => $val->cantidad,
-                                'totalprecio' => $val->total,
-                               
-                            ];
-                        }else{
-
-                            $items[] = [
-                                'descripcion' => $val->producto->descripcion,
-                                'codigo_barras' => $val->producto->codigo_barras,
-                                'pu' => ($val->descuento<0)?number_format($val->producto->precio-$val->des_unitario,3):$val->producto->precio,
-                                'cantidad' => $val->cantidad,
-                                'totalprecio' => $val->total,
-                            ];
+                $printer->text("\n");
+                $printer->text("Total: ".$totalpresupuesto);
+            }else{
+                if (!(new PedidosController)->checksipedidoprocesado($req->id)) {
+                    throw new \Exception("¡Debe procesar el pedido para imprimir!", 1);
+                    
+                }
+                $pedido = (new PedidosController)->getPedido($req,floatval($dolar));
+                if ($nombres=="precio" && $identificacion=="precio") {
+                    if($pedido->items){
+    
+                        foreach ($pedido->items as $val) {
+    
+                            if (!$val->producto) {
+                                $items[] = [
+                                    'descripcion' => $val->abono,
+                                    'codigo_barras' => 0,
+                                    'pu' => $val->monto,
+                                    'cantidad' => $val->cantidad,
+                                    'totalprecio' => $val->total,
+                                   
+                                ];
+                            }else{
+    
+                                $items[] = [
+                                    'descripcion' => $val->producto->descripcion,
+                                    'codigo_barras' => $val->producto->codigo_barras,
+                                    'pu' => $val->producto->precio,
+                                    'cantidad' => $val->cantidad,
+                                    'totalprecio' => $val->total,
+                                   
+                                ];
+                            }
                         }
                     }
-                }
-               
-                foreach ($items as $item) {
-
-                    //Current item ROW 1
-                   $printer->text($item['descripcion']);
-                   $printer->text("\n");
-                   $printer->text($item['codigo_barras']);
-                   $printer->text("\n");
-
-
-                   $printer->text(addSpaces("P/U. ",6).$item['pu']);
-                   $printer->text("\n");
-                   
-                   $printer->setEmphasis(true);
-                   $printer->text(addSpaces("Ct. ",6).$item['cantidad']);
-                   $printer->setEmphasis(false);
-                   $printer->text("\n");
-
-                   $printer->text(addSpaces("Tot. ",6).$item['totalprecio']);
-                   $printer->text("\n");
-
-
-
-                    $printer->feed();
-                }
-                $printer->setEmphasis(true);
-
-
-
-                $printer->text("Desc: ".$pedido->total_des);
-                $printer->text("\n");
-                $printer->text("Sub-Total: ". number_format($pedido->clean_total/1.16,2) );
-                $printer->text("\n");
-                $printer->text("Monto IVA 16%: ".number_format($pedido->clean_total*.16,2));
-                $printer->text("\n");
-                $printer->text("Total: ".$pedido->total);
-                $printer->text("\n");
-                $printer->text("\n");
                     $printer->setJustification(Printer::JUSTIFY_CENTER);
-
-                $printer->text("Creado: ".$pedido->created_at);
-                
-                $printer->text("\n");
-                $printer->text("*ESTE RECIBO NO TIENE NINGÚN");
-                $printer->text("\n");
-                $printer->text("VALOR FISCAL*");
-                $printer->text("\n");
-                $printer->text("\n");
-                $printer->text("\n");
-
-               
-
-                
-
-
+                   
+                    foreach ($items as $item) {
+    
+                        //Current item ROW 1
+    
+                        $printer->setEmphasis(true);
+                        $printer->text("\n");
+                        $printer->text($item['codigo_barras']);
+                        $printer->setEmphasis(false);
+                       $printer->text("\n");
+                       $printer->text($item['descripcion']);
+                       $printer->text("\n");
+    
+                        $printer->setEmphasis(true);
+    
+                       $printer->text($item['pu']);
+                       $printer->setEmphasis(false);
+                       
+                       $printer->text("\n");
+    
+                        $printer->feed();
+                    }
+                }else{
+    
+                    
+                   $printer->setJustification(Printer::JUSTIFY_CENTER);
+    
+                    // $tux = EscposImage::load(resource_path() . "/images/logo-small.jpg", false);
+                    // $printer -> bitImage($tux);
+                    // $printer->setEmphasis(true);
+    
+                    // $printer->text("\n");
+                    $printer->setJustification(Printer::JUSTIFY_CENTER);
+    
+                    $printer -> text("\n");
+                    $printer -> text($sucursal->nombre_registro);
+                    $printer -> text("\n");
+                    $printer -> text($sucursal->rif);
+                    $printer -> text("\n");
+                    $printer -> text($sucursal->telefono1." | ".$sucursal->telefono2);
+                    $printer -> text("\n");
+    
+                    $printer -> setTextSize(1,1);
+    
+                    $printer->setEmphasis(true);
+    
+                    
+                   
+                    $printer -> text("\n");
+                    $printer->text($sucursal->sucursal);
+                    $printer -> text("\n");
+                    $printer->text("NOTA DE ENTREGA #".$pedido->id);
+                    $printer->setEmphasis(false);
+    
+                    $printer -> text("\n");
+                    $printer -> text("\n");
+    
+                    if ($nombres!="") {
+                        $printer->setJustification(Printer::JUSTIFY_LEFT);
+                        $printer -> text("Nombre y Apellido: ".$nombres);
+                        $printer -> text("\n");
+                        $printer -> text("ID: ".$identificacion);
+                        $printer -> text("\n");
+                        $printer->setJustification(Printer::JUSTIFY_LEFT);
+    
+                        // $printer -> text("Teléfono: ".$tel);
+                        // $printer -> text("\n");
+                        // $printer->setJustification(Printer::JUSTIFY_LEFT);
+    
+                        // $printer -> text("Dirección: ".$dir);
+                        // $printer -> text("\n");
+                        // $printer->setJustification(Printer::JUSTIFY_LEFT);
+    
+    
+                    }
+    
+    
+    
+                    
+                    $printer->feed();
+                    $printer->setPrintLeftMargin(0);
+                    $printer->setJustification(Printer::JUSTIFY_LEFT);
+                    $printer->setEmphasis(true);
+                    $printer->setEmphasis(false);
+                    $items = [];
+                    $monto_total = 0;
+    
+                    if($pedido->items){
+    
+                        foreach ($pedido->items as $val) {
+    
+                            if (!$val->producto) {
+                                $items[] = [
+                                    'descripcion' => $val->abono,
+                                    'codigo_barras' => 0,
+                                    'pu' => $val->monto,
+                                    'cantidad' => $val->cantidad,
+                                    'totalprecio' => $val->total,
+                                   
+                                ];
+                            }else{
+    
+                                $items[] = [
+                                    'descripcion' => $val->producto->descripcion,
+                                    'codigo_barras' => $val->producto->codigo_barras,
+                                    'pu' => ($val->descuento<0)?number_format($val->producto->precio-$val->des_unitario,3):$val->producto->precio,
+                                    'cantidad' => $val->cantidad,
+                                    'totalprecio' => $val->total,
+                                ];
+                            }
+                        }
+                    }
+                   
+                    foreach ($items as $item) {
+    
+                        //Current item ROW 1
+                       $printer->text($item['descripcion']);
+                       $printer->text("\n");
+                       $printer->text($item['codigo_barras']);
+                       $printer->text("\n");
+    
+    
+                       $printer->text(addSpaces("P/U. ",6).$item['pu']);
+                       $printer->text("\n");
+                       
+                       $printer->setEmphasis(true);
+                       $printer->text(addSpaces("Ct. ",6).$item['cantidad']);
+                       $printer->setEmphasis(false);
+                       $printer->text("\n");
+    
+                       $printer->text(addSpaces("Tot. ",6).$item['totalprecio']);
+                       $printer->text("\n");
+    
+    
+    
+                        $printer->feed();
+                    }
+                    $printer->setEmphasis(true);
+    
+    
+    
+                    $printer->text("Desc: ".$pedido->total_des);
+                    $printer->text("\n");
+                    $printer->text("Sub-Total: ". number_format($pedido->clean_total/1.16,2) );
+                    $printer->text("\n");
+                    $printer->text("Monto IVA 16%: ".number_format($pedido->clean_total*.16,2));
+                    $printer->text("\n");
+                    $printer->text("Total: ".$pedido->total);
+                    $printer->text("\n");
+                    $printer->text("\n");
+                        $printer->setJustification(Printer::JUSTIFY_CENTER);
+    
+                    $printer->text("Creado: ".$pedido->created_at);
+                    
+                    $printer->text("\n");
+                    $printer->text("*ESTE RECIBO NO TIENE NINGÚN");
+                    $printer->text("\n");
+                    $printer->text("VALOR FISCAL*");
+                    $printer->text("\n");
+                    $printer->text("\n");
+                    $printer->text("\n");
+    
+                   
+    
+                    
+    
+    
+                }
             }
 
             $printer->cut();
             $printer->pulse();
             $printer->close();
 
-          return Response::json(["msj"=>"Imprimiendo...","estado",true]);
+            return Response::json([
+                "msj"=>"Imprimiendo...",
+                "estado"=>true
+            ]);
 
         } catch (\Exception $e) {
-          return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado",false]);
+            return Response::json([
+                "msj"=>"Error: ".$e->getMessage(),
+                "estado"=>false
+            ]);
             
         }
     }

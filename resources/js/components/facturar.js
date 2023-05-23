@@ -40,6 +40,7 @@ export default function Facturar({ user, notificar, setLoading }) {
         setproductosDevolucionSelecthistorico,
     ] = useState([]);
 
+    const [presupuestocarrito, setpresupuestocarrito] = useState([])
     const [selectprinter, setselectprinter] = useState(null);
 
     const [dropprintprice, setdropprintprice] = useState(false);
@@ -2056,34 +2057,26 @@ export default function Facturar({ user, notificar, setLoading }) {
             let printer = 0;
             if (!selectprinter) {
                 printer = parseInt(
-                    window.prompt(
-                        "Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4"
-                    )
+                    window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4", 1)
                 );
             }
 
-            let promptInfoCliente = window
-                .prompt(
-                    "(Moneda: $ | bs | cop),(Identificación),(Nombre y Apellido) Separado por coma (,)",
+            let promptInfoCliente = window.prompt("(Moneda: $ | bs | cop),(Identificación),(Nombre y Apellido) Separado por coma (,)",
                     pedidoData.cliente
                         ? "bs," +
                               pedidoData.cliente.identificacion +
                               "," +
                               pedidoData.cliente.nombre
                         : ""
-                )
-                .split(",");
+                ).split(",");
             let moneda = promptInfoCliente[0];
             let identificacion = promptInfoCliente[1];
             let nombres = promptInfoCliente[2];
 
             if (identificacion) {
-                if (selectprinter) {
-                    printer = selectprinter;
-                } else {
-                    setselectprinter(printer);
-                }
-                if (nombres) {
+                if (selectprinter) {printer = selectprinter;} else {setselectprinter(printer);}
+                if (!printer) {alert("¡Debe seleccionar una tickera!")}
+                if (nombres&&printer) {
                     console.log("Imprimiendo en Caja " + printer);
 
                     db.imprimirTicked({
@@ -2092,10 +2085,12 @@ export default function Facturar({ user, notificar, setLoading }) {
                         nombres,
                         moneda,
                         printer,
+                        presupuestocarrito
                     }).then((res) => {
                         notificar(res.data.msj);
                     });
                 }
+
             }
         }
     };
@@ -3700,7 +3695,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             setSelectItem(null);
         });
     };
-    const [presupuestocarrito, setpresupuestocarrito] = useState([])
+    
     const delitempresupuestocarrito = index => {
         setpresupuestocarrito(presupuestocarrito.filter((e,i)=>i!=index))
     }
@@ -4791,6 +4786,8 @@ export default function Facturar({ user, notificar, setLoading }) {
                                                     <h1>Presupuesto</h1>
                                                 </td>
                                                 <td className="text-right">
+                                                
+                                                    <button className="btn btn-warning" onClick={()=>toggleImprimirTicket("presupuesto")}><i className="fa fa-print"></i></button>
                                                     <button className="btn btn-outline-success" onClick={setpresupuestocarritotopedido}><i className="fa fa-save"></i></button>
                                                 </td>
                                             </tr>
