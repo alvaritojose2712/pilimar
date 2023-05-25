@@ -187,6 +187,17 @@ td,th{
   position: fixed; */
   overflow-y: auto;
 }
+.modalchangepedido{
+  background-color: white;
+  box-shadow: 6px 5px 26px -1px #0d0d0c;
+  padding: 10px;
+  border-radius: 5px;
+  border: solid darkgray 2px;
+  width: 200px;
+  z-index: 99999;
+  position: absolute;
+  overflow-y: auto;
+}
 .modalmovil{
   background-color: white;
   box-shadow: 6px 5px 26px -1px #0d0d0c;

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\items_pedidos;
+use App\Models\tareaslocal;
+
 use Illuminate\Http\Request;
 use Response;
 
@@ -107,21 +109,48 @@ class ItemsPedidosController extends Controller
         }
     }
 
-
+    
     public function setDescuentoUnitario(Request $req)
     {
-
-
         try {
-            (new PedidosController)->checkPedidoAuth($req->index,"item");
-            (new PedidosController)->checkPedidoPago($req->index,"item");
-            
-
             $item = items_pedidos::find($req->index);
-            $item->descuento = floatval($req->descuento);
-            $item->save();
+            $descuento = floatval($req->descuento);
+            $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                "id_pedido" => $item->id_pedido,
+                "tipo" => "descuentoUnitario",
+            ]);
 
-            return Response::json(["msj"=>"¡Éxito!","estado"=>true]);
+            if ((new UsuariosController)->isAdmin()) {
+                (new PedidosController)->checkPedidoAuth($req->index,"item");
+                (new PedidosController)->checkPedidoPago($req->index,"item");
+                
+                $item->descuento = $descuento;
+                $item->save();
+                return Response::json(["msj"=>"¡Éxito!","estado"=>true]);
+                
+            }elseif($isPermiso["permiso"]){
+
+                if ($isPermiso["valoraprobado"]==$descuento) {
+                    $item->descuento = $descuento;
+                    $item->save();
+                    return Response::json(["msj"=>"¡Éxito!","estado"=>true]);
+                }else{
+                    return Response::json(["msj"=>"Error: Valor no aprobado","estado"=>false]);
+
+                }
+            }else{
+
+                $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                    "id_pedido" =>  $item->id_pedido,
+                    "valoraprobado" => $descuento,
+                    "tipo" => "descuentoUnitario",
+                    "descripcion" => "Solicitud de descuento Unitario: ".$req->descuento."%",
+                ]);
+                if ($nuevatarea) {
+                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>true]);
+                }
+
+            }
             
         } catch (\Exception $e) {
             return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
@@ -137,12 +166,43 @@ class ItemsPedidosController extends Controller
     public function setDescuentoTotal(Request $req)
     {
         try {
-            (new PedidosController)->checkPedidoAuth($req->index);
-            (new PedidosController)->checkPedidoPago($req->index);
+            $descuento = floatval($req->descuento);
+            $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                "id_pedido" => $req->index,
+                "tipo" => "descuentoTotal",
+            ]);
             
-            
-            $item = items_pedidos::where("id_pedido",$req->index)->update(["descuento"=>floatval($req->descuento)]);
-            return Response::json(["msj"=>"¡Éxito!","estado"=>true]);
+            if ((new UsuariosController)->isAdmin()) {
+                (new PedidosController)->checkPedidoAuth($req->index);
+                (new PedidosController)->checkPedidoPago($req->index);
+
+                items_pedidos::where("id_pedido",$req->index)->update(["descuento"=>$descuento]);
+
+                return Response::json(["msj"=>"¡Éxito!","estado"=>true]);
+                
+            }elseif($isPermiso["permiso"]){
+                
+                if ($isPermiso["valoraprobado"]==round($descuento,0)) {
+                    items_pedidos::where("id_pedido",$req->index)->update(["descuento"=>$descuento]);
+
+                    return Response::json(["msj"=>"¡Éxito!","estado"=>true]);
+                }else{
+                    return Response::json(["msj"=>"Error: Valor no aprobado","estado"=>false]);
+
+                }
+            }else{
+
+                $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                    "id_pedido" =>  $req->index,
+                    "valoraprobado" => round($descuento,0),
+                    "tipo" => "descuentoTotal",
+                    "descripcion" => "Solicitud de descuento Total: ".round($descuento,0)." %",
+                ]);
+                if ($nuevatarea) {
+                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>true]);
+                }
+
+            }
             
         } catch (\Exception $e) {
             return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);

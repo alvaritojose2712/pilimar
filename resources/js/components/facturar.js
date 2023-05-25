@@ -448,6 +448,27 @@ export default function Facturar({ user, notificar, setLoading }) {
     const inputbuscarcentralforvincular = useRef(null);
     const [tareasenprocesocentral, settareasenprocesocentral] = useState({});
 
+    const [tareasinputfecha,settareasinputfecha] = useState("")
+    const [tareasAdminLocalData, settareasAdminLocalData] = useState([])
+    const getTareasLocal = () => {
+        setLoading(true)
+        db.getTareasLocal({
+            fecha: tareasinputfecha,
+        }).then(res=>{
+            setLoading(false)
+            settareasAdminLocalData(res.data)
+        })
+    } 
+    const resolverTareaLocal = (id,tipo="aprobar") => {
+        setLoading(true)
+        db.resolverTareaLocal({
+            id,
+            tipo
+        }).then(res=>{
+            setLoading(false)
+            getTareasLocal()
+        })
+    }   
     
     const autovincularSucursalCentral = () => {
         let obj = cloneDeep(inventarioSucursalFromCentral);
@@ -3356,6 +3377,45 @@ export default function Facturar({ user, notificar, setLoading }) {
             setpedidosFast(res.data);
         });
     };
+    const [modalchangepedido,setmodalchangepedido] = useState(false)
+    
+    const [usuarioChangeUserPedido,setusuarioChangeUserPedido] = useState("")
+    const [seletIdChangePedidoUser,setseletIdChangePedidoUser] = useState(null)
+    
+    const [modalchangepedidoy,setmodalchangepedidoy] = useState(0)
+    const [modalchangepedidox,setmodalchangepedidox] = useState(0)
+    
+    const setusuarioChangeUserPedidoHandle = (val) => {
+        let id_usuario =  val
+        setusuarioChangeUserPedido(val)
+
+        db.changepedidouser({
+            id_usuario,
+            id_pedido:seletIdChangePedidoUser
+        }).then(res=>{
+            console.log(res.data)
+            setseletIdChangePedidoUser(null)
+            setusuarioChangeUserPedido("")
+            setmodalchangepedido(false)
+            getPedidos()
+        })
+    }
+    const setseletIdChangePedidoUserHandle = (event, id) => {
+        setseletIdChangePedidoUser(id)
+        setmodalchangepedido(true)
+
+        let p = event.currentTarget.getBoundingClientRect();
+        let y = p.top + window.scrollY;
+        let x = p.left;
+        setmodalchangepedidoy(y);
+        setmodalchangepedidox(x);
+        
+    }
+
+
+
+
+
     const setSameGanancia = () => {
         let insert = window.prompt("Porcentaje");
         if (insert) {
@@ -4376,6 +4436,13 @@ export default function Facturar({ user, notificar, setLoading }) {
         }
         setProductosInventario(obj);
     };
+    
+    
+    
+    
+    
+    
+    
     const changeInventarioFromSucursalCentral = (
         val,
         i,
@@ -4542,6 +4609,24 @@ export default function Facturar({ user, notificar, setLoading }) {
         return sum
     } 
 
+    const [isCierre, setisCierre] = useState(false)
+    const getPermisoCierre = () => {
+        if (!isCierre) {
+            
+            db.getPermisoCierre({}).then(res=>{
+                if (res.data) {
+                    setisCierre(true)
+                    setView("cierres")
+                }else{
+                    notificar("Debe esperar aprobación del Administrador")
+                }
+            })
+        }else{
+            setView("cierres")
+
+        }
+    }
+
     return (
         <>
             <Header
@@ -4563,7 +4648,51 @@ export default function Facturar({ user, notificar, setLoading }) {
                 toggleClientesBtn={toggleClientesBtn}
                 settoggleClientesBtn={settoggleClientesBtn}
                 setView={setView}
+                isCierre={isCierre}
+                getPermisoCierre={getPermisoCierre}
             />
+            {view=="tareas"?
+                <div className="container">
+                    <h1>Tareas <button className="btn btn-outline-success" onClick={getTareasLocal}><i className="fa fa-search"></i></button></h1>
+                    <input type="date" className="form-control" value={tareasinputfecha} onChange={e=>settareasinputfecha(e.target.value)} />
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>ID Pedido</th>
+                                <th>Usuario</th>
+                                <th>Tipo</th>
+                                <th>Descripcion</th>
+                                <th>Hora</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {tareasAdminLocalData.length?
+                                tareasAdminLocalData.map(e=>
+                                    <tr key={e.id} >
+                                                
+                                        <td><button className="btn btn-danger" onClick={()=>resolverTareaLocal(e.id,"rechazar")}>Rechazar</button></td>
+                                        <td className="h3">#{e.id_pedido}</td>
+                                        <td>{e.usuario?e.usuario.usuario:null}</td>
+                                        <td>{e.tipo}</td>
+                                        <td>{e.descripcion}</td>
+                                        <td>{e.created_at}</td>
+                                        <td>
+                                            {e.estado?
+                                                <button className="btn btn-success">Resuelta</button>
+                                            :
+                                                <button className="btn btn-warning" onClick={()=>resolverTareaLocal(e.id)}>Resolver</button>
+                                            }
+                                        </td>
+                                    </tr>
+                                )
+                            :null
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            :null}
             {view == "seleccionar" ? (
                 <div className={(presupuestocarrito.length?"container-fluid":"container")+(" p-0")}>
                     <div className="row">
@@ -5017,6 +5146,15 @@ export default function Facturar({ user, notificar, setLoading }) {
             ) : null}
             {view == "pedidos" ? (
                 <Pedidos
+                    setmodalchangepedido={setmodalchangepedido}
+                    setseletIdChangePedidoUserHandle={setseletIdChangePedidoUserHandle}
+                    modalchangepedido={modalchangepedido}
+                    modalchangepedidoy={modalchangepedidoy}
+                    modalchangepedidox={modalchangepedidox}
+                    usuarioChangeUserPedido={usuarioChangeUserPedido}
+                    setusuarioChangeUserPedidoHandle={setusuarioChangeUserPedidoHandle}
+                    usuariosData={usuariosData}
+                    auth={auth}
                     toggleImprimirTicket={toggleImprimirTicket}
                     setexportpedido={setexportpedido}
                     pedidoData={pedidoData}

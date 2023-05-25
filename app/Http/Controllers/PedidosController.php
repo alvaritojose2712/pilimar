@@ -55,7 +55,24 @@ class PedidosController extends Controller
                 9=>"P",
                 0=>"X",
             ];
+    public function changepedidouser(Request $req)
+    {
+        $id_pedido = $req->id_pedido; 
+        $id_usuario = $req->id_usuario;
 
+        $pedido = pedidos::find($id_pedido);
+        $pedido->id_vendedor = $id_usuario;
+        if($pedido->save()){
+                $u = usuarios::find($id_usuario);
+                $mov = new movimientos;
+                $mov->id_usuario = session("id_usuario");
+                $mov->tipo = "Transferencia de Pedido"; 
+                $mov->motivo = "Para: ".$u->usuario; 
+                $mov->tipo_pago = ""; 
+                $mov->monto = "";
+                $mov->save();
+        }
+    }
     public function setexportpedido(Request $req)
     {
         $p = pedidos::find($req->id);
@@ -457,12 +474,35 @@ class PedidosController extends Controller
     public function delpedido(Request $req)
     {
         try {
-            if (session("tipo_usuario")!=1) {
-                throw new \Exception("¡No tiene permisos para eliminar! Contacte con un Administrador.", 1);
-                
-            }
+            
             $id = $req->id;
             $motivo = $req->motivo;
+
+            $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                "id_pedido" => $id,
+                "tipo" => "eliminarPedido",
+            ]);
+            
+            if ((new UsuariosController)->isAdmin()) {
+
+                
+            }elseif($isPermiso["permiso"]){
+                
+            }else{
+
+                $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                    "id_pedido" =>  $id,
+                    "valoraprobado" => 0,
+                    "tipo" => "eliminarPedido",
+                    "descripcion" => "Solicitud de eliminación de pedido: #".$id,
+                ]);
+                if ($nuevatarea) {
+                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>true]);
+                }
+
+            }
+
+
             $this->checkPedidoAuth($id);
             if ($id) {
                 $mov = new movimientos;

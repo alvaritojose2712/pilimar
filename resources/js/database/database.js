@@ -112,6 +112,11 @@ const db = {
   delFalla: data=>axios.post(host+"delFalla",data),
   imprimirTicked: data=>axios.post(host+"imprimirTicked",data),
   getTotalizarCierre: data=>axios.post(host+"getTotalizarCierre",data),
+  changepedidouser: data=>axios.post(host+"changepedidouser",data),
+  
+
+  getTareasLocal: data=>axios.get(host+"getTareasLocal",{params:data}),
+  resolverTareaLocal: data=>axios.get(host+"resolverTareaLocal",{params:data}),
   
   sendCierre: data=>axios.get(host+"verCierre",{params:data}),
   printTickedPrecio: ({ id }) => window.open(host + "/printTickedPrecio?id=" + id, "targed=blank"),
@@ -153,6 +158,8 @@ const db = {
   setPagoProveedor: data => axios.post(host + "setPagoProveedor", data),
   getPagoProveedor: data => axios.post(host + "getPagoProveedor", data),
   delPagoProveedor: data => axios.post(host + "delPagoProveedor", data),
+  getPermisoCierre: data => axios.post(host + "getPermisoCierre", data),
+  
 
   
   getHistoricoInventario: data => axios.get(host + "getHistoricoInventario", { params: data }),

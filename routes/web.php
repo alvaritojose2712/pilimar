@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TareaslocalController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InventarioController;
@@ -135,6 +136,10 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('createDevolucion', [DevolucionesController::class,"createDevolucion"]);
 		Route::post('setDevolucion', [DevolucionesController::class,"setDevolucion"]);
 		Route::post('setpagoDevolucion', [DevolucionesController::class,"setpagoDevolucion"]);
+		Route::post('changepedidouser', [PedidosController::class,"changepedidouser"]);
+		Route::get('getUsuarios', [UsuariosController::class,"getUsuarios"]);
+		
+		Route::post('getPermisoCierre', [TareaslocalController::class,"getPermisoCierre"]);
 		
 		
 	});
@@ -144,6 +149,8 @@ Route::group(['middleware' => ['login']], function () {
 	});
 	
 	Route::group(['middleware' => ['admin']], function () {
+		Route::get('getTareasLocal', [TareaslocalController::class,"getTareasLocal"]);
+		Route::get('resolverTareaLocal', [TareaslocalController::class,"resolverTareaLocal"]);
 		
 		Route::get('getHistoricoInventario', [MovimientosInventarioController::class,"getHistoricoInventario"]);
 		Route::get('getmovientoinventariounitario', [MovimientosInventariounitarioController::class,"getmovientoinventariounitario"]);
@@ -197,7 +204,6 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('verFactura', [FacturaController::class,"verFactura"]);
 		Route::post('setUsuario', [UsuariosController::class,"setUsuario"]);
 		Route::post('delUsuario', [UsuariosController::class,"delUsuario"]);
-		Route::get('getUsuarios', [UsuariosController::class,"getUsuarios"]);
 		Route::get('verCreditos', [PagoPedidosController::class,"verCreditos"]);
 		Route::get('reporteInventario', [InventarioController::class,"reporteInventario"]);
 		Route::post('getEstaInventario', [InventarioController::class,"getEstaInventario"]);
@@ -219,7 +225,7 @@ Route::group(['middleware' => ['login']], function () {
 		
 		
 	});
-		Route::post('delMov', [MovimientosController::class,"delMov"]);
+	Route::post('delMov', [MovimientosController::class,"delMov"]);
 	Route::post('getPedidosList', [PedidosController::class,"getPedidosUser"]);
 
 	Route::post('getVentas', [PedidosController::class,"getVentas"]);

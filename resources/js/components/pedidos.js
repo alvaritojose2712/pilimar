@@ -3,6 +3,7 @@ import {useState} from 'react';
 import ModalShowPedidoFast from '../components/ModalShowPedidoFast';
 
 function Pedidos({
+auth,
 pedidoData,
 getPedidoFast,
 setexportpedido,
@@ -40,6 +41,15 @@ filterMetodoPago,
 filterMetodoPagoToggle,
 clickSetOrderColumnPedidos,
 toggleImprimirTicket,
+
+setmodalchangepedido,
+setseletIdChangePedidoUserHandle,
+modalchangepedido,
+modalchangepedidoy,
+modalchangepedidox,
+usuarioChangeUserPedido,
+setusuarioChangeUserPedidoHandle,
+usuariosData,
 }) {
 	try{
 		return (
@@ -171,16 +181,33 @@ toggleImprimirTicket,
 								e?
 									<div className={("card-pedidos ")+(e.estado?"":"bg-sinapsis-light")} key={e.id}>
 											
-										<div className="cell1 pointer" data-id={e.id} onClick={onClickEditPedido}>
+										<div className="cell1 pointer"/*  data-id={e.id} onClick={onClickEditPedido} */>
 											
-								    	<h3>
-									    	<span className="btn btn-sm btn-secondary">
-									    		{e.id}
-									    	</span>
-								    	</h3>
+											<h3>
+												<span className="btn btn-sm btn-secondary">
+													{e.id}
+												</span>
+											</h3>
 											<span className="text-muted text-left">
-									    		{e.vendedor?e.vendedor.nombre:null} 
-									    </span>
+									    		{e.vendedor?e.vendedor.nombre:null} <i className="fa fa-undo pointer text-success" onClick={(event)=>{setseletIdChangePedidoUserHandle(event,e.id)}}></i>
+									    	</span>
+											{modalchangepedido?
+												<div className="modalchangepedido" style={{top:modalchangepedidoy+20,left:modalchangepedidox}}>
+													<div className="w-100 btn mb-1 btn-sm">
+														<i className="fa fa-times text-danger" onClick={()=>setmodalchangepedido(false)}></i>
+													</div>
+													<h5>Transferir a...</h5>
+													<select
+														className={("form-control form-control-sm ")}
+														value={usuarioChangeUserPedido}
+														onChange={e => setusuarioChangeUserPedidoHandle((e.target.value))}
+													>
+														<option value="">--Seleccione Usuario--</option>
+														{usuariosData.length?usuariosData.map(e => <option value={e.id} key={e.id}>{e.usuario}</option>):null}
+														
+													</select>
+												</div>
+											:null}
 									    <br/>
 									    <small className="text-muted font-size-12">{e.created_at}</small>
 										</div>
@@ -234,7 +261,7 @@ toggleImprimirTicket,
 																<button className="btn btn-outline-success btn-sm" data-id={e.id} onClick={getPedidoFast}><i className="fa fa-eye"></i></button>
 																<button className="btn btn-outline-sinapsis btn-sm" onClick={() => toggleImprimirTicket(e.id)}><i className="fa fa-print"></i></button>
 																<button className="btn btn-outline-secondary btn-sm" data-id={e.id} onClick={setexportpedido}><i className="fa fa-paper-plane"></i></button>
-																<button className="btn btn-outline-danger btn-sm" data-id={e.id} data-type="getPedidos" onClick={onCLickDelPedido}><i className="fa fa-times"></i></button>
+																{auth(1)?<button className="btn btn-outline-danger btn-sm" data-id={e.id} data-type="getPedidos" onClick={onCLickDelPedido}><i className="fa fa-times"></i></button>:null}
 															</div>
 											    	</td>
 								    				

@@ -430,7 +430,7 @@
 					@foreach($movimientos as $val)
 						@if ($val->motivo)
 							<tr>
-								<td>{{$val->usuario->usuario}}</td>
+								<td>{{$val->usuario?$val->usuario->usuario:null}}</td>
 								<td>{{$val->tipo}}</td>
 								<td><b>Motivo</b><br/>{{$val->motivo}}</td>
 								<td><b>{{$val->tipo_pago?"MétodoDePago":"Sin pago"}}</b><br/>{{$val->tipo_pago}}</td>

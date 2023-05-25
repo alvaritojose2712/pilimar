@@ -2,8 +2,27 @@ import logo from "../../images/logo.png"
 import carrito from "../../images/carrito1.png"
 function Header({
   updatetasasfromCentral,
-  user, logout, getip,
-  settoggleClientesBtn,toggleClientesBtn,getVentasClick,dolar,peso,view,setView,setMoneda,getPedidos,setViewCaja,viewCaja,setShowModalMovimientos,showModalMovimientos,auth}) {
+  user,
+  logout,
+  getip,
+  settoggleClientesBtn,
+  toggleClientesBtn,
+  getVentasClick,
+  dolar,
+  peso,
+  view,
+  setView,
+  setMoneda,
+  getPedidos,
+  setViewCaja,
+  viewCaja,
+  setShowModalMovimientos,
+  showModalMovimientos,
+  auth,
+
+  isCierre,
+  getPermisoCierre,
+}) {
   
     return (
     <header className="mb-3">
@@ -67,16 +86,24 @@ function Header({
             </div>:null}
 
 
-              {auth(2)?<span className={(view=="cierres"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("cierres")}>Cierre</span>:null}
+            {auth(1)
+              ?<span className={(view=="cierres"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("cierres")}>Cierre</span>
+              :<span className={(view=="cierres"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>getPermisoCierre()}>Cierre</span>
+            }
             
-            {auth(2)?
+            {auth(1)?
             <>
               <small className="p-3 monto-header" onClick={setMoneda} data-type="1">USD {dolar} </small>
               <small className="p-3 monto-header" onClick={setMoneda} data-type="2">COP {peso} </small>
               <small className="p-3 monto-header"><i className="fa fa-refresh" onClick={updatetasasfromCentral}></i> </small>
               
             </>
-            :null}
+            :
+            <>
+              <small className="p-3 monto-header" data-type="1">USD {dolar} </small>
+              <small className="p-3 monto-header" data-type="2">COP {peso} </small>
+            </>
+            }
             
           </div>
           <div className="col-4 d-flex header-justify-content-end">
@@ -91,6 +118,7 @@ function Header({
                 </>:null
               :null
             }
+            {auth(1)?<span className={(view=="tareas"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("tareas")}>Tareas</span>:null}
             {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Administración</span>:null}
             
             {
