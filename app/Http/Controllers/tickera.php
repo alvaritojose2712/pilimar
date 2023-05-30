@@ -109,10 +109,14 @@ class tickera extends Controller
                     $printer->text("\n");
                     $printer->feed();
 
-                    $totalpresupuesto = $totalpresupuesto + $e['subtotal'];
+                    $totalpresupuesto += $e['subtotal'];
                 }
 
                 $printer->text("\n");
+                $printer->text("\n");
+                $printer->text("\n");
+                $printer->setEmphasis(true);
+
                 $printer->text("Total: ".$totalpresupuesto);
             }else{
                 if (!(new PedidosController)->checksipedidoprocesado($req->id)) {

@@ -2968,6 +2968,16 @@ export default function Facturar({ user, notificar, setLoading }) {
             }
         }
     };
+    const [cierrenumreportez, setcierrenumreportez] = useState("")
+    const [cierreventaexcento, setcierreventaexcento] = useState("")
+    const [cierreventagravadas, setcierreventagravadas] = useState("")
+    const [cierreivaventa, setcierreivaventa] = useState("")
+    const [cierretotalventa, setcierretotalventa] = useState("")
+    const [cierreultimafactura, setcierreultimafactura] = useState("")
+    const [cierreefecadiccajafbs, setcierreefecadiccajafbs] = useState("")
+    const [cierreefecadiccajafcop, setcierreefecadiccajafcop] = useState("")
+    const [cierreefecadiccajafdolar, setcierreefecadiccajafdolar] = useState("")
+    const [cierreefecadiccajafeuro, setcierreefecadiccajafeuro] = useState("")
     const guardar_cierre = (e, callback = null) => {
         if (window.confirm("¿Realmente desea Guardar/Editar?")) {
             setLoading(true);
@@ -3009,6 +3019,24 @@ export default function Facturar({ user, notificar, setLoading }) {
                 notaCierre,
                 totalizarcierre,
                 tipo_accionCierre,
+
+                numreportez:cierrenumreportez,
+                ventaexcento:cierreventaexcento,
+                ventagravadas:cierreventagravadas,
+                ivaventa:cierreivaventa,
+                totalventa:cierretotalventa,
+                ultimafactura:cierreultimafactura,
+                efecadiccajafbs:cierreefecadiccajafbs,
+                efecadiccajafcop:cierreefecadiccajafcop,
+                efecadiccajafdolar:cierreefecadiccajafdolar,
+                efecadiccajafeuro:cierreefecadiccajafeuro,
+
+                inventariobase: cierre["total_inventario_base"],
+                inventarioventa: cierre["total_inventario"],
+                creditoporcobrartotal: cierre["cred_total"],
+                credito: cierre["4"],
+                vueltostotales: cierre["vueltos_totales"],
+                abonosdeldia: cierre["abonosdeldia"],
             }).then((res) => {
                 setLoading(false);
                 notificar(res, false);
@@ -3398,6 +3426,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             setusuarioChangeUserPedido("")
             setmodalchangepedido(false)
             getPedidos()
+            getPedidosList()
         })
     }
     const setseletIdChangePedidoUserHandle = (event, id) => {
@@ -5074,6 +5103,28 @@ export default function Facturar({ user, notificar, setLoading }) {
 
             {view == "cierres" ? (
                 <Cierres
+
+                    cierrenumreportez={cierrenumreportez}
+                    setcierrenumreportez={setcierrenumreportez}
+                    cierreventaexcento={cierreventaexcento}
+                    setcierreventaexcento={setcierreventaexcento}
+                    cierreventagravadas={cierreventagravadas}
+                    setcierreventagravadas={setcierreventagravadas}
+                    cierreivaventa={cierreivaventa}
+                    setcierreivaventa={setcierreivaventa}
+                    cierretotalventa={cierretotalventa}
+                    setcierretotalventa={setcierretotalventa}
+                    cierreultimafactura={cierreultimafactura}
+                    setcierreultimafactura={setcierreultimafactura}
+                    cierreefecadiccajafbs={cierreefecadiccajafbs}
+                    setcierreefecadiccajafbs={setcierreefecadiccajafbs}
+                    cierreefecadiccajafcop={cierreefecadiccajafcop}
+                    setcierreefecadiccajafcop={setcierreefecadiccajafcop}
+                    cierreefecadiccajafdolar={cierreefecadiccajafdolar}
+                    setcierreefecadiccajafdolar={setcierreefecadiccajafdolar}
+                    cierreefecadiccajafeuro={cierreefecadiccajafeuro}
+                    setcierreefecadiccajafeuro={setcierreefecadiccajafeuro}
+
                     getTotalizarCierre={getTotalizarCierre}
                     totalizarcierre={totalizarcierre}
                     setTotalizarcierre={setTotalizarcierre}

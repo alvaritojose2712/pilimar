@@ -280,8 +280,9 @@
 					<td colspan="5"><b>CRÉDITO POR COBRAR TOTAL</b> <br> <span class="h2">{{number_format($cred_total,2)}}</span></td>
 				</tr>
 				<tr>
-					<td colspan="5"><b>ABONOS DEL DÍA</b> </td>
+					<td colspan="5"><b>ABONOS DEL DÍA</b> <br> <span class="h2">{{number_format($abonosdeldia,2)}}</span></td>
 				</tr>
+				
 				@foreach ($pedidos_abonos as $e)
 					<tr>
 						<td>
@@ -293,28 +294,33 @@
 						<td>
 							@foreach ($e->pagos as $ee)
 								
-								<span> @switch($ee->tipo)
-									@case(1)
-									Transferencia
-										@break
-									@case(2)
-									Debito
-										@break
-
-									@case(3)
-									Efectivo
-										@break
-									@case(4)
-									Credito
-										@break
-									@case(5)
-									Otros
-										@break
-									@case(6)
-									Vuelto
-										@break
-								@endswitch - {{$ee->monto}}</span><br>
-									
+								<span> 
+									<b>
+										@switch($ee->tipo)
+											@case(1)
+											Transferencia
+											@break
+											@case(2)
+											Debito
+											@break
+											
+											@case(3)
+											Efectivo
+											@break
+											@case(4)
+											Credito
+											@break
+											@case(5)
+											Otros
+											@break
+											@case(6)
+											Vuelto
+											@break
+										@endswitch  
+									</b>
+									{{$ee->monto}}
+								</span>
+								<br>
 							@endforeach
 						</td>
 					</tr>
