@@ -50,6 +50,9 @@ export default function Panelcentrodeacopio({
     estadisticasinventarioSucursalFromCentral,
     autovincularSucursalCentral,
 
+    datainventarioSucursalFromCentralcopy,
+    setdatainventarioSucursalFromCentralcopy,
+
 }) {
     const type = (type) => {
         return !type || type === "delete" ? true : false;

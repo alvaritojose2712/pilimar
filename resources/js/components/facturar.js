@@ -469,9 +469,11 @@ export default function Facturar({ user, notificar, setLoading }) {
             getTareasLocal()
         })
     }   
-    
+    const [datainventarioSucursalFromCentralcopy,setdatainventarioSucursalFromCentralcopy] = useState([])
     const autovincularSucursalCentral = () => {
         let obj = cloneDeep(inventarioSucursalFromCentral);
+        
+        setdatainventarioSucursalFromCentralcopy(obj)
         db.getSyncProductosCentralSucursal({obj}).then(res=>{
             setdatainventarioSucursalFromCentral(res.data);
         })
@@ -5579,6 +5581,8 @@ export default function Facturar({ user, notificar, setLoading }) {
             {view == "panelcentrodeacopio" ? (
                 <Panelcentrodeacopio
                     autovincularSucursalCentral={autovincularSucursalCentral}
+                    datainventarioSucursalFromCentralcopy={datainventarioSucursalFromCentralcopy}
+                    setdatainventarioSucursalFromCentralcopy={setdatainventarioSucursalFromCentralcopy}
                     estadisticasinventarioSucursalFromCentral={
                         estadisticasinventarioSucursalFromCentral
                     }
