@@ -156,6 +156,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('getmovientoinventariounitario', [MovimientosInventariounitarioController::class,"getmovientoinventariounitario"]);
 		Route::post('getSyncProductosCentralSucursal', [InventarioController::class,"getSyncProductosCentralSucursal"]);
 		
+		Route::post('guardarDeSucursalEnCentral', [InventarioController::class,"guardarDeSucursalEnCentral"]);
+		
 		
 		
 		/* GastosController */
@@ -316,7 +318,11 @@ Route::group(['middleware' => ['login']], function () {
 	
 	
 	
-
+Route::get("/playground",function(){
+	# code...
+	event(new \App\Events\PlaygroundEvent());
+	return null;
+});
 
 
 

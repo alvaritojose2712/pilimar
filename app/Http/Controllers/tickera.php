@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\sucursal;
+use App\Models\pedidos;
+
 
 use Illuminate\Http\Request;
 use Mike42\Escpos;
@@ -97,7 +99,7 @@ class tickera extends Controller
                     $printer->text($e['id']);
                     $printer->text("\n");
 
-                    $printer->text(addSpaces("P/U. ",6).$e['precio']);
+                    $printer->text(addSpaces("P/U. ",6).moneda($e['precio']*$dolar));
                     $printer->text("\n");
                     
                     $printer->setEmphasis(true);
@@ -105,25 +107,57 @@ class tickera extends Controller
                     $printer->setEmphasis(false);
                     $printer->text("\n");
 
-                    $printer->text(addSpaces("Tot. ",6).$e['subtotal']);
+                    $printer->text(addSpaces("SubTotal. ",6).moneda($e['subtotal']*$dolar));
                     $printer->text("\n");
                     $printer->feed();
 
                     $totalpresupuesto += $e['subtotal'];
                 }
 
+                $printer->text("Total: ".moneda($totalpresupuesto*$dolar));
                 $printer->text("\n");
                 $printer->text("\n");
                 $printer->text("\n");
-                $printer->setEmphasis(true);
 
-                $printer->text("Total: ".$totalpresupuesto);
             }else{
+
                 if (!(new PedidosController)->checksipedidoprocesado($req->id)) {
                     throw new \Exception("¡Debe procesar el pedido para imprimir!", 1);
                     
                 }
                 $pedido = (new PedidosController)->getPedido($req,floatval($dolar));
+                $fecha_creada = date("Y-m-d",strtotime($pedido->created_at));
+                $today = (new PedidosController)->today();
+
+                if ($fecha_creada != $today || ($fecha_creada == $today && $pedido->ticked)) {
+                    $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                        "id_pedido" => $req->id,
+                        "tipo" => "tickera",
+                    ]);
+                    if ((new UsuariosController)->isAdmin()) {
+                        // Avanza
+                    }elseif($isPermiso["permiso"]){
+                        if ($isPermiso["valoraprobado"]==1) {
+                            // Avanza
+                        }else{
+                            return Response::json(["msj"=>"Error: Valor no aprobado","estado"=>false]);
+                        }
+                    }else{
+                        $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                            "id_pedido" =>  $req->id,
+                            "valoraprobado" => 1,
+                            "tipo" => "tickera",
+                            "descripcion" => "Solicitud de Reimpresion COPIA",
+                        ]);
+                        if ($nuevatarea) {
+                            return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>false]);
+                        }
+                    }
+                }
+                
+
+
+
                 if ($nombres=="precio" && $identificacion=="precio") {
                     if($pedido->items){
     
@@ -155,25 +189,24 @@ class tickera extends Controller
                    
                     foreach ($items as $item) {
     
-                        //Current item ROW 1
-    
                         $printer->setEmphasis(true);
                         $printer->text("\n");
                         $printer->text($item['codigo_barras']);
                         $printer->setEmphasis(false);
-                       $printer->text("\n");
-                       $printer->text($item['descripcion']);
-                       $printer->text("\n");
+                        $printer->text("\n");
+                        $printer->text($item['descripcion']);
+                        $printer->text("\n");
     
                         $printer->setEmphasis(true);
     
-                       $printer->text($item['pu']);
-                       $printer->setEmphasis(false);
-                       
-                       $printer->text("\n");
+                        $printer->text($item['pu']);
+                        $printer->setEmphasis(false);
+                        
+                        $printer->text("\n");
     
                         $printer->feed();
                     }
+
                 }else{
     
                     
@@ -185,7 +218,7 @@ class tickera extends Controller
     
                     // $printer->text("\n");
                     $printer->setJustification(Printer::JUSTIFY_CENTER);
-    
+                    
                     $printer -> text("\n");
                     $printer -> text($sucursal->nombre_registro);
                     $printer -> text("\n");
@@ -197,16 +230,13 @@ class tickera extends Controller
                     $printer -> setTextSize(1,1);
     
                     $printer->setEmphasis(true);
-    
-                    
                    
                     $printer -> text("\n");
                     $printer->text($sucursal->sucursal);
                     $printer -> text("\n");
-                    $printer->text("NOTA DE ENTREGA #".$pedido->id);
+                    $printer->text((!$pedido->ticked?"ORIGINAL: ":"COPIA: ")."NOTA DE ENTREGA #".$pedido->id);
                     $printer->setEmphasis(false);
     
-                    $printer -> text("\n");
                     $printer -> text("\n");
     
                     if ($nombres!="") {
@@ -228,9 +258,6 @@ class tickera extends Controller
     
                     }
     
-    
-    
-                    
                     $printer->feed();
                     $printer->setPrintLeftMargin(0);
                     $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -291,8 +318,6 @@ class tickera extends Controller
                     }
                     $printer->setEmphasis(true);
     
-    
-    
                     $printer->text("Desc: ".$pedido->total_des);
                     $printer->text("\n");
                     $printer->text("Sub-Total: ". number_format($pedido->clean_total/1.16,2) );
@@ -302,30 +327,28 @@ class tickera extends Controller
                     $printer->text("Total: ".$pedido->total);
                     $printer->text("\n");
                     $printer->text("\n");
-                        $printer->setJustification(Printer::JUSTIFY_CENTER);
+                    $printer->setJustification(Printer::JUSTIFY_CENTER);
     
                     $printer->text("Creado: ".$pedido->created_at);
                     
                     $printer->text("\n");
-                    $printer->text("*ESTE RECIBO NO TIENE NINGÚN");
+                    $printer->text("*ESTE RECIBO NO TIENE NINGUN");
                     $printer->text("\n");
                     $printer->text("VALOR FISCAL*");
                     $printer->text("\n");
                     $printer->text("\n");
                     $printer->text("\n");
-    
-                   
-    
-                    
-    
-    
+
+                    $updateprint = pedidos::find($pedido->id);
+                    $updateprint->ticked = 1;
+                    $updateprint->save();
+
                 }
             }
 
             $printer->cut();
             $printer->pulse();
             $printer->close();
-
             return Response::json([
                 "msj"=>"Imprimiendo...",
                 "estado"=>true

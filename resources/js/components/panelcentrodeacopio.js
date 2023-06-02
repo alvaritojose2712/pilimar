@@ -1,5 +1,8 @@
 import Modalmovil from "./modalmovil";
 export default function Panelcentrodeacopio({
+    modalmovilRef,
+    idselectproductoinsucursalforvicular,
+    guardarDeSucursalEnCentral,
     getSucursales,
     sucursalesCentral,
     setselectSucursalCentral,
@@ -61,6 +64,7 @@ export default function Panelcentrodeacopio({
         <div className="container-fluid">
             {modalmovilshow ? (
                 <Modalmovil
+                    modalmovilRef={modalmovilRef}
                     x={modalmovilx}
                     y={modalmovily}
                     setmodalmovilshow={setmodalmovilshow}
@@ -566,25 +570,26 @@ export default function Panelcentrodeacopio({
                                                                             <>
                                                                                 <td className="cell05">
                                                                                     {!e.id_vinculacion ? (
-                                                                                        <button
-                                                                                            className="btn btn-outline-danger fs-10px"
-                                                                                            onClick={(
-                                                                                                event
-                                                                                            ) =>
-                                                                                                openVincularSucursalwithCentral(
-                                                                                                    event,
-                                                                                                    {
-                                                                                                        id: e.id
-                                                                                                            ? e.id
-                                                                                                            : null,
-                                                                                                        index: i,
+                                                                                        <>
+                                                                                            <button
+                                                                                                className={(idselectproductoinsucursalforvicular.index==i?"btn-warning":"btn-outline-danger")+(" btn fs-10px")}
+                                                                                                
+                                                                                                onClick={(
+                                                                                                    event
+                                                                                                    ) =>
+                                                                                                    openVincularSucursalwithCentral(
+                                                                                                        event,
+                                                                                                        {
+                                                                                                            id: e.id ? e.id: null , index: i,
+                                                                                                        }
+                                                                                                        )
                                                                                                     }
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            No
-                                                                                            vinculado
-                                                                                        </button>
+                                                                                                    >
+                                                                                                No
+                                                                                                vinculado
+                                                                                            </button>
+                                                                                            <button className="btn btn-outline-success btn-sm fs-10px" onClick={()=>guardarDeSucursalEnCentral(i, e.id ? e.id: null)}><i className="fa fa-save"></i></button>
+                                                                                        </>
                                                                                     ) : (
                                                                                         <button
                                                                                             className="btn btn-outline-success"
@@ -668,25 +673,28 @@ export default function Panelcentrodeacopio({
                                                                             <>
                                                                                 <td className="cell1">
                                                                                     {!e.id_vinculacion ? (
-                                                                                        <button
-                                                                                            className="btn btn-outline-danger"
-                                                                                            onClick={(
-                                                                                                event
-                                                                                            ) =>
-                                                                                                openVincularSucursalwithCentral(
-                                                                                                    event,
-                                                                                                    {
-                                                                                                        id: e.id
+                                                                                        <>
+                                                                                            <button
+                                                                                                className="btn btn-outline-danger"
+                                                                                                onClick={(
+                                                                                                    event
+                                                                                                    ) =>
+                                                                                                    openVincularSucursalwithCentral(
+                                                                                                        event,
+                                                                                                        {
+                                                                                                            id: e.id
                                                                                                             ? e.id
                                                                                                             : null,
-                                                                                                        index: i,
+                                                                                                            index: i,
+                                                                                                        }
+                                                                                                        )
                                                                                                     }
-                                                                                                )
-                                                                                            }
-                                                                                        >
-                                                                                            No
-                                                                                            vinculado
-                                                                                        </button>
+                                                                                                    >
+                                                                                                No
+                                                                                                vinculado
+                                                                                            </button>
+
+                                                                                        </>
                                                                                     ) : (
                                                                                         <>
                                                                                             <button
@@ -725,6 +733,12 @@ export default function Panelcentrodeacopio({
                                                                                     )}
                                                                                 </td>
                                                                                 <td className="cell1">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].codigo_proveedor}</span>
+                                                                                        :null
+                                                                                    }<br />
+                                                                                    
                                                                                     <input
                                                                                         type="text"
                                                                                         disabled={type(
@@ -753,6 +767,11 @@ export default function Panelcentrodeacopio({
                                                                                     />
                                                                                 </td>
                                                                                 <td className="cell1">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].codigo_barras}</span>
+                                                                                        :null
+                                                                                    }<br />
                                                                                     <input
                                                                                         type="text"
                                                                                         required={
@@ -789,6 +808,11 @@ export default function Panelcentrodeacopio({
                                                                                     />
                                                                                 </td>
                                                                                 <td className="cell05">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].unidad}</span>
+                                                                                        :null
+                                                                                    }<br />
                                                                                     <select
                                                                                         disabled={type(
                                                                                             e.type
@@ -851,6 +875,11 @@ export default function Panelcentrodeacopio({
                                                                                     </select>
                                                                                 </td>
                                                                                 <td className="cell2">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].descripcion}</span>
+                                                                                        :null
+                                                                                    }<br />
                                                                                     <textarea
                                                                                         type="text"
                                                                                         required={
@@ -888,6 +917,11 @@ export default function Panelcentrodeacopio({
                                                                                     ></textarea>
                                                                                 </td>
                                                                                 <td className="cell05">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].cantidad}</span>
+                                                                                        :null
+                                                                                    }<br />
                                                                                     <input
                                                                                         type="text"
                                                                                         required={
@@ -926,11 +960,13 @@ export default function Panelcentrodeacopio({
                                                                                     />
                                                                                 </td>
                                                                                 <td className="cell1">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].precio_base}</span>
+                                                                                        :null
+                                                                                    }<br />
                                                                                     <input
                                                                                         type="text"
-                                                                                        required={
-                                                                                            true
-                                                                                        }
                                                                                         disabled={type(
                                                                                             e.type
                                                                                         )}
@@ -964,6 +1000,11 @@ export default function Panelcentrodeacopio({
                                                                                     />
                                                                                 </td>
                                                                                 <td className="cell15">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].precio}</span>
+                                                                                        :null
+                                                                                    }<br />
                                                                                     <div className="input-group">
                                                                                         <input
                                                                                             type="text"
@@ -1004,6 +1045,17 @@ export default function Panelcentrodeacopio({
                                                                                     </div>
                                                                                 </td>
                                                                                 <td className="cell15">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].id_categoria}</span>
+                                                                                        :null
+                                                                                    } /
+
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].id_proveedor}</span>
+                                                                                        :null
+                                                                                    }<br />
                                                                                     <select
                                                                                         required={
                                                                                             true
@@ -1050,7 +1102,10 @@ export default function Panelcentrodeacopio({
                                                                                                     key={
                                                                                                         e.id
                                                                                                     }
-                                                                                                >
+                                                                                                > 
+                                                                                                    {
+                                                                                                        e.id
+                                                                                                    }-
                                                                                                     {
                                                                                                         e.descripcion
                                                                                                     }
@@ -1107,6 +1162,9 @@ export default function Panelcentrodeacopio({
                                                                                                     }
                                                                                                 >
                                                                                                     {
+                                                                                                        e.id
+                                                                                                    }-
+                                                                                                    {
                                                                                                         e.descripcion
                                                                                                     }
                                                                                                 </option>
@@ -1115,6 +1173,11 @@ export default function Panelcentrodeacopio({
                                                                                     </select>
                                                                                 </td>
                                                                                 <td className="cell05">
+                                                                                    {
+                                                                                        datainventarioSucursalFromCentralcopy[i]?
+                                                                                        <span className="text-muted text-decoration-line-through">{datainventarioSucursalFromCentralcopy[i].iva}</span>
+                                                                                        :null
+                                                                                    }<br />
                                                                                     <input
                                                                                         type="text"
                                                                                         disabled={type(

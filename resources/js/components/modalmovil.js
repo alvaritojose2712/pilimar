@@ -9,22 +9,32 @@ export default function Modalmovil({
     productos,
     linkproductocentralsucursal,
     inputbuscarcentralforvincular,
+    modalmovilRef
 }) {
     useEffect(()=>{
+        
         if (inputbuscarcentralforvincular) {
             if (inputbuscarcentralforvincular.current) {
                 inputbuscarcentralforvincular.current.focus()
             }
         }
-    },[modalmovilshow])
+        if (modalmovilRef) {
+            if (modalmovilRef.current) {
+                modalmovilRef.current?.scrollIntoView({ block: "nearest", behavior: 'smooth' });
+            }
+        }
+
+    },[y])
+
     return (
-        <div className="modalmovil" style={{top:y+42,left:x}}>
-            <div className="w-100 btn mb-1 btn-sm" onClick={()=>setmodalmovilshow(false)}>
-                <i className="fa fa-times text-danger"></i>
+        <div className="modalmovil" style={{top:y+42,left:x}} ref={modalmovilRef} onMouseLeave={()=>setmodalmovilshow(false)}>
+            <div className="input-group">
+                <input type="text" className="form-control" placeholder="Buscar en centro de Acopio..." ref={inputbuscarcentralforvincular}  onChange={e=>getProductos(e.target.value)}/>
+                
+                <div className="input-group-prepend">
+                    <span className="input-group-text">Productos Centro de Acopio</span>
+                </div>
             </div>
-            
-            <h5>Productos Centro de Acopio</h5>
-            <input type="text" className="form-control" placeholder="Buscar en centro de Acopio..." ref={inputbuscarcentralforvincular}  onChange={e=>getProductos(e.target.value)}/>
             
             <table className="table">
                 <thead>

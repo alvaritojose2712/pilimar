@@ -37,10 +37,10 @@ class PedidosController extends Controller
 {   
 
     protected $sends = [
-        /* "omarelhenaoui@hotmail.com",           
+        "omarelhenaoui@hotmail.com",           
         "yeisersalah2@gmail.com",           
         "amerelhenaoui@outlook.com",           
-        "yesers982@hotmail.com",   */ 
+        "yesers982@hotmail.com",  
         "alvaroospino79@gmail.com"        
     ];
     protected  $letras = [
@@ -497,7 +497,7 @@ class PedidosController extends Controller
                     "descripcion" => "Solicitud de eliminación de pedido: #".$id,
                 ]);
                 if ($nuevatarea) {
-                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>true]);
+                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>false]);
                 }
 
             }

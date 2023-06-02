@@ -29,6 +29,10 @@ function Index() {
             setTimeout(() => {
                 setMsj("")
             }, 3000)
+        }else{
+            setTimeout(() => {
+                setMsj("")
+            }, 10000)
         }
         if (msj == "") {
             setMsj("")

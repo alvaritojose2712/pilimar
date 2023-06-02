@@ -160,6 +160,8 @@ const db = {
   delPagoProveedor: data => axios.post(host + "delPagoProveedor", data),
   getPermisoCierre: data => axios.post(host + "getPermisoCierre", data),
   
+  guardarDeSucursalEnCentral: data => axios.post(host + "guardarDeSucursalEnCentral", data),
+  
 
   
   getHistoricoInventario: data => axios.get(host + "getHistoricoInventario", { params: data }),

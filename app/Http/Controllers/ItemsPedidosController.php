@@ -147,7 +147,7 @@ class ItemsPedidosController extends Controller
                     "descripcion" => "Solicitud de descuento Unitario: ".$req->descuento."%",
                 ]);
                 if ($nuevatarea) {
-                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>true]);
+                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>false]);
                 }
 
             }
@@ -199,7 +199,7 @@ class ItemsPedidosController extends Controller
                     "descripcion" => "Solicitud de descuento Total: ".round($descuento,0)." %",
                 ]);
                 if ($nuevatarea) {
-                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>true]);
+                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>false]);
                 }
 
             }

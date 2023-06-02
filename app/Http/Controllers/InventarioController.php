@@ -32,6 +32,49 @@ use Response;
 
 class InventarioController extends Controller
 {
+
+    public function guardarDeSucursalEnCentral(Request $req)
+    {
+        $producto = $req->producto;
+        try{
+            $id = $this->guardarProducto([
+                "codigo_proveedor" => $producto["codigo_proveedor"],
+                "codigo_barras" => $producto["codigo_barras"],
+                "id_proveedor" => $producto["id_proveedor"],
+                "id_categoria" => $producto["id_categoria"],
+                "id_marca" => $producto["id_marca"],
+                "unidad" => $producto["unidad"],
+                "descripcion" => $producto["descripcion"],
+                "iva" => $producto["iva"],
+                "precio_base" => $producto["precio_base"],
+                "precio" => $producto["precio"],
+                "cantidad" => $producto["cantidad"],
+                "bulto" => $producto["bulto"],
+                "precio1" => $producto["precio1"],
+                "precio2" => $producto["precio2"],
+                "precio3" => $producto["precio3"],
+                "stockmin" => $producto["stockmin"],
+                "stockmax" => $producto["stockmax"],
+    
+                "id_deposito" => "",
+                "porcentaje_ganancia" => 0,
+                
+                "id_factura" => null,
+                "origen"=>"localCopyCentral",
+    
+                "id" => null,
+            ]);
+            return Response::json(["msj"=>"Éxito","estado"=>true,"id"=>$id]);   
+        } catch (\Exception $e) {
+
+            $id_producto = inventario::where("codigo_barras", $producto["codigo_barras"])->first();
+            $id = null;
+            if ($id_producto) {
+                $id = $id_producto->id;
+            }
+            return Response::json(["msj"=>"Err: ".$e->getMessage(),"estado"=>false, "id" => $id]);
+        } 
+    }
     public function saveChangeInvInSucurFromCentral(Request $req)
     {
         $inv = $req->inventarioModifiedCentralImport;
@@ -837,7 +880,7 @@ class InventarioController extends Controller
     {
         $datasucursal = $req->obj; 
         foreach ($datasucursal as $k => $v) {
-            $datacentral =  inventario::where("codigo_barras", $v["codigo_barras"])->get()->first();
+            $datacentral =  inventario::where("codigo_barras", "LIKE", $v["codigo_barras"]."%")->get()->first();
             if ($datacentral) {
                 $datasucursal[$k]["type"] = "update";
                 $datasucursal[$k]["estatus"] = 1;
@@ -1010,12 +1053,16 @@ class InventarioController extends Controller
                 return $insertOrUpdateInv->id;   
             }
         } catch (\Illuminate\Database\QueryException $e) {
-            if ($e->getCode()=="1062") {
-                throw new \Exception("Código Duplicado. ".$e->errorInfo[2], 1);
+            $errorCode = $e->errorInfo[1];
+            if($errorCode == 1062){
+                throw new \Exception("Código Duplicado. ".$req_inpInvbarras, 1);
             }else{
                 throw new \Exception("Error: ".$e->getMessage(), 1);
 
             }
+
+
+            
         }
     }
     public function insertItemFact($id_factura,$insertOrUpdateInv,$ctInsert,$beforecantidad,$ctNew,$tipo)

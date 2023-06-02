@@ -473,13 +473,13 @@ export default function Facturar({ user, notificar, setLoading }) {
     const autovincularSucursalCentral = () => {
         let obj = cloneDeep(inventarioSucursalFromCentral);
         
-        setdatainventarioSucursalFromCentralcopy(obj)
         db.getSyncProductosCentralSucursal({obj}).then(res=>{
             setdatainventarioSucursalFromCentral(res.data);
         })
 
 
     }
+    const modalmovilRef = useRef(null)
     const openVincularSucursalwithCentral = (e, idinsucursal) => {
         if (
             idinsucursal.index == idselectproductoinsucursalforvicular.index &&
@@ -488,29 +488,39 @@ export default function Facturar({ user, notificar, setLoading }) {
             setmodalmovilshow(false);
         } else {
             setmodalmovilshow(true);
+            if (modalmovilRef) {
+                if (modalmovilRef.current) {
+                    modalmovilRef.current?.scrollIntoView({ block: "nearest", behavior: 'smooth' });
+                }
+            }
         }
-
+        
+        
         let p = e.currentTarget.getBoundingClientRect();
         let y = p.top + window.scrollY;
         let x = p.left;
         setmodalmovily(y);
         setmodalmovilx(x);
-
+        
         setidselectproductoinsucursalforvicular({
             index: idinsucursal.index,
             id: idinsucursal.id,
         });
     };
     const linkproductocentralsucursal = (idincentral) => {
-        changeInventarioFromSucursalCentral(
-            idincentral,
-            idselectproductoinsucursalforvicular.index,
-            idselectproductoinsucursalforvicular.id,
-            "changeInput",
-            "id_vinculacion"
-        );
-
-        setmodalmovilshow(false);
+        if (!inventarioSucursalFromCentral.filter(e=>e.id_vinculacion==idincentral).length) {
+            changeInventarioFromSucursalCentral(
+                idincentral,
+                idselectproductoinsucursalforvicular.index,
+                idselectproductoinsucursalforvicular.id,
+                "changeInput",
+                "id_vinculacion"
+            );
+    
+            setmodalmovilshow(false);
+        }else{
+            alert("¡Error: Éste ID ya se ha vinculado!")
+        }
     };
     let puedoconsultarproductosinsucursalfromcentral = () => {
         //si todos los productos son consultados(0) o Procesados(3), puedo buscar mas productos.
@@ -563,6 +573,38 @@ export default function Facturar({ user, notificar, setLoading }) {
                 break;
         }
     };
+    const guardarDeSucursalEnCentral = (index, id) =>{
+        db.guardarDeSucursalEnCentral({
+            producto: inventarioSucursalFromCentral[index], 
+        }).then(res=>{
+            let d = res.data
+
+            if (d.estado) {
+
+                changeInventarioFromSucursalCentral(
+                    d.id,
+                    index,
+                    id,
+                    "changeInput",
+                    "id_vinculacion"
+                );
+                notificar(d.msj,false)
+            }else{
+
+                if (d.id) {
+                    changeInventarioFromSucursalCentral(
+                        d.id,
+                        index,
+                        id,
+                        "changeInput",
+                        "id_vinculacion"
+                    );  
+                }
+                notificar(d.msj,false)
+            }
+        })
+    }
+
     const setInventarioSucursalFromCentral = (type_force = null) => {
         setLoading(true);
         db.setInventarioSucursalFromCentral({
@@ -584,6 +626,8 @@ export default function Facturar({ user, notificar, setLoading }) {
                             setdatainventarioSucursalFromCentral(
                                 respuesta.respuesta?respuesta.respuesta:respuesta
                             );
+                            setdatainventarioSucursalFromCentralcopy(respuesta.respuesta?respuesta.respuesta:respuesta)
+
                             setestadisticasinventarioSucursalFromCentral(
                                 respuesta.estadisticas
                             );
@@ -4637,7 +4681,7 @@ export default function Facturar({ user, notificar, setLoading }) {
         presupuestocarrito.map(e=>{
             sum += parseFloat(e.subtotal)
         })
-        return sum
+        return moneda(sum)
     } 
 
     const [isCierre, setisCierre] = useState(false)
@@ -5580,6 +5624,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             ) : null}
             {view == "panelcentrodeacopio" ? (
                 <Panelcentrodeacopio
+                    guardarDeSucursalEnCentral={guardarDeSucursalEnCentral}
                     autovincularSucursalCentral={autovincularSucursalCentral}
                     datainventarioSucursalFromCentralcopy={datainventarioSucursalFromCentralcopy}
                     setdatainventarioSucursalFromCentralcopy={setdatainventarioSucursalFromCentralcopy}
@@ -5593,10 +5638,12 @@ export default function Facturar({ user, notificar, setLoading }) {
                     puedoconsultarproductosinsucursalfromcentral={puedoconsultarproductosinsucursalfromcentral}
                     getProductos={getProductos}
                     productos={productos}
+                    idselectproductoinsucursalforvicular={idselectproductoinsucursalforvicular}
                     linkproductocentralsucursal={linkproductocentralsucursal}
                     openVincularSucursalwithCentral={
                         openVincularSucursalwithCentral
                     }
+                    modalmovilRef={modalmovilRef}
                     inputbuscarcentralforvincular={
                         inputbuscarcentralforvincular
                     }
