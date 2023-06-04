@@ -31,7 +31,7 @@ class PlaygroundEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('public.playground.1');
+        return new PrivateChannel('private.sucursal.1');
         //return new PrivateChannel('channel-name');
     }
     public function broadcastAs()

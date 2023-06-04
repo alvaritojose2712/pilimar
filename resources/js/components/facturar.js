@@ -1574,6 +1574,7 @@ export default function Facturar({ user, notificar, setLoading }) {
         setSocketUrlDB();
         getSucursalFun();
 
+        runSockets()
         // return () => { isMounted = false }
     }, []);
 
@@ -1733,7 +1734,19 @@ export default function Facturar({ user, notificar, setLoading }) {
     let total_punto = dolar && caja_punto ? (caja_punto / dolar).toFixed(2) : 0;
     let total_biopago =
         dolar && caja_biopago ? (caja_biopago / dolar).toFixed(2) : 0;
+    
+    const runSockets = () => {
+        const channel = Echo.channel("private.eventocentral."+user.sucursal)
 
+        channel.subscribed(()=>{
+            console.log("Subscrito a Central!")
+        })
+        .listen(".eventocentral",event=>{
+            db.recibedSocketEvent({event}).then(({data})=>{
+                console.log(data,"recibedSocketEvent Response")
+            })
+        })
+    }
     const getSucursalFun = () => {
         db.getSucursal({}).then((res) => {
             if (res.data.codigo) {

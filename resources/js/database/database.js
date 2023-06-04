@@ -186,6 +186,7 @@ const db = {
   setconfigcredito: data=>axios.post(host+"setconfigcredito",data),
   
   setSocketUrlDB: data => axios.get(host + "setSocketUrlDB", { params: data }),
+  recibedSocketEvent: data => axios.get(host + "recibedSocketEvent", { params: data }),
   
   setNuevaTareaCentral: data =>axios.get(host+"setNuevaTareaCentral",{params:data}),
   setInventarioFromSucursal: data => axios.post(host + "setInventarioFromSucursal", data),

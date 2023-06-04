@@ -38,8 +38,6 @@ use App\Http\Controllers\MovimientosInventariounitarioController;
 
 
 
-
-
 Route::get('getip', [sendCentral::class,"getip"]);
 Route::get('/update', function () {
 
@@ -318,11 +316,11 @@ Route::group(['middleware' => ['login']], function () {
 	
 	
 	
-Route::get("/playground",function(){
-	# code...
-	event(new \App\Events\PlaygroundEvent());
-	return null;
-});
+Route::get("/recibedSocketEvent",[sendCentral::class,"recibedSocketEvent"]);
+
+
+
+
 
 
 

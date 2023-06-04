@@ -30,18 +30,31 @@ class sendCentral extends Controller
 
     public function path()
     {
-        //return "http://127.0.0.1:8001";
+        return "http://127.0.0.1:8001";
         //return "https://phplaravel-1009655-3565285.cloudwaysapps.com";
-        return "https://titanio.lat";
+        //return "https://titanio.lat";
     }
-    public function setSocketUrlDB(Request $req)
+    public function setSocketUrlDB()
     {
-        return $this->path();
+        return "127.0.0.1";
+    }
+
+    public function recibedSocketEvent(Request $req)
+    {
+        if (is_string($req->event)) {
+            $evento = json_decode($req->event,2);
+            if ($evento["eventotipo"]==="autoResolveAllTarea") {
+                return $this->autoResolveAllTarea();
+            }
+        }
+        return null;
     }
     public function getOrigen()
     {
         return sucursal::all()->first()->codigo;
     }
+
+    
     public function getSucursales()
     {
         try {
@@ -187,11 +200,10 @@ class sendCentral extends Controller
         }
         
     }
-    public function getTareasCentral(Request $req)
+    public function getTareasCentralFun($estado)
     {
         try{
             $codigo_origen = $this->getOrigen();
-            $estado = $req->estado;
             $response = Http::get($this->path() . "/getTareasCentral", [
                 "codigo_origen" => $codigo_origen,
                 "estado" => $estado
@@ -202,7 +214,6 @@ class sendCentral extends Controller
                     $data = $response->json();
                     foreach ($data as $kdata => $vdata) {
                         if ($vdata["estado"]!=0) {
-                            # code...
                             if (isset($vdata["respuesta"])) {
                                 $decoderes = json_decode($vdata["respuesta"],2); 
                                 if ($decoderes) {
@@ -214,153 +225,169 @@ class sendCentral extends Controller
                             }
                         }
                     }
-                    return Response::json([
+                    return ([
                         "msj"=>$data,
                         "estado"=>true,
                     ]);
 
                 } else {
-                    return Response::json([
+                    return ([
                         "msj"=> $response->body(),
                         "estado"=> false,
                     ]);
                 }
             } else {
-                return Response::json([
+                return ([
                     "msj"=> $response->body(),
                     "estado"=>false,
                 ]);
             }
 
         } catch (\Exception $e) {
-            return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+            return (["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
         }
+    }
+    public function autoResolveAllTarea()
+    {
+        $tareas = $this->getTareasCentralFun([0]);
+        $estados = [];
+        if ($tareas["estado"]) {
+            foreach ($tareas["msj"] as $tarea) {
+                $runtarea = $this->runTareaCentralFun($tarea);
+                array_push($estados,$runtarea);
+            }
+        }
+        return $estados;
+    }
+    public function runTareaCentralFun($tarea)
+    {
+        $id_tarea = $tarea["id"];
+        $respuesta = $tarea["respuesta"];
+        $estado = $tarea["estado"];
+
+        $codigo_destino = $tarea["destino"]["codigo"];
+        $solicitud = json_decode($tarea["solicitud"], 2);
+
+        $accion = $tarea["accion"];
+        switch ($accion) {
+            case 'inventarioSucursalFromCentral':
+                if ($estado == 0) {
+                    $q = $solicitud["qinventario"];
+                    $novinculados = $solicitud["novinculados"];
+
+                    $respuesta = inventario::where(function ($e) use ($q) {
+                        $e->orWhere("descripcion", "LIKE", "%$q%")
+                            ->orWhere("codigo_proveedor", "LIKE", "%$q%")
+                            ->orWhere("codigo_barras", "LIKE", "%$q%");
+                    })
+                        ->when($novinculados === "novinculados", function ($q) {
+                            $q->whereNull("id_vinculacion");
+                        })
+                        ->when($novinculados === "sivinculados", function ($q) {
+                            $q->whereNotNull("id_vinculacion");
+                        })
+                        ->limit($solicitud["numinventario"])
+                        ->orderBy("descripcion", "asc")
+                        ->get()->map(function ($q) {
+                            $q->estatus = 0;
+                            return $q;
+                        });
+
+                    $estadoset = 1;
+                } else if ($estado == 2) {
+                    $estadoset = 3;
+                    $respuesta = is_string($respuesta)? json_decode($respuesta, 2): $respuesta;
+                    foreach ($respuesta as $key => $ee) {
+                        try {
+                            $check = false;
+                            if (isset($ee["type"])) {
+                                if ($ee["type"] === "update" || $ee["type"] === "new") {
+                                    (new InventarioController)->guardarProducto([
+                                        "id_factura" => null,
+                                        "cantidad" => $ee["cantidad"],
+                                        "id" => $ee["id"],
+                                        "codigo_barras" => $ee["codigo_barras"],
+                                        "codigo_proveedor" => $ee["codigo_proveedor"],
+                                        "unidad" => $ee["unidad"],
+                                        "id_categoria" => $ee["id_categoria"],
+                                        "descripcion" => $ee["descripcion"],
+                                        "precio_base" => $ee["precio_base"],
+                                        "precio" => $ee["precio"],
+                                        "iva" => $ee["iva"],
+                                        "id_proveedor" => $ee["id_proveedor"],
+                                        "id_marca" => $ee["id_marca"],
+                                        "id_deposito" => /*inpInvid_deposito*/"",
+                                        "porcentaje_ganancia" => 0,
+                                        "origen"=>"central",
+
+                                        "precio1" => $ee["precio1"],
+                                        "precio2" => $ee["precio2"],
+                                        "precio3" => $ee["precio3"],
+                                        "stockmin" => $ee["stockmin"],
+                                        "stockmax" => $ee["stockmax"],
+                                        "id_vinculacion" => $ee["id_vinculacion"],
+                                    ]);
+                                } else if ($ee["type"] === "delete") {
+                                    $check = (new InventarioController)->delProductoFun($ee["id"],"central");
+                                }
+                            }
+                            $respuesta[$key]["estatus"] = 3;
+                        } catch (\Exception $e) {
+                            //return (["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+                        }
+                    }
+
+                }
+                break;
+        }
+
+        $respuesta = [
+            "respuesta" => $respuesta,
+            "estadisticas" => [
+                "vinculados" => inventario::whereNotNull("id_vinculacion")->count(),
+                "items_inventario" => inventario::count(),
+                "items_inventario_recuperados" => count($respuesta),
+            ],
+        ];
+
+        $response = Http::post(
+            $this->path() . "/resolveTareaCentral",
+            [
+                "id_tarea" => $id_tarea,
+                "estado" => $estadoset,
+                "respuesta" => $respuesta,
+            ]
+        );
+        if ($response->ok()) {
+            //Retorna respuesta solo si es Array
+            if ($response->json()) {
+                return ([
+                    "msj"=>$response->json(),
+                    "estado"=>true,
+                ]);
+            } else {
+                return ([
+                    "msj"=> $response->body(),
+                    "estado"=> true,
+                ]);
+            }
+        } else {
+            return ([
+                "msj"=> $response->body(),
+                "estado"=>false,
+            ]);
+        }
+    }
+    public function getTareasCentral(Request $req)
+    {
+        return Response::json($this->getTareasCentralFun($req->estado));
     }
     public function runTareaCentral(Request $req)
     {
-            $codigo_origen = $this->getOrigen();
-            $tarea = $req->tarea;
-
-            $id_tarea = $req["tarea"]["id"];
-            $respuesta = $req["tarea"]["respuesta"];
-            $estado = $req["tarea"]["estado"];
-
-            $codigo_destino = $req["tarea"]["destino"]["codigo"];
-            $solicitud = json_decode($req["tarea"]["solicitud"], 2);
-
-            $accion = $req["tarea"]["accion"];
-            switch ($accion) {
-                case 'inventarioSucursalFromCentral':
-                    if ($estado == 0) {
-                        $q = $solicitud["qinventario"];
-                        $novinculados = $solicitud["novinculados"];
-
-                        $respuesta = inventario::where(function ($e) use ($q) {
-                            $e->orWhere("descripcion", "LIKE", "%$q%")
-                                ->orWhere("codigo_proveedor", "LIKE", "%$q%")
-                                ->orWhere("codigo_barras", "LIKE", "%$q%");
-                        })
-                            ->when($novinculados === "novinculados", function ($q) {
-                                $q->whereNull("id_vinculacion");
-                            })
-                            ->when($novinculados === "sivinculados", function ($q) {
-                                $q->whereNotNull("id_vinculacion");
-                            })
-                            ->limit($solicitud["numinventario"])
-                            ->orderBy("descripcion", "asc")
-                            ->get()->map(function ($q) {
-                                $q->estatus = 0;
-                                return $q;
-                            });
-
-                        $estadoset = 1;
-                    } else if ($estado == 2) {
-                        $estadoset = 3;
-                        $respuesta = is_string($respuesta)? json_decode($respuesta, 2): $respuesta;
-                        foreach ($respuesta as $key => $ee) {
-                            try {
-                                $check = false;
-                                if (isset($ee["type"])) {
-                                    if ($ee["type"] === "update" || $ee["type"] === "new") {
-                                        (new InventarioController)->guardarProducto([
-                                            "id_factura" => null,
-                                            "cantidad" => $ee["cantidad"],
-                                            "id" => $ee["id"],
-                                            "codigo_barras" => $ee["codigo_barras"],
-                                            "codigo_proveedor" => $ee["codigo_proveedor"],
-                                            "unidad" => $ee["unidad"],
-                                            "id_categoria" => $ee["id_categoria"],
-                                            "descripcion" => $ee["descripcion"],
-                                            "precio_base" => $ee["precio_base"],
-                                            "precio" => $ee["precio"],
-                                            "iva" => $ee["iva"],
-                                            "id_proveedor" => $ee["id_proveedor"],
-                                            "id_marca" => $ee["id_marca"],
-                                            "id_deposito" => /*$req->inpInvid_deposito*/"",
-                                            "porcentaje_ganancia" => 0,
-                                            "origen"=>"central",
-
-                                            "precio1" => $ee["precio1"],
-                                            "precio2" => $ee["precio2"],
-                                            "precio3" => $ee["precio3"],
-                                            "stockmin" => $ee["stockmin"],
-                                            "stockmax" => $ee["stockmax"],
-                                            "id_vinculacion" => $ee["id_vinculacion"],
-                                        ]);
-                                    } else if ($ee["type"] === "delete") {
-                                        $check = (new InventarioController)->delProductoFun($ee["id"],"central");
-                                    }
-                                }
-                                $respuesta[$key]["estatus"] = 3;
-                            } catch (\Exception $e) {
-                                //return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
-                            }
-                        }
-
-                    }
-                    break;
-            }
-
-            $respuesta = [
-                "respuesta" => $respuesta,
-                "estadisticas" => [
-                    "vinculados" => inventario::whereNotNull("id_vinculacion")->count(),
-                    "items_inventario" => inventario::count(),
-                    "items_inventario_recuperados" => count($respuesta),
-                ],
-            ];
-
-            $response = Http::post(
-                $this->path() . "/resolveTareaCentral",
-                [
-                    "id_tarea" => $id_tarea,
-                    "estado" => $estadoset,
-                    "respuesta" => $respuesta,
-                ]
-            );
-            if ($response->ok()) {
-                //Retorna respuesta solo si es Array
-                if ($response->json()) {
-                    return Response::json([
-                        "msj"=>$response->json(),
-                        "estado"=>true,
-                    ]);
-                } else {
-                    return Response::json([
-                        "msj"=> $response->body(),
-                        "estado"=> true,
-                    ]);
-                }
-            } else {
-                return Response::json([
-                    "msj"=> $response->body(),
-                    "estado"=>false,
-                ]);
-            }
-
-        
-        
+        return Response::json($this->runTareaCentralFun($req["tarea"]));
     }
+
+    
     public function sendCierres($id)
     {   
         $cierre = cierres::find($id);

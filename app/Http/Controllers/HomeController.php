@@ -133,6 +133,8 @@ class HomeController extends Controller
                     "iscentral" => $sucursal->iscentral,
                 ];
                 session($arr_session);
+                session()->regenerate();
+                
                 
                 $estado = $this->selectRedirect();
             }else{

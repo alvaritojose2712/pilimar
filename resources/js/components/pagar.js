@@ -673,7 +673,7 @@ const syncPago = (val,type)=>{
                         </div>
                         <div className="col p-0">
                         </div>
-                        <div className="col p-0">
+                        {/* <div className="col p-0">
                             
                             <div className={(vuelto!=""?"card-danger-pago":"t-5")+(" card pointer w125px")}>
                             <div className="card-body">
@@ -697,7 +697,7 @@ const syncPago = (val,type)=>{
                                 }
                             </div>
                             </div>
-                        </div>
+                        </div> */}
                         
             
                       </div>
