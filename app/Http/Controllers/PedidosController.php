@@ -37,10 +37,10 @@ class PedidosController extends Controller
 {   
 
     protected $sends = [
-        /* "omarelhenaoui@hotmail.com",           
+        "omarelhenaoui@hotmail.com",           
         "yeisersalah2@gmail.com",           
         "amerelhenaoui@outlook.com",           
-        "yesers982@hotmail.com",   */ 
+        "yesers982@hotmail.com",   
         "alvaroospino79@gmail.com"        
     ];
     protected  $letras = [

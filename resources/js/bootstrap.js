@@ -23,7 +23,7 @@ window.Echo = new Echo({
     key: process.env.MIX_PUSHER_APP_KEY,
     //cluster: process.env.MIX_PUSHER_APP_CLUSTER,
     forceTLS: false,
-    wsHost: "127.0.0.1",
+    wsHost: "titanio.lat",
     wsPort: 6001, 
     encrypted: false,
     enabledTransports: ['ws', 'wss']
