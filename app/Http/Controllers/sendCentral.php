@@ -287,7 +287,7 @@ class sendCentral extends Controller
                 if ($estado == 0) {
                     $q = $solicitud["qinventario"];
                     $novinculados = $solicitud["novinculados"];
-                    $ids = $solicitud["ids"]?json_decode($solicitud["ids"],2):"";
+                    $ids = $solicitud["ids"]?$solicitud["ids"]:"";
 
                     $respuesta = inventario::where(function ($e) use ($q) {
                         $e->orWhere("descripcion", "LIKE", "%$q%")
