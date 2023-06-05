@@ -289,28 +289,38 @@ class sendCentral extends Controller
                     $novinculados = $solicitud["novinculados"];
                     $ids = $solicitud["ids"]?$solicitud["ids"]:"";
 
-                    $respuesta = inventario::where(function ($e) use ($q) {
-                        $e->orWhere("descripcion", "LIKE", "%$q%")
-                            ->orWhere("codigo_proveedor", "LIKE", "%$q%")
-                            ->orWhere("codigo_barras", "LIKE", "%$q%");
-                    })
-                        ->when($novinculados === "novinculados", function ($q) {
-                            $q->whereNull("id_vinculacion");
-                        })
-                        ->when($novinculados === "sivinculados", function ($q) {
-                            $q->whereNotNull("id_vinculacion");
-                        })
-                        ->when($ids != "", function ($q) use ($ids) {
+
+                    if ($ids) {
+                        $respuesta = inventario::where(function ($q) use ($ids) {
                             for ($i = 0; $i < count($ids); $i++){
                                 $q->orwhere('codigo_barras', 'like',  $ids[$i] .'%');
                             } 
                         })
-                        ->limit($solicitud["numinventario"])
                         ->orderBy("descripcion", "asc")
                         ->get()->map(function ($q) {
                             $q->estatus = 0;
                             return $q;
                         });
+                    }else{
+                        $respuesta = inventario::where(function ($e) use ($q) {
+                            $e->orWhere("descripcion", "LIKE", "%$q%")
+                                ->orWhere("codigo_proveedor", "LIKE", "%$q%")
+                                ->orWhere("codigo_barras", "LIKE", "%$q%");
+                        })
+                            ->when($novinculados === "novinculados", function ($q) {
+                                $q->whereNull("id_vinculacion");
+                            })
+                            ->when($novinculados === "sivinculados", function ($q) {
+                                $q->whereNotNull("id_vinculacion");
+                            })
+                        
+                            ->limit($solicitud["numinventario"])
+                            ->orderBy("descripcion", "asc")
+                            ->get()->map(function ($q) {
+                                $q->estatus = 0;
+                                return $q;
+                            });
+                    }
                         
                     $estadoset = 1;
                 } else if ($estado == 2) {
