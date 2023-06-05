@@ -405,6 +405,9 @@ export default function Panelcentrodeacopio({
                                                     <option value="sivinculados">
                                                         vinculados
                                                     </option>
+                                                    <option value="pedido">
+                                                        Pedido
+                                                    </option>
                                                 </select>
 
                                                 <button

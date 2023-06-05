@@ -557,7 +557,12 @@ export default function Facturar({ user, notificar, setLoading }) {
             case "inventarioSucursalFromCentral":
                 //si todos los productos son consultados(0) o Procesados(3), puedo buscar mas productos.
                 if (puedoconsultarproductosinsucursalfromcentral()) {
+                    let pedidonum = "";
+                    if (parametrosConsultaFromsucursalToCentral.novinculados==="pedido") {
+                        pedidonum = window.prompt("ID PEDIDO")
+                    }
                     db.getInventarioSucursalFromCentral({
+                        pedidonum,
                         codigo_destino: selectSucursalCentral,
                         type: type_force
                             ? type_force

@@ -16,6 +16,8 @@ use App\Models\pedidos;
 use App\Models\tareas;
 use App\Models\cierres;
 use App\Models\gastos;
+use App\Models\items_pedidos;
+
 
 
 
@@ -96,6 +98,17 @@ class sendCentral extends Controller
                     $codigo_origen = $this->getOrigen();
                     $codigo_destino = $req->codigo_destino;
                     $parametros = $req->parametros; //Solicitud
+
+                    $ids = [];
+                    if ($req->pedidonum) {
+                        $ids = inventario::whereIn("id",items_pedidos::where("id_pedido",$req->pedidonum)->select("id_producto"))->select("codigo_barras")->get()->map(function($q){
+                            return $q->codigo_barras;
+                        });
+                    }
+                    $parametros = array_merge([
+                        "ids" => $ids,
+                    ], $parametros);
+
                     $response = Http::post(
                         $this->path() . "/getInventarioSucursalFromCentral",
                         array_merge([
@@ -274,6 +287,7 @@ class sendCentral extends Controller
                 if ($estado == 0) {
                     $q = $solicitud["qinventario"];
                     $novinculados = $solicitud["novinculados"];
+                    $ids = $solicitud["ids"]?json_decode($solicitud["ids"],2):"";
 
                     $respuesta = inventario::where(function ($e) use ($q) {
                         $e->orWhere("descripcion", "LIKE", "%$q%")
@@ -286,13 +300,18 @@ class sendCentral extends Controller
                         ->when($novinculados === "sivinculados", function ($q) {
                             $q->whereNotNull("id_vinculacion");
                         })
+                        ->when($ids != "", function ($q) use ($ids) {
+                            for ($i = 0; $i < count($ids); $i++){
+                                $q->orwhere('codigo_barras', 'like',  $ids[$i] .'%');
+                            } 
+                        })
                         ->limit($solicitud["numinventario"])
                         ->orderBy("descripcion", "asc")
                         ->get()->map(function ($q) {
                             $q->estatus = 0;
                             return $q;
                         });
-
+                        
                     $estadoset = 1;
                 } else if ($estado == 2) {
                     $estadoset = 3;
