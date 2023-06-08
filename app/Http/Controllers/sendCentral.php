@@ -102,11 +102,11 @@ class sendCentral extends Controller
         try {
        
             $type = $req->type;
+            $codigo_origen = $this->getOrigen();
+            $codigo_destino = $req->codigo_destino;
 
             switch ($type) {
                 case 'inventarioSucursalFromCentral':
-                    $codigo_origen = $this->getOrigen();
-                    $codigo_destino = $req->codigo_destino;
                     $parametros = $req->parametros; //Solicitud
 
                     $ids = [];
@@ -136,6 +136,9 @@ class sendCentral extends Controller
                             "type" => $type,
                             "id_tarea" => $req->id_tarea,
                             "productos" => $req->productos,
+
+                            "codigo_origen" => $codigo_origen,
+                            "codigo_destino" => $codigo_destino,
                         ]
                     );
                     break;
@@ -292,6 +295,7 @@ class sendCentral extends Controller
         $solicitud = json_decode($tarea["solicitud"], 2);
 
         $accion = $tarea["accion"];
+        
         switch ($accion) {
             case 'inventarioSucursalFromCentral':
                 if ($estado == 0) {

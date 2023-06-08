@@ -571,12 +571,13 @@ export default function Facturar({ user, notificar, setLoading }) {
                     id_tarea:
                         tareasenprocesocentral.inventarioSucursalFromCentral,
                     productos: enedicionoinsercion,
+                    codigo_destino: selectSucursalCentral,
                 }).then((res) => {
                     if (res.data.estado) {
-                        notificar(res.data.msj, true);
-                        setLoading(false);
                         setdatainventarioSucursalFromCentral([])
                     }
+                    notificar(res.data.msj, true);
+                    setLoading(false);
                     
                 });
                 break;
