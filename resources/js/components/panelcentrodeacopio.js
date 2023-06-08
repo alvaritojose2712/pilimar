@@ -728,7 +728,7 @@ export default function Panelcentrodeacopio({
                                                                                                 ) =>
                                                                                                     getUniqueProductoById(
                                                                                                         event,
-                                                                                                        e.id
+                                                                                                        e.id_vinculacion
                                                                                                     )
                                                                                                 }
                                                                                             ></i>

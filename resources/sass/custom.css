@@ -536,6 +536,9 @@ body{
   border-color: var(--sinapsis-color) !important;
 
 }
+.borderbottom{
+  border-bottom: 5pt solid black;
+}
 .btn-hacer-pedido{
   position: fixed;
   bottom: 0px;

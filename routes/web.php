@@ -34,14 +34,8 @@ use App\Http\Controllers\DevolucionesController;
 use App\Http\Controllers\MovimientosInventarioController;
 use App\Http\Controllers\MovimientosInventariounitarioController;
 
-
-
-
-
 Route::get('getip', [sendCentral::class,"getip"]);
 Route::get('/update', function () {
-
-
     return '
 		c:\\xampp\mysql\bin\mysqldump -u root -p --no-create-db --no-create-info --complete-insert --extended-insert sinapsis > sinapsisData.sql <br/>
 		git stash <br/>
@@ -49,27 +43,20 @@ Route::get('/update', function () {
 		php artisan optimize <br/>
 		php artisan optimize:clear <br/>
 	';
-
 });
 Route::get('/backup', function () {
-
     \Illuminate\Support\Facades\Artisan::call('database:backup');
-
     return 'Successful backup!';
-
 });
-
-Route::get('', [HomeController::class,"index"]);
-Route::get('setCarrito', [InventarioController::class,"setCarrito"]);
-
-Route::post('getinventario', [InventarioController::class,"index"]);
-Route::post('printPrecios', [tickera::class,"precio"]);
-
-
 Route::get('error', function (){
 	return view("layouts.error");
 })->name("error");
 
+
+
+Route::get('', [HomeController::class,"index"]);
+
+Route::get('closeAllSession', [HomeController::class,"closeAllSession"]);
 Route::post('login', [HomeController::class,"login"]);
 Route::get('logout', [HomeController::class,"logout"]);
 Route::post('verificarLogin', [HomeController::class,"verificarLogin"]);
@@ -77,12 +64,29 @@ Route::post('verificarLogin', [HomeController::class,"verificarLogin"]);
 Route::get('sucursal', [SucursalController::class,"index"]);
 Route::get('setSucursal', [SucursalController::class,"setSucursal"])->name("setSucursal");
 Route::get('getSucursal', [SucursalController::class,"getSucursal"]);
+Route::post('getMoneda', [MonedaController::class,"getMoneda"]);
+Route::post('today', [PedidosController::class,"today"]);
+Route::get('today', [PedidosController::class,"today"]);
 
 Route::group(['middleware' => ['login']], function () {
 	
-
-
 	Route::group(['middleware' => ['caja']], function () {
+		Route::get('setCarrito', [InventarioController::class,"setCarrito"]);
+
+		Route::post('getPedidosList', [PedidosController::class,"getPedidosUser"]);
+		
+		Route::post('getVentas', [PedidosController::class,"getVentas"]);
+		Route::post('getPedido', [PedidosController::class,"getPedido"]);
+		Route::post('getPedidosFast', [PedidosController::class,"getPedidosFast"]);
+		Route::post('delItemPedido', [ItemsPedidosController::class,"delItemPedido"]);
+		Route::post('changeEntregado', [ItemsPedidosController::class,"changeEntregado"]);
+		
+		Route::post('setCantidad', [ItemsPedidosController::class,"setCantidad"]);
+		Route::post('setpersonacarrito', [PedidosController::class,"setpersonacarrito"]);
+		
+		Route::post('setPrecioAlternoCarrito', [ItemsPedidosController::class,"setPrecioAlternoCarrito"]);
+		Route::post('setCtxBultoCarrito', [ItemsPedidosController::class,"setCtxBultoCarrito"]);
+		
 		Route::post('getPedidos', [PedidosController::class,"getPedidos"]);
 		
 		Route::get('notaentregapedido', [PedidosController::class,"notaentregapedido"]);
@@ -117,7 +121,6 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('getBuscarDevolucion', [InventarioController::class,"index"]);
 		Route::post('getBuscarDevolucionhistorico', [DevolucionesController::class,"getBuscarDevolucionhistorico"]);
 		
-		
 		Route::post('setClienteCrud', [ClientesController::class,"setClienteCrud"]);
 		Route::post('getClienteCrud', [ClientesController::class,"getpersona"]);
 		Route::post('delCliente', [ClientesController::class,"delCliente"]);
@@ -129,6 +132,7 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('guardarCierre', [PedidosController::class,"guardarCierre"]);
 		Route::get('verCierre', [PedidosController::class,"verCierre"]);
 		Route::post('cerrar', [PedidosController::class,"cerrar"]);
+		Route::post('getPermisoCierre', [TareaslocalController::class,"getPermisoCierre"]);
 		Route::get('sendCuentasporCobrar', [PedidosController::class,"sendCuentasporCobrar"]);
 
 		Route::post('createDevolucion', [DevolucionesController::class,"createDevolucion"]);
@@ -137,7 +141,7 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('changepedidouser', [PedidosController::class,"changepedidouser"]);
 		Route::get('getUsuarios', [UsuariosController::class,"getUsuarios"]);
 		
-		Route::post('getPermisoCierre', [TareaslocalController::class,"getPermisoCierre"]);
+		Route::post('getinventario', [InventarioController::class,"index"]);
 		
 		
 	});
@@ -208,6 +212,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('reporteInventario', [InventarioController::class,"reporteInventario"]);
 		Route::post('getEstaInventario', [InventarioController::class,"getEstaInventario"]);
 
+		Route::post('changeIdVinculacionCentral', [InventarioController::class,"changeIdVinculacionCentral"]);
+
 		Route::post('saveMontoFactura', [FacturaController::class,"saveMontoFactura"]);
 		Route::post('setPagoProveedor', [PagoFacturasController::class,"setPagoProveedor"]);
 		Route::post('getPagoProveedor', [PagoFacturasController::class,"getPagoProveedor"]);
@@ -215,49 +221,16 @@ Route::group(['middleware' => ['login']], function () {
 		
 		Route::post('delMovCaja', [MovimientosCajaController::class,"delMovCaja"]);
 		
-		
-		
-		
 		Route::get('printTickedPrecio', [tickeprecioController::class,"tickedPrecio"]);
 		Route::post('getStatusCierre', [CierresController::class,"getStatusCierre"]);
 		Route::post('getTotalizarCierre', [CierresController::class,"getTotalizarCierre"]);
+
+		Route::post('printPrecios', [tickera::class,"precio"]);
 		
 		
+		Route::post('delpedido', [PedidosController::class,"delpedido"]);
+		Route::post('delMov', [MovimientosController::class,"delMov"]);
 		
-	});
-	Route::post('delMov', [MovimientosController::class,"delMov"]);
-	Route::post('getPedidosList', [PedidosController::class,"getPedidosUser"]);
-
-	Route::post('getVentas', [PedidosController::class,"getVentas"]);
-
-	Route::post('getMoneda', [MonedaController::class,"getMoneda"]);
-	Route::post('today', [PedidosController::class,"today"]);
-	
-	Route::post('getPedido', [PedidosController::class,"getPedido"]);
-	Route::post('getPedidosFast', [PedidosController::class,"getPedidosFast"]);
-	Route::post('delItemPedido', [ItemsPedidosController::class,"delItemPedido"]);
-	Route::post('changeEntregado', [ItemsPedidosController::class,"changeEntregado"]);
-	
-	Route::post('delpedido', [PedidosController::class,"delpedido"]);
-	Route::post('setCantidad', [ItemsPedidosController::class,"setCantidad"]);
-	Route::post('setpersonacarrito', [PedidosController::class,"setpersonacarrito"]);
-
-	Route::post('setPrecioAlternoCarrito', [ItemsPedidosController::class,"setPrecioAlternoCarrito"]);
-	Route::post('setCtxBultoCarrito', [ItemsPedidosController::class,"setCtxBultoCarrito"]);
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	//Update App
-	//Route::get('update', [sendCentral::class,"updateApp"]);
-	
-	
 	//Central
 		Route::post('checkPedidosCentral', [InventarioController::class,"checkPedidosCentral"]);
 		Route::post('saveChangeInvInSucurFromCentral', [InventarioController::class,"saveChangeInvInSucurFromCentral"]);
@@ -277,46 +250,56 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('setnewtasainsucursal', [sendCentral::class,"setnewtasainsucursal"]);
 		Route::post('updatetasasfromCentral', [sendCentral::class,"updatetasasfromCentral"]);
 		
+		//req
+		Route::get('setNuevaTareaCentral', [sendCentral::class,"setNuevaTareaCentral"]);
+	
+		Route::get('setSocketUrlDB', [sendCentral::class,"setSocketUrlDB"]);
 		
-
+		Route::post('reqpedidos', [sendCentral::class,"reqpedidos"]);
+		Route::post('setInventarioFromSucursal', [sendCentral::class,"setInventarioFromSucursal"]);
+		Route::post('getSucursales', [sendCentral::class,"getSucursales"]);
+		Route::post('getInventarioSucursalFromCentral', [sendCentral::class,"getInventarioSucursalFromCentral"]);
+		Route::post('setInventarioSucursalFromCentral', [sendCentral::class,"setInventarioSucursalFromCentral"]);
+		
+		Route::post('getInventarioFromSucursal', [sendCentral::class,"getInventarioFromSucursal"]);
+		
+		Route::post('setCambiosInventarioSucursal', [sendCentral::class,"setCambiosInventarioSucursal"]);
+		Route::get('getTareasCentral', [sendCentral::class,"getTareasCentral"]);
+		Route::post('runTareaCentral', [sendCentral::class,"runTareaCentral"]);
+		
+		//res
+		Route::post('resinventario', [sendCentral::class,"resinventario"]);
+		Route::post('respedidos', [sendCentral::class,"respedidos"]);
+	
+		Route::post('setexportpedido', [PedidosController::class,"setexportpedido"]);
+		
+		Route::get("/recibedSocketEvent",[sendCentral::class,"recibedSocketEvent"]);
 		
 		
 		
+		//Update App
+		//Route::get('update', [sendCentral::class,"updateApp"]);
+	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 		
 });
-//req
-	
-	Route::get('setNuevaTareaCentral', [sendCentral::class,"setNuevaTareaCentral"]);
-
-	Route::get('setSocketUrlDB', [sendCentral::class,"setSocketUrlDB"]);
-	
-	Route::post('reqpedidos', [sendCentral::class,"reqpedidos"]);
-	Route::post('setInventarioFromSucursal', [sendCentral::class,"setInventarioFromSucursal"]);
-	Route::post('getSucursales', [sendCentral::class,"getSucursales"]);
-	Route::post('getInventarioSucursalFromCentral', [sendCentral::class,"getInventarioSucursalFromCentral"]);
-	Route::post('setInventarioSucursalFromCentral', [sendCentral::class,"setInventarioSucursalFromCentral"]);
-	
-	Route::post('getInventarioFromSucursal', [sendCentral::class,"getInventarioFromSucursal"]);
-	
-	Route::post('setCambiosInventarioSucursal', [sendCentral::class,"setCambiosInventarioSucursal"]);
-	Route::get('getTareasCentral', [sendCentral::class,"getTareasCentral"]);
-	Route::post('runTareaCentral', [sendCentral::class,"runTareaCentral"]);
 	
 	
 	
 	
-	
-	//res
-	Route::post('resinventario', [sendCentral::class,"resinventario"]);
-	Route::post('respedidos', [sendCentral::class,"respedidos"]);
-
-	Route::post('setexportpedido', [PedidosController::class,"setexportpedido"]);
-	
-	
-	
-	
-	
-Route::get("/recibedSocketEvent",[sendCentral::class,"recibedSocketEvent"]);
 
 
 

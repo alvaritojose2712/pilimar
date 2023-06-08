@@ -45,7 +45,7 @@ class tickera extends Controller
             $dolar = $get_moneda["bs"];
             }
 
-            $fecha_emision = date("Y-m-d H:i:s");
+            $fecha_emision = (new PedidosController)->today().date(" H:i:s");
             
             $sucursal = sucursal::all()->first();
             $arr_printers = explode(";", $sucursal->tickera);

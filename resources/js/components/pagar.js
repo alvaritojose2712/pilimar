@@ -137,6 +137,7 @@ setmonto_referenciapago,
 banco_referenciapago,
 setbanco_referenciapago,
 
+refaddfast,
 
 }) {
 
@@ -357,6 +358,7 @@ const syncPago = (val,type)=>{
       refinputaddcarritofast.current.value = ""
 
     }
+    
     // refinputaddcarritofast.current.focus()
   },[])
   try{
@@ -414,7 +416,7 @@ const syncPago = (val,type)=>{
                   e?
                     <div className="card-pedidos d-flex justify-content-center flex-column" key={e.id} data-id={e.id} onClick={onClickEditPedido}>
                       <h3>
-                        <span className={(e.id==id?"btn":"btn-outline")+(!e.estado?"-sinapsis":"-success")+(" fs-4 btn btn-xl btn-circle f")}>
+                        <span className={(e.id==id?"btn":"btn-outline")+(!e.estado?"-sinapsis":"-success")+(" fs-4 btn f")}>
                           {e.id}
                         </span>
                       </h3>
@@ -428,7 +430,8 @@ const syncPago = (val,type)=>{
             </div>
             <div className="col">
               
-              {ModaladdproductocarritoToggle&&<Modaladdproductocarrito 
+              {ModaladdproductocarritoToggle&&<Modaladdproductocarrito
+                ModaladdproductocarritoToggle={ModaladdproductocarritoToggle}
                 qProductosMain={qProductosMain}
                 showinputaddCarritoFast={showinputaddCarritoFast}
                 setshowinputaddCarritoFast={setshowinputaddCarritoFast}
@@ -476,6 +479,18 @@ const syncPago = (val,type)=>{
               </div>
               <table className="table table-striped text-center">
                 <thead>
+                  {editable?
+                    <tr>
+                        <td colSpan={auth(1)?"9":"8"} className='p-0 pt-1'>
+                          <div className="input-group">
+                            <input type="text" ref={refaddfast} className="fs-2 form-control form-control-lg" placeholder="Auto agregar...(F1) y (F1)"/>
+                              <div className="input-group-append">
+                                <button className="btn text-white btn-sinapsis h-100 fs-2" onClick={toggleModalProductos}><i className="fa fa-plus"></i></button>
+                              </div>
+                          </div>
+                        </td>
+                    </tr>
+                  :null}
                   <tr>
                     <th className="text-sinapsis cell2">Código</th>
                     <th className="text-sinapsis cell3">Producto</th>
@@ -489,9 +504,7 @@ const syncPago = (val,type)=>{
                     
 
                     <th className="text-sinapsis cell2">Total</th>
-                    {editable?
-                    <th className='cell1'><button className="btn btn-circle text-white btn-sinapsis btn-sm" onClick={toggleModalProductos}>F1 <i className="fa fa-plus"></i></button></th>
-                    :null}
+                    
                   </tr>
                 </thead>
                 <tbody>
@@ -541,7 +554,7 @@ const syncPago = (val,type)=>{
                   ):null}
                   <tr>
                     <td><button className="btn btn-outline-success fs-5">{items?items.length:null}</button></td>
-                    <th colSpan="7" className="p-2 align-middle">{cliente?cliente.nombre:null} <b>{cliente?cliente.identificacion:null}</b></th>
+                    <th colSpan={auth(1)?"8":"7"} className="p-2 align-middle">{cliente?cliente.nombre:null} <b>{cliente?cliente.identificacion:null}</b></th>
                   </tr>
                 </tbody>
               </table>

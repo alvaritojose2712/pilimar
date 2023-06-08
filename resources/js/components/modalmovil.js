@@ -25,14 +25,13 @@ export default function Modalmovil({
         }
 
     },[y])
-
     return (
-        <div className="modalmovil" style={{top:y+42,left:x}} ref={modalmovilRef} onMouseLeave={()=>setmodalmovilshow(false)}>
+        <div className="modalmovil" style={{top:y+110,left:x}} ref={modalmovilRef} onMouseLeave={()=>setmodalmovilshow(false)}>
             <div className="input-group">
-                <input type="text" className="form-control" placeholder="Buscar en centro de Acopio..." ref={inputbuscarcentralforvincular}  onChange={e=>getProductos(e.target.value)}/>
+                <input type="text" className="form-control" placeholder="Buscar en Local..." ref={inputbuscarcentralforvincular}  onChange={e=>getProductos(e.target.value)}/>
                 
                 <div className="input-group-prepend">
-                    <span className="input-group-text">Productos Centro de Acopio</span>
+                    <span className="input-group-text">Productos Local</span>
                 </div>
             </div>
             

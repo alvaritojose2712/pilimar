@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-
-
-
+import Modalmovil from "./modalmovil";
 
 export default function PedidosCentralComponent({
 	socketUrl,
@@ -39,15 +37,44 @@ export default function PedidosCentralComponent({
 	settareasCentral,
 	tareasCentral,
 	runTareaCentral,
+
+	modalmovilRef,
+	modalmovilx,
+	modalmovily,
+	setmodalmovilshow,
+	modalmovilshow,
+	getProductos,
+	productos,
+	linkproductocentralsucursal,
+	inputbuscarcentralforvincular,
+	openVincularSucursalwithCentral,
+	idselectproductoinsucursalforvicular,
 }){
 
-	const [subviewcentral, setsubviewcentral] = useState("tareas")
+	const [subviewcentral, setsubviewcentral] = useState("pedidos")
 	try {
 		return (
 			<div className="container-fluid">
+
+			{modalmovilshow ? (
+                <Modalmovil
+                    modalmovilRef={modalmovilRef}
+                    x={modalmovilx}
+                    y={modalmovily}
+                    setmodalmovilshow={setmodalmovilshow}
+                    modalmovilshow={modalmovilshow}
+                    getProductos={getProductos}
+                    productos={productos}
+                    linkproductocentralsucursal={linkproductocentralsucursal}
+                    inputbuscarcentralforvincular={
+                        inputbuscarcentralforvincular
+                    }
+                />
+            ) : null}
+
 				<div className="btn-group mb-2">
-					<button className={subviewcentral == "tareas" ? ("btn btn-outline-sinapsis") : ("btn btn-outline-secondary")} onClick={() => { setsubviewcentral("tareas") }}>Tareas</button>
 					<button className={subviewcentral == "pedidos" ? ("btn btn-outline-sinapsis") : ("btn btn-outline-secondary")} onClick={() => { getPedidosCentral(); setsubviewcentral("pedidos") }}>Recibir Pedidos</button>
+					<button className={subviewcentral == "tareas" ? ("btn btn-outline-sinapsis") : ("btn btn-outline-secondary")} onClick={() => { setsubviewcentral("tareas") }}>Tareas</button>
 					{/* <button className={subviewcentral == "inventario" ? ("btn btn-outline-sinapsis") : ("btn btn-outline-secondary")} onClick={() => { getInventarioFromSucursal(); setsubviewcentral("inventario") }}>Actualizar Inventario</button>
  */}
 				</div>
@@ -263,53 +290,88 @@ export default function PedidosCentralComponent({
 												<th className="text-right">Monto</th>
 											</tr>
 										</thead>
-										<tbody>
 											{indexPedidoCentral !== null && pedidosCentral ?
 												pedidosCentral[indexPedidoCentral] ?
 													pedidosCentral[indexPedidoCentral].items.map((e, i) =>
-														<tr key={e.id}
-															className={(e.aprobado ? "bg-success-light" : "bg-sinapsis-light" ) + (" pointer")}>
-															<td
-																onClick={selectPedidosCentral}
-																data-index={i}
-																data-tipo="select"
-															>
-																{typeof (e.aprobado) === "undefined"?
-																	<button className="btn btn-outline-danger"><i className="fa fa-times"></i></button>
-																:
-																	e.aprobado === true?
-																		<button className="btn btn-outline-success"><i className="fa fa-check"></i></button>
-																	:null
-																}
+														<tbody key={e.id}>
+															<tr>
+																<td>
+																</td>
+																<td></td>
+																<td className='d-flex justify-content-between align-items-end'>
+																	<div className="">
+																		{e.match&&e.match.codigo_barras?e.match.codigo_barras: <small className="text-muted">se creará nuevo</small>	} <br />
+																		{e.match&&e.match.codigo_barras?e.match.codigo_proveedor: <small className="text-muted">se creará nuevo</small>	}
+																	</div>
+																	<div className="">
+																		<div className="d-flex align-item-center">
+																			{!e.match?
+																				<button
+																					className={(idselectproductoinsucursalforvicular.index==i?"btn-danger":"btn-outline-danger")+(" btn fs-10px btn-sm")}
+																					onClick={(event)=>openVincularSucursalwithCentral(event,{id: e.producto.id ? e.producto.id: null , index: i,})}
+																				>
+																					No
+																					
+																				</button>
+																			:
+																				<button
+																					className={(idselectproductoinsucursalforvicular.index==i?"btn-success":"btn-outline-success")+(" btn fs-10px btn-sm")}
+																					onClick={(event)=>openVincularSucursalwithCentral(event,{id: e.producto.id ? e.producto.id: null , index: i,})}
+																				>
+																					<i className="fa fa-link"></i>
+																				</button>
+																			} 
+																		</div>
+																	</div>
+																</td>
+																<td className='align-bottom'>
+																	{e.match&&e.match.descripcion?e.match.descripcion: <small className="text-muted">se creará nuevo</small>	} 	<small className='text-muted'> Sucursal</small>
+																</td>
+																<td className='align-bottom'>{e.match&&e.match.precio_base?e.match.precio_base: <small className="text-muted">se creará nuevo</small>	}</td>
+																<td className='align-bottom'>{e.match&&e.match.precio?e.match.precio: <small className="text-muted">se creará nuevo</small>	}</td>
+															</tr>
+															<tr className={(e.aprobado ? "bg-success-light" : "bg-sinapsis-light" ) + (" pointer borderbottom")}>
+																<td
+																	onClick={selectPedidosCentral}
+																	data-index={i}
+																	data-tipo="select"
+																>
+																	{typeof (e.aprobado) === "undefined"?
+																		<button className="btn btn-outline-danger"><i className="fa fa-times"></i></button>
+																	:
+																		e.aprobado === true?
+																			<button className="btn btn-outline-success"><i className="fa fa-check"></i></button>
+																		:null
+																	}
 
-																
-															</td>
-															<th className="align-middle">
-																<span className={(typeof (e.ct_real) != "undefined" ? "text-decoration-line-through" : null)}>{e.cantidad.toString().replace(/\.00/, "")}</span>
-																<br />
-																{/* {typeof (e.ct_real) != "undefined" ?
-																	<input type="text" value={e.ct_real}
-																		data-index={i}
-																		data-tipo="changect_real"
-																		onChange={selectPedidosCentral}
-																		size="4"
-																	/>
-																	: null} */}
-															</th>
-															<td className="align-middle">
-																<small className="text-muted">{e.producto.codigo_barras}</small>
-																<br />
-																<small className="text-muted">{e.producto.codigo_proveedor}</small>
-															</td>
-															<td className="align-middle">{e.producto.descripcion}</td>
-															<td className="align-middle text-sinapsis">{moneda(e.producto.precio_base)}</td>
-															<td className="align-middle text-success">{moneda(e.producto.precio)}</td>
-															<td className="align-middle text-right">{moneda(e.monto)}</td>
-														</tr>
+																	
+																</td>
+																<th className="align-middle">
+																	<span className={(typeof (e.ct_real) != "undefined" ? "text-decoration-line-through" : null)}>{e.cantidad.toString().replace(/\.00/, "")}</span>
+																	<br />
+																	{/* {typeof (e.ct_real) != "undefined" ?
+																		<input type="text" value={e.ct_real}
+																			data-index={i}
+																			data-tipo="changect_real"
+																			onChange={selectPedidosCentral}
+																			size="4"
+																		/>
+																		: null} */}
+																</th>
+																<td className="align-middle">
+																	<small className="text-muted">{e.producto.codigo_barras}</small>
+																	<br />
+																	<small className="text-muted">{e.producto.codigo_proveedor}</small>
+																</td>
+																<td className="align-top">{e.producto.descripcion} <small className='text-muted'>Central</small></td>
+																<td className="align-top text-sinapsis">{moneda(e.producto.precio_base)}</td>
+																<td className="align-top text-success">{moneda(e.producto.precio)}</td>
+																<td className="align-top text-right">{moneda(e.monto)}</td>
+															</tr>
+														</tbody>
 													)
 													: null
 												: null}
-										</tbody>
 									</table>
 									{indexPedidoCentral !== null && pedidosCentral ?
 										pedidosCentral[indexPedidoCentral] ?

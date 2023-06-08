@@ -242,7 +242,7 @@ export default function InventarioForzado({
                 <table className="table">
                     <thead>
                         <tr>
-                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("id")}>{!user.iscentral?"ID VINCULACION":null} ID</span></th>
+                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("id")}>ID VINCULACION / ID</span></th>
                             <th className="cell1 pointer"><span onClick={() => setInvorderColumn("codigo_proveedor")}>C. Alterno</span></th>
                             <th className="cell1 pointer"><span onClick={() => setInvorderColumn("codigo_barras")}>C. Barras</span></th>
                             <th className="cell05 pointer"><span onClick={() => setInvorderColumn("unidad")}>Unidad</span></th>
@@ -291,7 +291,7 @@ export default function InventarioForzado({
                         {productosInventario.length?productosInventario.map((e,i)=>
                             <tr key={i} className="pointer" onDoubleClick={() => changeInventario(null, i, e.id, "update")}>
                                 <td className="cell05">
-                                    <b>{!user.iscentral?e.id_vinculacion:null}</b> / {e.id}
+                                    <b>{e.id_vinculacion}</b> / {e.id}
                                 </td>
                                 {type(e.type)?
                                 <>

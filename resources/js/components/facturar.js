@@ -215,6 +215,8 @@ export default function Facturar({ user, notificar, setLoading }) {
     const [movCajamonto, setMovCajamonto] = useState("");
     const [movCajaFecha, setMovCajaFecha] = useState("");
 
+    const refaddfast = useRef(null)
+
     const tbodyproductosref = useRef(null);
     const inputBuscarInventario = useRef(null);
 
@@ -522,6 +524,30 @@ export default function Facturar({ user, notificar, setLoading }) {
             alert("¡Error: Éste ID ya se ha vinculado!")
         }
     };
+
+
+    const linkproductocentralsucursalSUCURSAL = (idinsucursal) => {
+
+         //Id in central ID VINCULACION
+         let pedidosCentralcopy = cloneDeep(pedidosCentral)
+        db.changeIdVinculacionCentral({
+            pedioscentral: pedidosCentralcopy[indexPedidoCentral],
+            idinsucursal,
+            idincentral: idselectproductoinsucursalforvicular.id,  //id vinculacion
+        }).then(({data})=>{
+
+            if (data.estado) {
+                pedidosCentralcopy[indexPedidoCentral] = data.pedido
+                setpedidoCentral(pedidosCentralcopy)
+                setmodalmovilshow(false);
+            }else{
+                notificar(data.msj)
+            }
+
+        })
+    };
+
+
     let puedoconsultarproductosinsucursalfromcentral = () => {
         //si todos los productos son consultados(0) o Procesados(3), puedo buscar mas productos.
         if (inventarioSucursalFromCentral) {
@@ -841,11 +867,20 @@ export default function Facturar({ user, notificar, setLoading }) {
         "f1",
         () => {
             if (view == "pagar") {
-                toggleModalProductos(true, () => {
-                    inputaddcarritointernoref.current.focus();
-                    setQProductosMain("");
-                    setCountListInter(0);
-                });
+                if (ModaladdproductocarritoToggle) {
+                    toggleModalProductos(false)
+                    if (refaddfast) {
+                        if (refaddfast.current) {
+                          refaddfast.current.focus()
+                        }
+                    }
+                }else{
+                    toggleModalProductos(true, () => {
+                        
+                        setQProductosMain("");
+                        setCountListInter(0);
+                    });
+                }
             } else if (selectItem === null && view == "seleccionar") {
                 getPedido("ultimo", () => {
                     setView("pagar");
@@ -1257,6 +1292,8 @@ export default function Facturar({ user, notificar, setLoading }) {
                 } else {
                     if (viewconfigcredito) {
                         setPagoPedido();
+                    } else if(document.activeElement===refaddfast.current){
+                        addCarritoFast()
                     } else {
                         facturar_pedido();
                     }
@@ -1308,12 +1345,6 @@ export default function Facturar({ user, notificar, setLoading }) {
 
     useEffect(() => {
         if (showinputaddCarritoFast) {
-            if (inputaddcarritointernoref) {
-                if (inputaddcarritointernoref.current) {
-                    inputaddcarritointernoref.current.focus();
-                }
-            }
-
             if (inputbusquedaProductosref) {
                 if (inputbusquedaProductosref.current) {
                     inputbusquedaProductosref.current.focus();
@@ -1579,16 +1610,13 @@ export default function Facturar({ user, notificar, setLoading }) {
         setSocketUrlDB();
         getSucursalFun();
 
-        runSockets()
         // return () => { isMounted = false }
     }, []);
 
     useEffect(() => {
         getFallas();
     }, [qFallas, orderCatFallas, orderSubCatFallas, ascdescFallas]);
-    useEffect(() => {
-        addCarritoFast();
-    }, [inputaddCarritoFast]);
+    
     useEffect(() => {
         getClienteCrud();
     }, [qBuscarCliente]);
@@ -1741,7 +1769,7 @@ export default function Facturar({ user, notificar, setLoading }) {
         dolar && caja_biopago ? (caja_biopago / dolar).toFixed(2) : 0;
     
     const runSockets = () => {
-        const channel = Echo.channel("private.eventocentral."+user.sucursal)
+        /* const channel = Echo.channel("private.eventocentral."+user.sucursal)
 
         channel.subscribed(()=>{
             console.log("Subscrito a Central!")
@@ -1750,8 +1778,9 @@ export default function Facturar({ user, notificar, setLoading }) {
             db.recibedSocketEvent({event}).then(({data})=>{
                 console.log(data,"recibedSocketEvent Response")
             })
-        })
+        }) */
     }
+
     const getSucursalFun = () => {
         db.getSucursal({}).then((res) => {
             if (res.data.codigo) {
@@ -2109,7 +2138,7 @@ export default function Facturar({ user, notificar, setLoading }) {
         if (valor) {
             db.setMoneda({ tipo, valor }).then((res) => {
                 getMoneda();
-                getProductos();
+                /* getProductos(); */
             });
         }
     };
@@ -2128,11 +2157,7 @@ export default function Facturar({ user, notificar, setLoading }) {
     };
     const toggleModalProductos = (prop, callback = null) => {
         setModaladdproductocarritoToggle(prop);
-        if (inputaddcarritointernoref) {
-            if (inputaddcarritointernoref.current) {
-                inputaddcarritointernoref.current.focus();
-            }
-        }
+        
         if (callback) {
             callback();
         }
@@ -2250,6 +2275,9 @@ export default function Facturar({ user, notificar, setLoading }) {
                 orderBy,
             }).then((res) => {
                 if (res.data) {
+                    if (res.data.estado===false) {
+                        notificar(res.data.msj,false)
+                    }
                     let len = res.data.length;
                     if (len) {
                         setProductos(res.data);
@@ -2566,6 +2594,9 @@ export default function Facturar({ user, notificar, setLoading }) {
         db.getPedido({ id }).then((res) => {
             setLoading(false);
             if (res.data) {
+                if (res.data.estado===false) {
+                    notificar(res.data.msj,false)
+                }
                 setPedidoData(res.data);
                 setdatadeudacredito({});
                 setviewconfigcredito(false);
@@ -2671,6 +2702,23 @@ export default function Facturar({ user, notificar, setLoading }) {
             }
         });
     };
+    const addCarritoFast = () => {
+        if (pedidoData.id) {
+          if (refaddfast) {
+            if (refaddfast.current) {
+              db.getinventario({exacto:"si",num:1,itemCero:true,qProductosMain:refaddfast.current.value,orderColumn:"id",orderBy:"desc"}).then(res=>{
+                if(res.data.length==1){
+                  let id = res.data[0].id
+                  db.setCarrito({id,type:null,cantidad:1000000,numero_factura:pedidoData.id}).then(res=>{
+                    refaddfast.current.value=""
+                    getPedido()
+                  })
+                }
+              })
+            }
+          }
+        }
+      } 
     const addCarrito = (e, callback = null) => {
         let index, loteid;
         if (e.currentTarget) {
@@ -2728,7 +2776,10 @@ export default function Facturar({ user, notificar, setLoading }) {
                 loteIdCarrito,
             }).then((res) => {
                 // getProductos()
-
+                if (!res.data.estado) {
+                    notificar(res.data.msj)
+                    return;
+                }
                 if (numero_factura == "nuevo") {
                     getPedidosList();
                 }
@@ -3481,17 +3532,18 @@ export default function Facturar({ user, notificar, setLoading }) {
         let id_usuario =  val
         setusuarioChangeUserPedido(val)
 
-        db.changepedidouser({
-            id_usuario,
-            id_pedido:seletIdChangePedidoUser
-        }).then(res=>{
-            console.log(res.data)
-            setseletIdChangePedidoUser(null)
-            setusuarioChangeUserPedido("")
-            setmodalchangepedido(false)
-            getPedidos()
-            getPedidosList()
-        })
+        if (window.confirm("Por favor confirmar transferencia de pedido #"+seletIdChangePedidoUser+" a usuario "+id_usuario)) {
+            db.changepedidouser({
+                id_usuario,
+                id_pedido:seletIdChangePedidoUser
+            }).then(res=>{
+                setseletIdChangePedidoUser(null)
+                setusuarioChangeUserPedido("")
+                setmodalchangepedido(false)
+                getPedidos()
+                getPedidosList()
+            })
+        }
     }
     const setseletIdChangePedidoUserHandle = (event, id) => {
         setseletIdChangePedidoUser(id)
@@ -3797,38 +3849,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             setsumPedidosArr(sumPedidosArr.filter((e) => e != id));
         }
     };
-    const addCarritoFast = () => {
-        if (pedidoData.id) {
-            if (time != 0) {
-                clearTimeout(typingTimeout);
-            }
-
-            let time = window.setTimeout(() => {
-                db.getinventario({
-                    exacto: "si",
-                    num: 1,
-                    itemCero: true,
-                    qProductosMain: inputaddCarritoFast,
-                    orderColumn: "id",
-                    orderBy: "desc",
-                }).then((res) => {
-                    if (res.data.length == 1) {
-                        let id = res.data[0].id;
-                        db.setCarrito({
-                            id,
-                            type: null,
-                            cantidad: 1,
-                            numero_factura: pedidoData.id,
-                        }).then((res) => {
-                            setinputaddCarritoFast("");
-                            getPedido();
-                        });
-                    }
-                });
-            }, 100);
-            setTypingTimeout(time);
-        }
-    };
+    
     const getFallas = () => {
         setLoading(true);
         db.getFallas({
@@ -5086,6 +5107,18 @@ export default function Facturar({ user, notificar, setLoading }) {
                     settareasCentral={settareasCentral}
                     tareasCentral={tareasCentral}
                     runTareaCentral={runTareaCentral}
+
+                    modalmovilRef={modalmovilRef}
+                    modalmovilx={modalmovilx}
+                    modalmovily={modalmovily}
+                    setmodalmovilshow={setmodalmovilshow}
+                    modalmovilshow={modalmovilshow}
+                    getProductos={getProductos}
+                    productos={productos}
+                    linkproductocentralsucursal={linkproductocentralsucursalSUCURSAL}
+                    inputbuscarcentralforvincular={inputbuscarcentralforvincular}
+                    openVincularSucursalwithCentral={openVincularSucursalwithCentral}
+                    idselectproductoinsucursalforvicular={idselectproductoinsucursalforvicular}
                 />
             ) : null}
             {view == "ventas" ? (
@@ -5523,6 +5556,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             {view == "ViewPedidoVendedor" ? <ViewPedidoVendedor /> : null}
             {view == "pagar" ? (
                 <Pagar
+                    refaddfast={refaddfast}
                     changeEntregado={changeEntregado}
                     setPagoPedido={setPagoPedido}
                     viewconfigcredito={viewconfigcredito}

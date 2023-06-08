@@ -238,6 +238,8 @@ class InventarioController extends Controller
     public function hacer_pedido($id,$id_pedido,$cantidad,$type,$lote=null)
     {   
         try {
+            (new PedidosController)->checkLastPedido($id_pedido);
+
             if ($cantidad<0) {
                 exit;
             }
@@ -265,9 +267,13 @@ class InventarioController extends Controller
 
                 if ($checkIfExits) {
                     $old_ct = $checkIfExits["cantidad"];
-                    // $setcantidad = $cantidad + $old_ct; //Sumar cantidad a lo que ya existe en carrito
 
-                    $setcantidad = $cantidad;
+                    if ($cantidad=="1000000") { //codigo para sumar de uno en uno
+                        $setcantidad = 1 + $old_ct; //Sumar cantidad a lo que ya existe en carrito
+                    }else{
+                        $setcantidad = $cantidad;
+                    }
+
                     $setprecio = $setcantidad*$precio;
                 }else{
                     $setprecio = $setcantidad*$precio;
@@ -291,7 +297,7 @@ class InventarioController extends Controller
 
                 $ctSeter = ($ctquehabia - $setcantidad);
                 
-                $this->descontarInventario($id,$ctSeter, $ctquehabia, $id_pedido, "insItemPedido");
+                $this->descontarInventario($id,$ctSeter, $ctquehabia, $id_pedido, "inItPd");
 
                 $this->checkFalla($id,$ctSeter);
 
@@ -414,14 +420,22 @@ class InventarioController extends Controller
                     }
                 }
             }
+            ///Check items mal vinculados
+            foreach ($pedido["items"] as $i => $item) {
+                $checkbarras = inventario::where("codigo_barras",$item["producto"]["codigo_barras"])->first();
+                $id_viculacionFromCentral = $item["producto"]["id"];
+                if ($checkbarras) {
+                    if (($checkbarras->id_vinculacion!=$id_viculacionFromCentral)) {
+                        return Response::json(["msj"=>"Error: producto malvinculado. BarrasCentral ".$item["producto"]["codigo_barras"],"estado"=>false]);
+                    }
+                }
+            }   
             //Check Proveedor
             
-            
-          
                 $id = $pedido["id"];
                 
                 $factInpnumfact = $pedido["id"];
-                $factInpdescripcion = "De centro de acopio ".$pedido["created_at"];
+                $factInpdescripcion = "De ".$pedido["origen"]["codigo"]." ".$pedido["created_at"];
                 $factInpmonto = $pedido["venta"];
                 $factInpfechavencimiento = $pedido["created_at"];
                 $factInpestatus = 1;
@@ -444,19 +458,19 @@ class InventarioController extends Controller
                             $id_pro = $item["producto"]["id"];
                             $ctNew = $item["cantidad"];
 
-                            $checkoldCt = inventario::where("id_vinculacion",$id_pro)->first();
-                            $match_ct = 0;
-                            if ($checkoldCt) {
-                                 $match_ct = $checkoldCt->cantidad;
-                            }
                             $minivinculacioncheck = inventario::where("id_vinculacion",$id_pro)->first();
-
                             if (!$minivinculacioncheck) {
                                 $minivinculacionset = inventario::where("codigo_barras",$item["producto"]["codigo_barras"])->first();
                                 if ($minivinculacionset) {
                                     $minivinculacionset->id_vinculacion = $id_pro;
                                     $minivinculacionset->save();
                                 }
+                            }
+
+                            $checkoldCt = inventario::where("id_vinculacion",$id_pro)->first();
+                            $match_ct = 0;
+                            if ($checkoldCt) {
+                                $match_ct = $checkoldCt->cantidad;
                             }
 
                             $insertOrUpdateInv = $this->guardarProducto([
@@ -501,7 +515,7 @@ class InventarioController extends Controller
                         
                         (new sendCentral)->setFacturasCentral();
                         (new sendCentral)->changeExportStatus($pathcentral,$id);
-                        return Response::json(["msj"=>"¡Éxito.".$num." productos procesados!","estado"=>true]);
+                        return Response::json(["msj"=>"¡Éxito ".$num." productos procesados!","estado"=>true]);
 
                     }
                 }else{
@@ -710,6 +724,32 @@ class InventarioController extends Controller
         return $this->getInventarioFun($req);
         
     }
+    public function changeIdVinculacionCentral(Request $req)
+    {
+        try {
+
+            inventario::where("id_vinculacion",$req->idincentral)->update(["id_vinculacion"=>null]);
+            $inv = inventario::find($req->idinsucursal);
+            $inv->id_vinculacion = $req->idincentral;
+            if ($inv->save()) {
+                
+                $pedido = $req->pedioscentral;
+    
+                foreach ($pedido["items"] as $keyitem => $item) {
+                    ///id central ID VINCULACION
+                    $pedido["items"][$keyitem]["match"] = inventario::where("id_vinculacion",$item["producto"]["id"])->get()->first();
+                }
+                return Response::json([
+                    "msj"=>"Éxito", 
+                    "estado"=>true,
+                    "pedido"=>$pedido,
+                ]);
+                
+            }
+        } catch (\Exception $e) {
+            return Response::json(["msj"=>"Error ".$e->getMessage(), "estado"=>false]);
+        }
+    }
     public function setCarrito(Request $req)
     {
         $type = $req->type;
@@ -723,16 +763,12 @@ class InventarioController extends Controller
             $id_producto = $req->id;
             $cantidad = $cantidad==""?1:$cantidad;
 
-            $usuario = "";
+            $usuario = session()->has("id_usuario")? session("id_usuario"): $req->usuario;
 
-            if (session()->has("id_usuario")) {
-                $usuario = session("id_usuario");
-            }else{
-
-                $usuario = $req->usuario;
+            if (!$usuario) {
+                return Response::json(["msj"=>"Debe iniciar Sesión", "estado"=>false,"num_pedido"=>0,"type"=>""]);
             }
-
-          // $producto = inventario::select(["descripcion"])->find($id_producto);
+            // $producto = inventario::select(["descripcion"])->find($id_producto);
 
             
             if ($id=="nuevo") {
@@ -757,14 +793,14 @@ class InventarioController extends Controller
               //Next pedido num
                 $nuevo_pedido_num = $new_pedido->id;
 
-                pago_pedidos::insert([
+                /* pago_pedidos::insert([
                     ["tipo"=>1,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>2,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>3,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>4,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>5,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>6,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
-                ]);
+                ]); */
 
                 // 1 Transferencia
                // 2 Debito 
@@ -979,24 +1015,17 @@ class InventarioController extends Controller
             $tipo = "";
             
             $before = null;
-            if ($req_id==="id_vinculacion") {
-                $before = inventario::where("id_vinculacion", $id_vinculacion)->first();
+            if (!$req_id) {
+                $ctNew = $ctInsert;
+                $tipo = "Nuevo";
+            }else{
+                $before = $req_id==="id_vinculacion"? inventario::where("id_vinculacion", $id_vinculacion)->first(): inventario::find($req_id);
                 if ($before) {
                     $beforecantidad = $before->cantidad;
                     $ctNew = $ctInsert - $beforecantidad;
                     $tipo = "Actualización";
                 }else{
                     $tipo = "Nuevo";
-                }
-            }elseif (!$req_id) {
-                $ctNew = $ctInsert;
-                $tipo = "Nuevo";
-            }else{
-                $before = inventario::find($req_id);
-                if ($before) {
-                    $beforecantidad = $before->cantidad;
-                    $ctNew = $ctInsert - $beforecantidad;
-                    $tipo = "Actualización";
                 }
             }
 

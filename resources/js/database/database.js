@@ -18,6 +18,8 @@ const db = {
   getPedidosList: data=>axios.post(host+"getPedidosList",data),
   verificarLogin: () => axios.post(host + "verificarLogin"),
   logout: ()=>axios.get(host+"logout"),
+  closeAllSession: ()=>axios.get(host+"closeAllSession"),
+  
   
   guardarCierre: data=>axios.post(host+"guardarCierre",data),
 
@@ -126,6 +128,8 @@ const db = {
   saveMontoFactura: data=>axios.post(host+"saveMontoFactura",data),
 
   reqpedidos: data => axios.post(host + "reqpedidos", data),
+  changeIdVinculacionCentral: data => axios.post(host + "changeIdVinculacionCentral", data),
+  
   setexportpedido: data => axios.post(host + "setexportpedido", data),
   
   getmastermachine: data=>axios.post(host+"getmastermachine",data),

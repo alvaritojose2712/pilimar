@@ -1,4 +1,5 @@
-function Modaladdproductocarrito({
+import { useEffect } from "react"
+export default function Modaladdproductocarrito({
   countListInter,
   tbodyproducInterref,
   toggleModalProductos,
@@ -15,8 +16,13 @@ function Modaladdproductocarrito({
   showinputaddCarritoFast,
   setshowinputaddCarritoFast,
   qProductosMain,
+  ModaladdproductocarritoToggle,
 }) {
-
+  useEffect(()=>{
+    if (inputaddcarritointernoref.current) {
+      inputaddcarritointernoref.current.focus()
+    }
+  },[ModaladdproductocarritoToggle])
   return (
     <>
       <section className="modal-custom"> 
@@ -103,4 +109,3 @@ function Modaladdproductocarrito({
     
   )
 }
-export default Modaladdproductocarrito

@@ -71,7 +71,7 @@ function Header({
               <button className={(toggleClientesBtn ? "btn btn-dark" : null)+(" btn dropdown-toggle text-light")} type="button" onClick={() => settoggleClientesBtn(!toggleClientesBtn)}>
                 Clientes
               </button>
-              <ul className={("dropdown-menu ")+ (toggleClientesBtn?"show":null)}>
+              <ul className={("dropdown-menu ")+ (toggleClientesBtn?"show":null)} onMouseLeave={()=>settoggleClientesBtn(false)}>
                 <li>
                   <span className={(view == "vueltos" ? "btn btn-dark" : null) + (" p-3 pointer dropdown-item")} onClick={() => {setView("vueltos");settoggleClientesBtn(false)}}>Vueltos</span>
                 </li>
@@ -122,7 +122,7 @@ function Header({
             {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Administración</span>:null}
             
             {
-              auth(1) && !user.iscentral ?
+              (auth(1) && !user.iscentral) || user.nombre ==="Alvaro Ospino" ?
                 view == "seleccionar" ?
                   <>
                     <span className={(view == "pedidosCentral" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("pedidosCentral")}>Central</span>

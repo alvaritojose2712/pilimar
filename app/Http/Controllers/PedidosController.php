@@ -36,13 +36,8 @@ use Response;
 class PedidosController extends Controller
 {   
 
-    protected $sends = [
-        "omarelhenaoui@hotmail.com",           
-        "yeisersalah2@gmail.com",           
-        "amerelhenaoui@outlook.com",           
-        "yesers982@hotmail.com",   
-        "alvaroospino79@gmail.com"        
-    ];
+    
+    
     protected  $letras = [
                 1=>"L",
                 2=>"R",
@@ -55,6 +50,10 @@ class PedidosController extends Controller
                 9=>"P",
                 0=>"X",
             ];
+    public function sends()
+    {
+        return (new sendCentral)->sends();
+    }
     public function changepedidouser(Request $req)
     {
         $id_pedido = $req->id_pedido; 
@@ -107,7 +106,7 @@ class PedidosController extends Controller
             $ret->whereIn("id_vendedor",$vendedor);
         }
 
-        return $ret->limit(4)
+        return $ret->limit(8)
         ->orderBy("id","desc")
         ->get(["id","estado"]);
     }
@@ -133,7 +132,36 @@ class PedidosController extends Controller
     }
     public function today()
     {
-        return date("Y-m-d");
+        date_default_timezone_set("America/Caracas"); 
+        $today = date("Y-m-d");
+        
+        $fechafixedsql = cierres::orderBy("fecha","desc")->first();
+        
+        
+        if ($fechafixedsql->fecha) {
+            $Date1 = $fechafixedsql->fecha;
+            $fechafixedsqlmas5 = date('Y-m-d', strtotime($Date1 . " + 3 day"));
+
+
+            if (($today < $fechafixedsql->fecha) OR ($today > $fechafixedsqlmas5) ) {
+                throw new \Exception("Fecha incorrecta", 1);
+            }else{
+                return $today;
+            }
+        }else{
+            return $today; 
+        }
+        
+        
+        /* if (isset($_COOKIE["today"])) {
+            return $_COOKIE["today"];
+        }else{
+            
+            $fechafixed = $fechafixedsql->fecha? $fechafixedsql->fecha: $today;
+    
+            setcookie("today", $fechafixed, time() + 21600);
+            return $fechafixed;
+        } */
     } 
     public function sumpedidos(Request $req)
     {
@@ -442,7 +470,7 @@ class PedidosController extends Controller
        //si la fecha del ultimo cierre es igual la fecha de entrada
     
        $today = $this->today();
-       if (!$estado || !cierres::where("fecha",$fecha_creada)->get()->count() || $fecha_creada == $today) {
+       if ((!$estado AND $today===$fecha_creada) || !cierres::where("fecha",$fecha_creada)->get()->count() || $fecha_creada == $today) {
         return true;   
        }else{
         return false;   
@@ -802,13 +830,30 @@ class PedidosController extends Controller
             return [session("id_usuario")];
         } 
     }
+    public function checkLastPedido($id_pedido)
+    {
+        return $id_pedido;
+        $today = $this->today();
+        $fecha_str = strtotime(pedidos::find($id_pedido)->created_at);
+        $fecha_pedido = date("Y-m-d",$fecha_str);
+        if ($today!==$fecha_pedido) {
+            throw new \Exception("¡No puede agregar productos a este pedido!", 1);
+        }
+    }
     public function cerrarFun($fecha,$total_caja_neto,$total_punto,$total_biopago,$dejar=[],$grafica=false,$totalizarcierre=false,$check_pendiente=true)
     {   
         if (!$fecha) {return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);}
 
         if ($check_pendiente) {
-            $pedido_pendientes_check = pedidos::where("created_at","LIKE",$fecha."%")->where("estado",0)->get();
-            if (count($pedido_pendientes_check)) {return Response::json(["msj"=>"Error: Hay pedidos pendientes","estado"=>false]);}
+            $pedido_pendientes_check = pedidos::where("estado",0)->get();
+            if (count($pedido_pendientes_check)) {
+                return Response::json([
+                    "msj" => "Error: Hay pedidos pendientes ".$pedido_pendientes_check->map(function($q){
+                        return $q->id;
+                    }) ,
+                    "estado" => false
+                ]);
+            }
         }
 
 
@@ -1561,7 +1606,7 @@ class PedidosController extends Controller
                 \Artisan::call('database:backup');
                 $gastosCentral = (new sendCentral)->setGastos();
                 $sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
-                Mail::to($this->sends)->send(new enviarCierre($arr_send,$from1,$from,$subject));    
+                Mail::to($this->sends())->send(new enviarCierre($arr_send,$from1,$from,$subject));    
                 
                 return Response::json(["msj"=>"Cierre enviado con Éxito al correo. Envío a Central: ".$sendCierreCentral." ".$gastosCentral,"estado"=>true]);
             
@@ -1585,7 +1630,7 @@ class PedidosController extends Controller
         $data = (new PagoPedidosController)->getDeudoresFun("","saldo","asc",$today);
         try {
             
-            Mail::to($this->sends)->send(new enviarCuentaspagar([
+            Mail::to($this->sends())->send(new enviarCuentaspagar([
                 "data" => $data,
                 "sucursal" => $sucursal,
                 "today"=>$today
