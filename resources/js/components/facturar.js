@@ -654,14 +654,10 @@ export default function Facturar({ user, notificar, setLoading }) {
                         
                         if (data.msj.respuesta) {
                             let respuesta = JSON.parse(data.msj.respuesta);
-                            setdatainventarioSucursalFromCentral(
-                                respuesta.respuesta?respuesta.respuesta:respuesta
-                            );
+                            setdatainventarioSucursalFromCentral(respuesta.respuesta?respuesta.respuesta:respuesta);
                             setdatainventarioSucursalFromCentralcopy(respuesta.respuesta?respuesta.respuesta:respuesta)
 
-                            setestadisticasinventarioSucursalFromCentral(
-                                respuesta.estadisticas
-                            );
+                            setestadisticasinventarioSucursalFromCentral(respuesta.estadisticas);
                         }
                         break;
                     case "fallaspanelcentroacopio":
@@ -4648,26 +4644,33 @@ export default function Facturar({ user, notificar, setLoading }) {
         pro = sameProValue
       }
 
-      
-      let newObj = [{
-        id: null,
-        id_vinculacion: null,
-        codigo_proveedor: "",
-        codigo_barras: "",
-        descripcion: "",
-        id_categoria: sameCatValue,
-        id_marca: "",
-        unidad: "UND",
-        id_proveedor: pro,
-        cantidad: "",
-        precio_base: "",
-        precio: "",
-        iva: "0",
-        type: "new",
+      */
+                let newObj = [{
+                    id: null,
+                    id_vinculacion: null,
+                    codigo_proveedor: "",
+                    codigo_barras: "",
+                    descripcion: "",
+                    id_categoria: 1,
+                    id_marca: "",
+                    unidad: "UND",
+                    id_proveedor: 1,
+                    cantidad: "",
+                    precio_base: "",
+                    precio: "",
+                    iva: "0",
+                    type: "new",
+                    estatus: 1,
+                    precio1: 0,
+                    precio2: 0,
+                    precio3: 0,
+                    stockmin: 0,
+                    stockmax: 0,
+                    id_vinculacion: null,
 
-      }]
+                }]
 
-      obj = newObj.concat(obj) */
+                obj = newObj.concat(obj) 
                 break;
 
             case "delMode":
@@ -4675,6 +4678,7 @@ export default function Facturar({ user, notificar, setLoading }) {
                 obj[i]["estatus"] = 1;
                 break;
         }
+        setdatainventarioSucursalFromCentralcopy(obj)
         setdatainventarioSucursalFromCentral(obj);
     };
 
