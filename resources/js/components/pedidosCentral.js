@@ -314,11 +314,15 @@ export default function PedidosCentralComponent({
 																					
 																				</button>
 																			:
-																				<button
-																					className={(idselectproductoinsucursalforvicular.index==i?"btn-success":"btn-outline-success")+(" btn fs-10px btn-sm")}
-																					onClick={(event)=>openVincularSucursalwithCentral(event,{id: e.producto.id ? e.producto.id: null , index: i,})}
-																				>
-																					<i className="fa fa-link"></i>
+																				e.modificable?
+																					<button
+																						className={(idselectproductoinsucursalforvicular.index==i?"btn-warning":"btn-outline-warning")+(" btn fs-10px btn-sm")}
+																						onClick={(event)=>openVincularSucursalwithCentral(event,{id: e.producto.id ? e.producto.id: null , index: i,})}
+																					>
+																						<i className="fa fa-link"></i>
+																					</button>
+																				:<button className={"btn-outline-success btn fs-10px btn-sm"}>
+																					<i className="fa fa-check"></i>
 																				</button>
 																			} 
 																		</div>
@@ -358,10 +362,10 @@ export default function PedidosCentralComponent({
 																		/>
 																		: null} */}
 																</th>
-																<td className="align-middle">
-																	<small className="text-muted">{e.producto.codigo_barras}</small>
+																<td className="align-top">
+																	{e.producto.codigo_barras}
 																	<br />
-																	<small className="text-muted">{e.producto.codigo_proveedor}</small>
+																	{e.producto.codigo_proveedor}
 																</td>
 																<td className="align-top">{e.producto.descripcion} <small className='text-muted'>Central</small></td>
 																<td className="align-top text-sinapsis">{moneda(e.producto.precio_base)}</td>

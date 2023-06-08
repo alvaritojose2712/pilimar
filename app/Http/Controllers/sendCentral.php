@@ -524,8 +524,9 @@ class sendCentral extends Controller
                     foreach ($pedidos as $pedidokey => $pedido) {
                         foreach ($pedido["items"] as $keyitem => $item) {
                             ///id central ID VINCULACION
-                            $pedidos[$pedidokey]["items"][$keyitem]["match"] = inventario::where("id_vinculacion",$item["producto"]["id"])->get()->first();
-                            $pedidos[$pedidokey]["items"][$keyitem]["idddd"] = $item["producto"]["id"];
+                            $showvinculacion = inventario::where("id_vinculacion",$item["producto"]["id"])->get()->first();
+                            $pedidos[$pedidokey]["items"][$keyitem]["match"] = $showvinculacion;
+                            $pedidos[$pedidokey]["items"][$keyitem]["modificable"] = $showvinculacion?false:true;
                         }
                         //$pedidos[$pedidokey];
                     }
