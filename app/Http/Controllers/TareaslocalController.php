@@ -25,8 +25,8 @@ class TareaslocalController extends Controller
 
     public function getTareasLocal(Request $req)
     {
-        $fecha = $req->fecha;
-        return tareaslocal::with("usuario")->where("created_at","LIKE",$fecha."%")->orderBy("estado","asc")->get();
+        $fecha = $req->fecha?$req->fecha:(new PedidosController)->today();
+        return tareaslocal::with("usuario")->where("created_at","LIKE",$fecha."%")->orderBy("estado","asc")->orderBy("created_at","desc")->get();
     }
     
     public function checkIsResolveTarea($arr)

@@ -107,7 +107,9 @@ usuariosData,
 					<div className="input-group cell3">
 	      		<div className="btn-group">
 	      			<button onClick={()=>setshowMisPedido(true)} className={("btn btn-sm btn-outline-")+(!showMisPedido?null:"success")}>Mis pedidos</button>
-	      			<button onClick={()=>setshowMisPedido(false)} className={("btn btn-sm btn-outline-")+(showMisPedido?null:"success")}>Todos los pedidos</button>
+					{auth(1)?
+	      				<button onClick={()=>setshowMisPedido(false)} className={("btn btn-sm btn-outline-")+(showMisPedido?null:"success")}>Todos los pedidos</button>
+					:null}
 	      		</div>
 	      	</div>
 					<div className="cell4">

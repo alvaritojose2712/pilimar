@@ -238,7 +238,7 @@ class PedidosController extends Controller
     {
         
 
-        $arr = $this->cerrarFun($fechaventas,0,0,0,[],true,false,false);
+        $arr = $this->cerrarFun($fechaventas,0,0,0,[],true, ( session("tipo_usuario")==1? true: false )  ,false);
 
         
 
