@@ -436,9 +436,9 @@ class PedidosController extends Controller
         return [
             "fact"=>$fact, 
             "prod"=>$prod,
-            "subtotal"=>number_format($subtotal,2,".",","), 
+            "subtotal"=>toLetras(number_format($subtotal,2,".",",")), 
             "desctotal"=>$desctotal, 
-            "totaltotal"=>number_format($totaltotal,2,".",","),
+            "totaltotal"=>toLetras(number_format($totaltotal,2,".",",")),
             "itemstotal"=>$itemstotal,
             "totalventas"=>$totalventas,
         ];
