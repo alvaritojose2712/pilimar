@@ -138,7 +138,7 @@ class PedidosController extends Controller
         $fechafixedsql = cierres::orderBy("fecha","desc")->first();
         
         
-        if ($fechafixedsql->fecha) {
+        if ($fechafixedsql) {
             $Date1 = $fechafixedsql->fecha;
             $fechafixedsqlmas5 = date('Y-m-d', strtotime($Date1 . " + 3 day"));
 

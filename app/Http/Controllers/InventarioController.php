@@ -276,6 +276,10 @@ class InventarioController extends Controller
 
                     $setprecio = $setcantidad*$precio;
                 }else{
+                    if ($cantidad=="1000000") { //codigo para sumar de uno en uno
+                        $setcantidad = 1; //Sumar cantidad a lo que ya existe en carrito
+                    }
+
                     $setprecio = $setcantidad*$precio;
                 }
 
