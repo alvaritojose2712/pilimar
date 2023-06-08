@@ -46,7 +46,7 @@ Route::get('/update', function () {
 });
 Route::get('/backup', function () {
     \Illuminate\Support\Facades\Artisan::call('database:backup');
-    return 'Successful backup!';
+    return 'Respaldo Exitoso!';
 });
 Route::get('error', function (){
 	return view("layouts.error");
