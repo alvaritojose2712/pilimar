@@ -450,6 +450,7 @@ class PedidosController extends Controller
     }
     public function pedidoAuth($id,$tipo="pedido")
     {
+        $today = $this->today();
 
         if ($id===null) {
             $fecha_creada = $tipo;
@@ -464,13 +465,15 @@ class PedidosController extends Controller
             $last_cierre = cierres::orderBy("fecha","desc")->first();
 
         }
-
+        //si el pedido no es de hoy, no se puede hacer nada
+        if ($fecha_creada != $today) {
+            return false;
+        }
        //Si no se ha pagado
        //si la fecha de entrada no existe en los cierres
        //si la fecha del ultimo cierre es igual la fecha de entrada
     
-       $today = $this->today();
-       if ((!$estado AND $today===$fecha_creada) || !cierres::where("fecha",$fecha_creada)->get()->count() || $fecha_creada == $today) {
+       if ((!$estado AND $today===$fecha_creada) || !cierres::where("fecha",$fecha_creada)->get()->count()) {
         return true;   
        }else{
         return false;   
@@ -498,6 +501,9 @@ class PedidosController extends Controller
     {
         $pedidomodify = $tipo=="pedido"? pedidos::find($id): pedidos::find(items_pedidos::find($id)->id_pedido);
         return $pedidomodify->estado;
+    }
+    function delpedidoForce(Request $req) {
+        $this->delPedidoFun($req->id, $req->motivo);
     }
     public function delpedido(Request $req)
     {
@@ -533,44 +539,7 @@ class PedidosController extends Controller
 
             $this->checkPedidoAuth($id);
             if ($id) {
-                $mov = new movimientos;
-                $mov->id_usuario = session("id_usuario");
-
-               $items = items_pedidos::where("id_pedido",$id)->get();
-               $monto_pedido = pago_pedidos::where("id_pedido",$id)->where("monto","<>",0)->get();
-               $monto = 0;
-               $pagos = "";
-               foreach ($monto_pedido as $k => $v) {
-                   $monto += $v->monto;
-                   if($v->tipo==1){$pagos .= "Transferencia ";} 
-                   if($v->tipo==2){$pagos .= "Debito ";}  
-                   if($v->tipo==3){$pagos .= "Efectivo ";}  
-                   if($v->tipo==4){$pagos .= "Credito ";}   
-                   if($v->tipo==5){$pagos .= "Biopago ";} 
-                   if($v->tipo==6){$pagos .= "vuelto ";} 
-               }
-                
-                $mov->tipo = "Eliminación de Pedido #".$id; 
-                $mov->motivo = $motivo; 
-                $mov->tipo_pago = $pagos; 
-                $mov->monto = $monto;
-                $mov->save();
-
-
-                foreach ($items as $key => $value) {
-                   (new InventarioController)->hacer_pedido($value->id,null,99,"del");
-                   
-
-                   $items_mov = new items_movimiento;
-                   $items_mov->id_producto = $value->id_producto;
-                   $items_mov->cantidad = $value->cantidad;
-                   $items_mov->tipo = 2;
-                   $items_mov->categoria = "Eliminación de pedido - Item";
-                   $items_mov->id_movimiento = $mov->id;
-                   $items_mov->save();
-
-                }
-                pedidos::find($id)->delete();
+                $this->delPedidoFun($id, $motivo);
             }
             return Response::json(["msj"=>"Éxito al eliminar. Pedido #".$id,"estado"=>true]);
             
@@ -578,6 +547,46 @@ class PedidosController extends Controller
             return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
             
         }
+    }
+    public function delPedidoFun($id, $motivo) {
+        $mov = new movimientos;
+        $mov->id_usuario = session("id_usuario");
+
+        $items = items_pedidos::where("id_pedido",$id)->get();
+        $monto_pedido = pago_pedidos::where("id_pedido",$id)->where("monto","<>",0)->get();
+        $monto = 0;
+        $pagos = "";
+        foreach ($monto_pedido as $k => $v) {
+            $monto += $v->monto;
+            if($v->tipo==1){$pagos .= "Transferencia ";} 
+            if($v->tipo==2){$pagos .= "Debito ";}  
+            if($v->tipo==3){$pagos .= "Efectivo ";}  
+            if($v->tipo==4){$pagos .= "Credito ";}   
+            if($v->tipo==5){$pagos .= "Biopago ";} 
+            if($v->tipo==6){$pagos .= "vuelto ";} 
+        }
+        
+        $mov->tipo = "Eliminación de Pedido #".$id; 
+        $mov->motivo = $motivo; 
+        $mov->tipo_pago = $pagos; 
+        $mov->monto = $monto;
+        $mov->save();
+
+
+        foreach ($items as $key => $value) {
+            (new InventarioController)->hacer_pedido($value->id,null,99,"del");
+            
+
+            $items_mov = new items_movimiento;
+            $items_mov->id_producto = $value->id_producto;
+            $items_mov->cantidad = $value->cantidad;
+            $items_mov->tipo = 2;
+            $items_mov->categoria = "Eliminación de pedido - Item";
+            $items_mov->id_movimiento = $mov->id;
+            $items_mov->save();
+
+        }
+        pedidos::find($id)->delete();
     }
     public function getPedidoFun($id_pedido,$filterMetodoPagoToggle="todos",$cop=1,$bs=1,$factor=1,$clean=false)
     {

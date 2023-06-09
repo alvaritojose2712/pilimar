@@ -1304,6 +1304,8 @@ export default function Facturar({ user, notificar, setLoading }) {
             }
         },
         {
+            keydown:false,
+            keyup:true,
             filterPreventDefault: false,
             enableOnTags: ["INPUT", "SELECT", "TEXTAREA"],
         },

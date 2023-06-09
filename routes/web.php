@@ -142,6 +142,8 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('getUsuarios', [UsuariosController::class,"getUsuarios"]);
 		
 		Route::post('getinventario', [InventarioController::class,"index"]);
+		Route::post('delpedido', [PedidosController::class,"delpedido"]);
+
 		
 		
 	});
@@ -151,6 +153,9 @@ Route::group(['middleware' => ['login']], function () {
 	});
 	
 	Route::group(['middleware' => ['admin']], function () {
+		Route::get('delpedidoforce', [PedidosController::class,"delpedidoForce"]);
+
+
 		Route::get('getTareasLocal', [TareaslocalController::class,"getTareasLocal"]);
 		Route::get('resolverTareaLocal', [TareaslocalController::class,"resolverTareaLocal"]);
 		
@@ -228,7 +233,6 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('printPrecios', [tickera::class,"precio"]);
 		
 		
-		Route::post('delpedido', [PedidosController::class,"delpedido"]);
 		Route::post('delMov', [MovimientosController::class,"delMov"]);
 		
 	//Central
