@@ -797,14 +797,14 @@ class InventarioController extends Controller
               //Next pedido num
                 $nuevo_pedido_num = $new_pedido->id;
 
-                /* pago_pedidos::insert([
+                pago_pedidos::insert([
                     ["tipo"=>1,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>2,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>3,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>4,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>5,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
                     ["tipo"=>6,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
-                ]); */
+                ]);
 
                 // 1 Transferencia
                // 2 Debito 
