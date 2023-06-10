@@ -1304,8 +1304,8 @@ export default function Facturar({ user, notificar, setLoading }) {
             }
         },
         {
-            keydown:false,
-            keyup:true,
+            keydown:true,
+            keyup:false,
             filterPreventDefault: false,
             enableOnTags: ["INPUT", "SELECT", "TEXTAREA"],
         },
@@ -2164,9 +2164,21 @@ export default function Facturar({ user, notificar, setLoading }) {
     const toggleImprimirTicket = (id_fake = null) => {
         if (pedidoData) {
             let printer = 0;
+            let printdefault = 1
+            if (user.usuario) {
+                let lastchar = user.usuario.slice(-1)
+                if (
+                    lastchar==1 ||
+                    lastchar==2 ||
+                    lastchar==3 ||
+                    lastchar==4
+                ) {
+                    printdefault = lastchar
+                }
+            }
             if (!selectprinter) {
                 printer = parseInt(
-                    window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4", 1)
+                    window.prompt("Número de impresora donde desea imprimir (La que seleccione se guardará por ésta sesión). 1 | 2 | 3 | 4", printdefault)
                 );
             }
 

@@ -149,6 +149,6 @@ class HomeController extends Controller
 
     public function closeAllSession(Request $request)
     {
-        Session::flush();
+        //Session::flush();
     }
 }

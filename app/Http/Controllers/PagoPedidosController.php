@@ -96,7 +96,6 @@ class PagoPedidosController extends Controller
     }
     public function setPagoPedido(Request $req)
     {   
-        (new PedidosController)->checkLastPedido($req->id);
         $ped = (new PedidosController)->getPedido($req);
 
         $total_real = $ped->clean_total;
@@ -144,6 +143,8 @@ class PagoPedidosController extends Controller
                // 5 Biopago
                // 6 vuelto
             try {
+                (new PedidosController)->checkLastPedido($req->id);
+
                 (new PedidosController)->checkPedidoAuth($req->id);
                 
                 
@@ -156,12 +157,6 @@ class PagoPedidosController extends Controller
                 }else{
                     //No es abono
                 }
-                /* pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>1],["cuenta"=>$cuenta,"monto"=>floatval($req->transferencia)]);
-                pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>2],["cuenta"=>$cuenta,"monto"=>floatval($req->debito)]);
-                pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>3],["cuenta"=>$cuenta,"monto"=>floatval($req->efectivo)]);
-                pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>4],["cuenta"=>$cuenta,"monto"=>floatval($req->credito)]);
-                pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>5],["cuenta"=>$cuenta,"monto"=>floatval($req->biopago)]);
-                pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>6],["cuenta"=>$cuenta,"monto"=>floatval($req->vuelto)]); */
                 pago_pedidos::where("id_pedido",$req->id)->delete();
                 if($req->transferencia) {pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>1],["cuenta"=>$cuenta,"monto"=>floatval($req->transferencia)]);}
                 if($req->debito) {pago_pedidos::updateOrCreate(["id_pedido"=>$req->id,"tipo"=>2],["cuenta"=>$cuenta,"monto"=>floatval($req->debito)]);}

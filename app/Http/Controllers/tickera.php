@@ -236,6 +236,7 @@ class tickera extends Controller
                     $printer -> text("\n");
                     $printer->text((!$pedido->ticked?"ORIGINAL: ":"COPIA: ")."NOTA DE ENTREGA #".$pedido->id);
                     $printer->setEmphasis(false);
+
     
                     $printer -> text("\n");
     
@@ -328,8 +329,11 @@ class tickera extends Controller
                     $printer->text("\n");
                     $printer->text("\n");
                     $printer->setJustification(Printer::JUSTIFY_CENTER);
-    
+                    
                     $printer->text("Creado: ".$pedido->created_at);
+                    $printer->text("\n");
+                    $printer->text("Por: ".session("usuario"));
+                    
                     
                     $printer->text("\n");
                     $printer->text("*ESTE RECIBO NO TIENE NINGUN");

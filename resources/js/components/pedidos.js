@@ -205,7 +205,7 @@ usuariosData,
 														onChange={e => setusuarioChangeUserPedidoHandle((e.target.value))}
 													>
 														<option value="">--Seleccione Usuario--</option>
-														{usuariosData.length?usuariosData.map(e => <option value={e.id} key={e.id}>{e.usuario}</option>):null}
+														{usuariosData.length?usuariosData.map(e => <option value={e.id} key={e.id}>{e.id} - {e.usuario}</option>):null}
 														
 													</select>
 												</div>

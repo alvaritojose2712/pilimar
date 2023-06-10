@@ -5,9 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\cierres;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class CierresController extends Controller
 {
+    function getLastCierre() {
+        $seconds = 3600;
+        
+        if (Cache::has('lastcierres')) {
+            return Cache::get('lastcierres');
+        }else{
+            return Cache::remember('lastcierres', $seconds, function () {
+                return cierres::orderBy("fecha","desc")->first();
+            });
+        }
+    }
     public function getStatusCierre(Request $req)
     {
         $today = (new PedidosController)->today();

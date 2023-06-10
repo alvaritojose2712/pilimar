@@ -177,6 +177,12 @@ const changeRecibido = (val,type) => {
   }
 
 }
+const setPagoInBs = callback => {
+  let bs = parseFloat(window.prompt("Monto Bs"))
+  if (bs) {
+    callback((bs/dolar).toFixed(2))
+  }
+}
 const sumRecibido = () => {
   let vuel_dolar = parseFloat(recibido_dolar?recibido_dolar:0)
   let vuel_bs = parseFloat(recibido_bs?recibido_bs:0) / parseFloat(dolar)
@@ -473,8 +479,8 @@ const syncPago = (val,type)=>{
                 clienteInpdireccion={clienteInpdireccion}
                 setclienteInpdireccion={setclienteInpdireccion}
               />}
-              <div className={(estado?"bg-success-light":"bg-sinapsis")+(" d-flex justify-content-between p-2 rounded")}>
-                <span className='h4'>Pedido #{id}</span>
+              <div className={(estado?"bg-success-light":"bg-sinapsis")+(" d-flex justify-content-between p-1 rounded")}>
+                <span className='fs-5'>Pedido #{id}</span>
                 <span className='pull-right'>{created_at}</span>
               </div>
               <table className="table table-striped text-center">
@@ -483,9 +489,9 @@ const syncPago = (val,type)=>{
                     <tr>
                         <td colSpan={auth(1)?"9":"8"} className='p-0 pt-1'>
                           <div className="input-group">
-                            <input type="text" ref={refaddfast} className="fs-2 form-control form-control-lg" placeholder="Auto agregar...(F1) y (F1)"/>
+                            <input type="text" ref={refaddfast} className="form-control" placeholder="Auto agregar...(F1) y (F1)"/>
                               <div className="input-group-append">
-                                <button className="btn text-white btn-sinapsis h-100 fs-2" onClick={toggleModalProductos}><i className="fa fa-plus"></i></button>
+                                <button className="btn text-white btn-sinapsis" onClick={toggleModalProductos}><i className="fa fa-plus"></i></button>
                               </div>
                           </div>
                         </td>
@@ -562,7 +568,7 @@ const syncPago = (val,type)=>{
           
             
             <div className="col-5">
-              <div className="mb-1 container-fluid pt-2">
+              <div className="mb-1 container-fluid pt-1">
                 <div className="row">
                   <div className="col p-0">
                     <div className="container-fluid p-0">
@@ -573,19 +579,32 @@ const syncPago = (val,type)=>{
                             {editable?
                             <div className={(debito!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card w125px")}>
                                 <div className="card-body">
-                                <div className="card-title pointer" onClick={getDebito}>Déb.</div>
-                                <div className="card-text pago-numero"><input type="text" value={debito} onChange={(e)=>syncPago(e.target.value,"Debito")} placeholder="D"/></div>
-                                <small className="text-muted fs-4">{debitoBs("debito")}</small>
-                                <span className='ref pointer' data-type="toggle" onClick={()=>addRefPago("toggle")}>Ref. <i className="fa fa-plus"></i></span>
+                                  <div className="card-title pointer" onClick={getDebito}>Déb. </div> 
+                                  
+
+                                  <div className="card-text pago-numero">
+                                    <div className="input-group">
+                                      <input type="text" className='form-control' value={debito} onChange={(e)=>syncPago(e.target.value,"Debito")} placeholder="D"/>
+                                      <div className="input-group-prepend">
+                                          <span className="input-group-text pointer" onClick={()=>setPagoInBs(val=>{
+                                            syncPago(val,"Debito")
+                                          })}>Bs</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <small className="text-muted fs-4">{debitoBs("debito")}</small>
+                                  <span className='ref pointer' data-type="toggle" onClick={()=>addRefPago("toggle")}>Ref. <i className="fa fa-plus"></i></span>
+                                  
+                                  
                                 </div>
                             </div>
                             :
                             <div className={(debito!=""?"bg-success-light card-sinapsis":"t-5")+(" card w125px")}>
-                            <div className="card-body">
-                                <div className="card-title pointer">Déb.</div>
-                                <div className="card-text pago-numero">{debito}</div>
-                                
-                            </div>
+                              <div className="card-body">
+                                  <div className="card-title pointer">Déb.</div>
+                                  <div className="card-text pago-numero">{debito}</div>
+                                  
+                              </div>
                             </div>
                             }
                             
@@ -596,9 +615,17 @@ const syncPago = (val,type)=>{
                             <div className={(efectivo!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card w125px")}>
                             <div className="card-body">
                                 <div className="card-title pointer" onClick={getEfectivo}>Efec.</div>
-                                <div className="card-text pago-numero"><input type="text" value={efectivo} onChange={(e)=>syncPago(e.target.value,"Efectivo")} placeholder="E"/></div>
+                                <div className="card-text pago-numero">
+                                  <div className="input-group">
+                                    <input type="text" className='form-control' value={efectivo} onChange={(e)=>syncPago(e.target.value,"Efectivo")} placeholder="E"/>
+                                    <div className="input-group-prepend">
+                                        <span className="input-group-text pointer" onClick={()=>setPagoInBs(val=>{
+                                          syncPago(val,"Efectivo")
+                                        })}>Bs</span>
+                                    </div>
+                                  </div>
+                                </div>
                                 <small className="text-muted fs-4">{debitoBs("efectivo")}</small>
-            
                             </div>
                             </div>
                             :
@@ -619,9 +646,20 @@ const syncPago = (val,type)=>{
                             <div className={(transferencia!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card w125px")}>
                             <div className="card-body">
                                 <div className="card-title pointer" onClick={getTransferencia}>Tran.</div>
-                                <div className="card-text pago-numero"><input type="text" value={transferencia} onChange={(e)=>syncPago(e.target.value,"Transferencia")} placeholder="T"/></div>
+                                <div className="card-text pago-numero">
+                                  <div className="input-group">
+                                    <input type="text" className='form-control' value={transferencia} onChange={(e)=>syncPago(e.target.value,"Transferencia")} placeholder="T"/>
+                                    <div className="input-group-prepend">
+                                        <span className="input-group-text pointer" onClick={()=>setPagoInBs(val=>{
+                                          syncPago(val,"Transferencia")
+                                        })}>Bs</span>
+                                    </div>
+                                  </div>
+                                </div>
                                 <small className="text-muted fs-4">{debitoBs("transferencia")}</small>
                                 <span className='ref pointer' data-type="toggle" onClick={()=>addRefPago("toggle",transferencia,"1")}>Ref. <i className="fa fa-plus"></i></span>
+                                
+
                             </div>
                             </div>
             
@@ -642,10 +680,20 @@ const syncPago = (val,type)=>{
                             
                             <div className={(biopago!=""?"bg-success-light card-sinapsis addref":"t-5")+(" card w125px")}>
                                 <div className="card-body">
-                                <div className="card-title pointer" onClick={getBio}>Biopago</div>
-                                <div className="card-text pago-numero"><input type="text" value={biopago} onChange={(e)=>syncPago(e.target.value,"Biopago")} placeholder="B"/></div>
-                                <small className="text-muted fs-4">{debitoBs("biopago")}</small>
-                                <span className='ref pointer' data-type="toggle" onClick={()=>addRefPago("toggle",biopago,"5")}>Ref. <i className="fa fa-plus"></i></span>
+                                  <div className="card-title pointer" onClick={getBio}>Biopago</div>
+                                  <div className="card-text pago-numero">
+                                    <div className="input-group">
+                                      <input type="text" className='form-control' value={biopago} onChange={(e)=>syncPago(e.target.value,"Biopago")} placeholder="B"/>
+                                      <div className="input-group-prepend">
+                                        <span className="input-group-text pointer" onClick={()=>setPagoInBs(val=>{
+                                          syncPago(val,"Biopago")
+                                        })}>Bs</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <small className="text-muted fs-4">{debitoBs("biopago")}</small>
+                                  <span className='ref pointer' data-type="toggle" onClick={()=>addRefPago("toggle",biopago,"5")}>Ref. <i className="fa fa-plus"></i></span>
+                                  
                                 </div>
                             </div>
             

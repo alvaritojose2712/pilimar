@@ -5,26 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\pedidos;
 use App\Models\inventario;
 use App\Models\items_pedidos;
-use App\Models\moneda;
-use App\Models\pago_pedidos;
 use App\Models\factura;
 use App\Models\items_factura;
 use App\Models\fallas;
 use App\Models\proveedores;
-use App\Models\lotes;
 use App\Models\sucursal;
 use App\Models\categorias;
 use App\Models\clientes;
-use App\Models\movimientosInventario;
+use App\Models\cierres;
 
 
 use App\Models\movimientos;
 use App\Models\items_movimiento;
 
-
 use DB;
-
-            
 
 
 use Illuminate\Http\Request;
@@ -772,6 +766,13 @@ class InventarioController extends Controller
             if (!$usuario) {
                 return Response::json(["msj"=>"Debe iniciar Sesión", "estado"=>false,"num_pedido"=>0,"type"=>""]);
             }
+            $today = (new PedidosController)->today();
+            $fechaultimocierre = (new CierresController)->getLastCierre();
+            if ($fechaultimocierre) {
+                if($fechaultimocierre->fecha == $today){
+                    return Response::json(["msj"=>"¡Imposible hacer pedidos! Cierre procesado", "estado"=>false,"num_pedido"=>0,"type"=>""]);
+                }
+            }
             // $producto = inventario::select(["descripcion"])->find($id_producto);
 
             
@@ -796,15 +797,6 @@ class InventarioController extends Controller
 
               //Next pedido num
                 $nuevo_pedido_num = $new_pedido->id;
-
-                /* pago_pedidos::insert([
-                    ["tipo"=>1,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
-                    ["tipo"=>2,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
-                    ["tipo"=>3,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
-                    ["tipo"=>4,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
-                    ["tipo"=>5,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
-                    ["tipo"=>6,"monto"=>0,"id_pedido"=>$nuevo_pedido_num],
-                ]); */
 
                 // 1 Transferencia
                // 2 Debito 

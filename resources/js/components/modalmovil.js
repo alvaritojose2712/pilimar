@@ -9,7 +9,8 @@ export default function Modalmovil({
     productos,
     linkproductocentralsucursal,
     inputbuscarcentralforvincular,
-    modalmovilRef
+    modalmovilRef,
+    margin=42
 }) {
     useEffect(()=>{
         
@@ -26,7 +27,7 @@ export default function Modalmovil({
 
     },[y])
     return (
-        <div className="modalmovil" style={{top:y+110,left:x}} ref={modalmovilRef} onMouseLeave={()=>setmodalmovilshow(false)}>
+        <div className="modalmovil" style={{top:y+margin,left:x}} ref={modalmovilRef} onMouseLeave={()=>setmodalmovilshow(false)}>
             <div className="input-group">
                 <input type="text" className="form-control" placeholder="Buscar en Local..." ref={inputbuscarcentralforvincular}  onChange={e=>getProductos(e.target.value)}/>
                 

@@ -135,13 +135,11 @@ class PedidosController extends Controller
         date_default_timezone_set("America/Caracas"); 
         $today = date("Y-m-d");
         
-        $fechafixedsql = cierres::orderBy("fecha","desc")->first();
-        
-        
+        $fechafixedsql = (new CierresController)->getLastCierre();
+
         if ($fechafixedsql) {
             $Date1 = $fechafixedsql->fecha;
             $fechafixedsqlmas5 = date('Y-m-d', strtotime($Date1 . " + 3 day"));
-
 
             if (($today < $fechafixedsql->fecha) OR ($today > $fechafixedsqlmas5) ) {
                 throw new \Exception("Fecha incorrecta", 1);
@@ -152,16 +150,7 @@ class PedidosController extends Controller
             return $today; 
         }
         
-        
-        /* if (isset($_COOKIE["today"])) {
-            return $_COOKIE["today"];
-        }else{
-            
-            $fechafixed = $fechafixedsql->fecha? $fechafixedsql->fecha: $today;
-    
-            setcookie("today", $fechafixed, time() + 21600);
-            return $fechafixed;
-        } */
+
     } 
     public function sumpedidos(Request $req)
     {
@@ -841,7 +830,6 @@ class PedidosController extends Controller
     }
     public function checkLastPedido($id_pedido)
     {
-        return $id_pedido;
         $today = $this->today();
         $fecha_str = strtotime(pedidos::find($id_pedido)->created_at);
         $fecha_pedido = date("Y-m-d",$fecha_str);
@@ -1306,7 +1294,7 @@ class PedidosController extends Controller
             $id_usuario = session("id_usuario");
             if ($check===null || $fecha_ultimo_cierre==$today) {
                 if ($req->total_biopago || $req->total_punto || $req->efectivo || $req->transferencia) {
-                    
+                    Cache::forget('lastcierres');
                     if ($req->tipo_accionCierre=="guardar") {
                         $objcierres = new cierres;
                         

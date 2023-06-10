@@ -58,6 +58,7 @@ export default function PedidosCentralComponent({
 
 			{modalmovilshow ? (
                 <Modalmovil
+					margin={100}
                     modalmovilRef={modalmovilRef}
                     x={modalmovilx}
                     y={modalmovily}
@@ -310,13 +311,13 @@ export default function PedidosCentralComponent({
 																					className={(idselectproductoinsucursalforvicular.index==i?"btn-danger":"btn-outline-danger")+(" btn fs-10px btn-sm")}
 																					onClick={(event)=>openVincularSucursalwithCentral(event,{id: e.producto.id ? e.producto.id: null , index: i,})}
 																				>
-																					No
+																					<i className="fa fa-times"></i>
 																					
 																				</button>
 																			:
 																				e.modificable?
 																					<button
-																						className={(idselectproductoinsucursalforvicular.index==i?"btn-warning":"btn-outline-warning")+(" btn fs-10px btn-sm")}
+																						className={(idselectproductoinsucursalforvicular.index==i?"btn-warning":"btn-warning")+(" btn fs-10px btn-sm")}
 																						onClick={(event)=>openVincularSucursalwithCentral(event,{id: e.producto.id ? e.producto.id: null , index: i,})}
 																					>
 																						<i className="fa fa-link"></i>
