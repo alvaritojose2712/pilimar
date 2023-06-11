@@ -143,7 +143,6 @@ class PagoPedidosController extends Controller
                // 5 Biopago
                // 6 vuelto
             try {
-                (new PedidosController)->checkLastPedido($req->id);
 
                 (new PedidosController)->checkPedidoAuth($req->id);
                 

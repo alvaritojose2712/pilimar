@@ -232,8 +232,6 @@ class InventarioController extends Controller
     public function hacer_pedido($id,$id_pedido,$cantidad,$type,$lote=null)
     {   
         try {
-            (new PedidosController)->checkLastPedido($id_pedido);
-
             if ($cantidad<0) {
                 exit;
             }
@@ -762,13 +760,15 @@ class InventarioController extends Controller
             $cantidad = $cantidad==""?1:$cantidad;
 
             $usuario = session()->has("id_usuario")? session("id_usuario"): $req->usuario;
+            $iscentral = session("iscentral");
+            
 
             if (!$usuario) {
                 return Response::json(["msj"=>"Debe iniciar Sesión", "estado"=>false,"num_pedido"=>0,"type"=>""]);
             }
             $today = (new PedidosController)->today();
             $fechaultimocierre = (new CierresController)->getLastCierre();
-            if ($fechaultimocierre) {
+            if ($fechaultimocierre && $iscentral==0) {
                 if($fechaultimocierre->fecha == $today){
                     return Response::json(["msj"=>"¡Imposible hacer pedidos! Cierre procesado", "estado"=>false,"num_pedido"=>0,"type"=>""]);
                 }

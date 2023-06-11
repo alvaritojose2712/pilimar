@@ -447,12 +447,9 @@ class PedidosController extends Controller
         }else{
 
             $pedido = $tipo=="pedido"? pedidos::select(["estado","created_at"])->find($id): pedidos::select(["estado","created_at"])->find(items_pedidos::find($id)->id_pedido);
-            
             $fecha_creada = date("Y-m-d",strtotime($pedido->created_at));
            
             $estado = $pedido->estado;
-            $last_cierre = cierres::orderBy("fecha","desc")->first();
-
         }
         //si el pedido no es de hoy, no se puede hacer nada
         if ($fecha_creada != $today) {
@@ -828,15 +825,7 @@ class PedidosController extends Controller
             return [session("id_usuario")];
         } 
     }
-    public function checkLastPedido($id_pedido)
-    {
-        $today = $this->today();
-        $fecha_str = strtotime(pedidos::find($id_pedido)->created_at);
-        $fecha_pedido = date("Y-m-d",$fecha_str);
-        if ($today!==$fecha_pedido) {
-            throw new \Exception("¡No puede agregar productos a este pedido!", 1);
-        }
-    }
+    
     public function cerrarFun($fecha,$total_caja_neto,$total_punto,$total_biopago,$dejar=[],$grafica=false,$totalizarcierre=false,$check_pendiente=true)
     {   
         if (!$fecha) {return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);}

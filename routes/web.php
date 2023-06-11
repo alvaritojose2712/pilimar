@@ -68,6 +68,10 @@ Route::post('getMoneda', [MonedaController::class,"getMoneda"]);
 Route::post('today', [PedidosController::class,"today"]);
 Route::get('today', [PedidosController::class,"today"]);
 
+//Fuera de los middlewares debido a que es la ruta mas solicitadad de la app. Mejora el rendimiento al hacer menos calculos
+Route::post('getinventario', [InventarioController::class,"index"]);
+
+
 Route::group(['middleware' => ['login']], function () {
 	
 	Route::group(['middleware' => ['caja']], function () {
@@ -141,7 +145,6 @@ Route::group(['middleware' => ['login']], function () {
 		Route::post('changepedidouser', [PedidosController::class,"changepedidouser"]);
 		Route::get('getUsuarios', [UsuariosController::class,"getUsuarios"]);
 		
-		Route::post('getinventario', [InventarioController::class,"index"]);
 		Route::post('delpedido', [PedidosController::class,"delpedido"]);
 
 		

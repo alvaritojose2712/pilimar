@@ -115,7 +115,6 @@ class ItemsPedidosController extends Controller
         try {
 
             $item = items_pedidos::find($req->index);
-            (new PedidosController)->checkLastPedido($item->id_pedido);
 
             $descuento = floatval($req->descuento);
             $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
@@ -169,7 +168,6 @@ class ItemsPedidosController extends Controller
     public function setDescuentoTotal(Request $req)
     {
         try {
-            (new PedidosController)->checkLastPedido($req->index);
 
             $descuento = floatval($req->descuento);
             $isPermiso = (new TareaslocalController)->checkIsResolveTarea([

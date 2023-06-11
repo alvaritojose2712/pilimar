@@ -20,13 +20,19 @@ class TareaslocalController extends Controller
             "valoraprobado" => $arr["valoraprobado"],
             "estado" => 0,
             "descripcion"=> $arr["descripcion"],
+            "created_at"=> date("Y-m-d H:i:s"),
         ]);
     }
 
     public function getTareasLocal(Request $req)
     {
-        $fecha = $req->fecha?$req->fecha:(new PedidosController)->today();
-        return tareaslocal::with("usuario")->where("created_at","LIKE",$fecha."%")->orderBy("estado","asc")->orderBy("created_at","desc")->get();
+        $fecha = $req->fecha;
+        return tareaslocal::with("usuario")
+        ->when($fecha,function($q) use ($fecha){
+            $q->where("created_at","LIKE",$fecha."%");
+        })
+        ->orderBy("estado","asc")
+        ->orderBy("created_at","desc")->get();
     }
     
     public function checkIsResolveTarea($arr)
