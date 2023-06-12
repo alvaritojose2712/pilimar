@@ -48,6 +48,14 @@ Route::get('/backup', function () {
     \Illuminate\Support\Facades\Artisan::call('database:backup');
     return 'Respaldo Exitoso!';
 });
+
+Route::get('/backup-run', function () {
+
+    \Illuminate\Support\Facades\Artisan::call('backup:run');
+
+    return 'Copia de seguridad completada!';
+
+});
 Route::get('error', function (){
 	return view("layouts.error");
 })->name("error");

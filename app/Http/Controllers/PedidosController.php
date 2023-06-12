@@ -1589,7 +1589,8 @@ class PedidosController extends Controller
             $from = $sucursal->sucursal;
             $subject = $sucursal->sucursal." | CIERRE DIARIO | ".$fechareq;
             try {
-                \Artisan::call('database:backup');
+                \Artisan::call('database:backup'); //Hacer respaldo Local
+                \Artisan::call('backup:run'); //Enviar Respaldo
                 $gastosCentral = (new sendCentral)->setGastos();
                 $sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
                 Mail::to($this->sends())->send(new enviarCierre($arr_send,$from1,$from,$subject));    
