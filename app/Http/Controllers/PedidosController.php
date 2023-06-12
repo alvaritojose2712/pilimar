@@ -1282,7 +1282,7 @@ class PedidosController extends Controller
             
             $id_usuario = session("id_usuario");
             if ($check===null || $fecha_ultimo_cierre==$today) {
-                if ($req->total_biopago || $req->total_punto || $req->efectivo || $req->transferencia) {
+                if ($req->total_biopago && $req->total_punto && $req->efectivo && $req->transferencia) {
                     Cache::forget('lastcierres');
                     if ($req->tipo_accionCierre=="guardar") {
                         $objcierres = new cierres;
