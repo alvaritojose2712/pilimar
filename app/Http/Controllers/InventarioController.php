@@ -642,7 +642,9 @@ class InventarioController extends Controller
                     "lotes"=>function($q){
                         $q->orderBy("vence","asc");
                     },
-                ])->where(function($e) use($itemCero){
+                ])
+                ->selectRaw("*,@bs := (inventarios.precio*$bs) as bs, @cop := (inventarios.precio*$cop) as cop")
+                ->where(function($e) use($itemCero){
                     if (!$itemCero) {
                         $e->where("cantidad",">",0);
                     }
@@ -661,11 +663,10 @@ class InventarioController extends Controller
                         $q->orderBy("vence","asc");
                     },
                 ])
-                ->where(function($e) use($itemCero){
-                    if (!$itemCero) {
-                        $e->where("cantidad",">",0);
-                        // code...
-                    }
+                ->selectRaw("*,@bs := (inventarios.precio*$bs) as bs, @cop := (inventarios.precio*$cop) as cop")
+
+                ->when(!$itemCero, function($e) use($itemCero){
+                    $e->where("cantidad",">",0);
     
                 })
                 ->where(function($e) use($itemCero,$q,$exacto){
@@ -691,17 +692,6 @@ class InventarioController extends Controller
 
         }
 
-        $data->map(function($q) use ($bs,$cop)
-        {
-            $q->bs = number_format($q->precio*$bs,2,".",",");
-            $q->cop = number_format($q->precio*$cop,2,".",",");
-            $q->precio = number_format($q->precio,2,".","");
-            if ($q->precio1) {
-                $q->precio1 = number_format($q->precio1,2,".","");
-            }
-            $q->lotes_ct = $q->lotes->sum("cantidad");
-            return $q;
-        });
         return $data;
     }
     public function index(Request $req)
@@ -1184,7 +1174,7 @@ class InventarioController extends Controller
     {   
         if ($id) {
             $stockmin = 0;
-            $stockminquery = inventario::find($id);
+            $stockminquery = inventario::find($id)->get(["id","stockmin"]);
             if ($stockminquery) {
                 $stockmin = $stockminquery->stockmin?$stockminquery->stockmin:0; 
             }

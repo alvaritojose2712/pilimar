@@ -20,6 +20,8 @@ class CreateGarantiasTable extends Migration
             $table->foreign('id_producto')->references('id')->on('inventarios')->onUpdate("cascade");
             $table->decimal("cantidad",8,2);
             $table->unique("id_producto");
+            $table->text("motivo")->nullable();
+
             $table->timestamps();
         });
     }

@@ -2825,7 +2825,7 @@ export default function Facturar({ user, notificar, setLoading }) {
                 setLoading(false);
             });
         } catch (err) {
-            console.log(err);
+            alert(err);
         }
     };
     const onClickEditPedido = (e) => {
@@ -3183,23 +3183,10 @@ export default function Facturar({ user, notificar, setLoading }) {
         } else {
             setLoading(true);
 
-            db.sendCierre({ type, fecha: fechaCierre, totalizarcierre }).then(
-                (res) => {
-                    notificar(res, false);
-
-                   /*  notificar({
-                        data: {
-                            msj: "Respaldando Base de Datos",
-                            estado: true,
-                        },
-                    });
-                    setLoading(true); */
-                   /*  db.backup({}).then((res) => {
-                        notificar(res);
-                    }); */
-                    setLoading(false);
-                }
-            );
+            db.sendCierre({ type, fecha: fechaCierre, totalizarcierre }).then((res) => {
+                notificar(res, false);
+                setLoading(false);
+            });
         }
     };
     const verCierreReq = (fechaCierre, type = "ver") => {
@@ -3990,7 +3977,7 @@ export default function Facturar({ user, notificar, setLoading }) {
         });
     };
     const setSocketUrlDB = () => {
-        db.setSocketUrlDB({}).then((res) => setSocketUrl(res.data));
+       // db.setSocketUrlDB({}).then((res) => setSocketUrl(res.data));
     };
     const getPedidosCentral = () => {
         setLoading(true);

@@ -132,23 +132,34 @@ class PedidosController extends Controller
     }
     public function today()
     {
-        date_default_timezone_set("America/Caracas"); 
-        $today = date("Y-m-d");
-        
-        $fechafixedsql = (new CierresController)->getLastCierre();
 
-        if ($fechafixedsql) {
-            $Date1 = $fechafixedsql->fecha;
-            $fechafixedsqlmas5 = date('Y-m-d', strtotime($Date1 . " + 3 day"));
-
-            if (($today < $fechafixedsql->fecha) OR ($today > $fechafixedsqlmas5) ) {
-                throw new \Exception("Fecha incorrecta", 1);
+        if (!Cache::has('today'))
+        {
+            date_default_timezone_set("America/Caracas"); 
+            $today = date("Y-m-d");
+            
+            $fechafixedsql = (new CierresController)->getLastCierre();
+    
+            if ($fechafixedsql) {
+                $Date1 = $fechafixedsql->fecha;
+                $fechafixedsqlmas5 = date('Y-m-d', strtotime($Date1 . " + 3 day"));
+    
+                if (($today < $fechafixedsql->fecha) OR ($today > $fechafixedsqlmas5) ) {
+                    throw new \Exception("Fecha incorrecta", 1);
+                }else{
+                    Cache::put('today', $today, 10800);
+                    return $today;
+                }
             }else{
+                Cache::put('today', $today, 10800);
                 return $today;
             }
-        }else{
-            return $today; 
         }
+        else{
+            return Cache::get('today');
+        }
+
+
         
 
     } 
@@ -447,9 +458,13 @@ class PedidosController extends Controller
         }else{
 
             $pedido = $tipo=="pedido"? pedidos::select(["estado","created_at"])->find($id): pedidos::select(["estado","created_at"])->find(items_pedidos::find($id)->id_pedido);
-            $fecha_creada = date("Y-m-d",strtotime($pedido->created_at));
-           
-            $estado = $pedido->estado;
+            if ($pedido) {
+                $fecha_creada = date("Y-m-d",strtotime($pedido->created_at));
+               
+                $estado = $pedido->estado;
+            }else{
+                return false;
+            }
         }
         //si el pedido no es de hoy, no se puede hacer nada
         if ($fecha_creada != $today) {
@@ -458,8 +473,18 @@ class PedidosController extends Controller
        //Si no se ha pagado
        //si la fecha de entrada no existe en los cierres
        //si la fecha del ultimo cierre es igual la fecha de entrada
+
+
+        if (!Cache::has('cierreCount')){
+            $cierreCount = cierres::where("fecha",$fecha_creada)->get()->count();
+            Cache::put('cierreCount', $cierreCount, 7200);
+        }else{
+            $cierreCount = Cache::get('cierreCount');
+        }
+
+        
     
-       if ((!$estado AND $today===$fecha_creada) || !cierres::where("fecha",$fecha_creada)->get()->count()) {
+       if ((!$estado AND $today===$fecha_creada) || !$cierreCount) {
         return true;   
        }else{
         return false;   
@@ -489,6 +514,7 @@ class PedidosController extends Controller
         return $pedidomodify->estado;
     }
     function delpedidoForce(Request $req) {
+        //$this->checkPedidoAuth($req->id);
         $this->delPedidoFun($req->id, $req->motivo);
     }
     public function delpedido(Request $req)
@@ -521,7 +547,6 @@ class PedidosController extends Controller
                 }
 
             }
-
 
             $this->checkPedidoAuth($id);
             if ($id) {
@@ -1282,125 +1307,122 @@ class PedidosController extends Controller
             
             $id_usuario = session("id_usuario");
             if ($check===null || $fecha_ultimo_cierre==$today) {
-                if ($req->total_biopago && $req->total_punto && $req->efectivo && $req->transferencia) {
-                    Cache::forget('lastcierres');
-                    if ($req->tipo_accionCierre=="guardar") {
-                        $objcierres = new cierres;
-                        
-                        $objcierres->caja_biopago = floatval($req->total_biopago);
-                        $objcierres->debito = floatval($req->total_punto);
-                        $objcierres->efectivo = floatval($req->efectivo);
-                        $objcierres->transferencia = floatval($req->transferencia);
-                        $objcierres->dejar_dolar = floatval($req->dejar_usd);
-                        $objcierres->dejar_peso = floatval($req->dejar_cop);
-                        $objcierres->dejar_bss = floatval($req->dejar_bs);
+                Cache::forget('lastcierres');
+                Cache::forget('cierreCount');
+                Cache::forget('today');
+                
+                if ($req->tipo_accionCierre=="guardar") {
+                    $objcierres = new cierres;
+                    
+                    $objcierres->caja_biopago = floatval($req->total_biopago);
+                    $objcierres->debito = floatval($req->total_punto);
+                    $objcierres->efectivo = floatval($req->efectivo);
+                    $objcierres->transferencia = floatval($req->transferencia);
+                    $objcierres->dejar_dolar = floatval($req->dejar_usd);
+                    $objcierres->dejar_peso = floatval($req->dejar_cop);
+                    $objcierres->dejar_bss = floatval($req->dejar_bs);
 
-                        $objcierres->efectivo_guardado = floatval($req->guardar_usd);
-                        $objcierres->efectivo_guardado_cop = floatval($req->guardar_cop);
-                        $objcierres->efectivo_guardado_bs = floatval($req->guardar_bs);
-                        $objcierres->tasa = $bs;
-                        $objcierres->nota = $req->notaCierre;
-                        $objcierres->id_usuario = $id_usuario;
-                        $objcierres->fecha = $today;
+                    $objcierres->efectivo_guardado = floatval($req->guardar_usd);
+                    $objcierres->efectivo_guardado_cop = floatval($req->guardar_cop);
+                    $objcierres->efectivo_guardado_bs = floatval($req->guardar_bs);
+                    $objcierres->tasa = $bs;
+                    $objcierres->nota = $req->notaCierre;
+                    $objcierres->id_usuario = $id_usuario;
+                    $objcierres->fecha = $today;
 
-                        $objcierres->precio = floatval($req->precio);
-                        $objcierres->precio_base = floatval($req->precio_base);
-                        $objcierres->ganancia = floatval($req->ganancia);
-                        $objcierres->porcentaje = floatval($req->porcentaje);
-                        $objcierres->numventas = intval($req->numventas);
-                        $objcierres->desc_total = floatval($req->desc_total);
-                        
-                        $objcierres->efectivo_actual = floatval($req->caja_usd);
-                        $objcierres->efectivo_actual_cop = floatval($req->caja_cop);
-                        $objcierres->efectivo_actual_bs = floatval($req->caja_bs);
-                        $objcierres->puntodeventa_actual_bs = floatval($req->caja_punto);
-                        
-                        $objcierres->tipo_cierre = $tipo_cierre;
+                    $objcierres->precio = floatval($req->precio);
+                    $objcierres->precio_base = floatval($req->precio_base);
+                    $objcierres->ganancia = floatval($req->ganancia);
+                    $objcierres->porcentaje = floatval($req->porcentaje);
+                    $objcierres->numventas = intval($req->numventas);
+                    $objcierres->desc_total = floatval($req->desc_total);
+                    
+                    $objcierres->efectivo_actual = floatval($req->caja_usd);
+                    $objcierres->efectivo_actual_cop = floatval($req->caja_cop);
+                    $objcierres->efectivo_actual_bs = floatval($req->caja_bs);
+                    $objcierres->puntodeventa_actual_bs = floatval($req->caja_punto);
+                    
+                    $objcierres->tipo_cierre = $tipo_cierre;
 
-                        $objcierres->tasacop = $cop;
+                    $objcierres->tasacop = $cop;
 
-                        $objcierres->numreportez = $req->numreportez;
-                        $objcierres->ventaexcento = floatval($req->ventaexcento);
-                        $objcierres->ventagravadas = floatval($req->ventagravadas);
-                        $objcierres->ivaventa = floatval($req->ivaventa);
-                        $objcierres->totalventa = floatval($req->totalventa);
-                        $objcierres->ultimafactura = $req->ultimafactura;
-                        
-                        $objcierres->efecadiccajafbs = floatval($req->efecadiccajafbs);
-                        $objcierres->efecadiccajafcop = floatval($req->efecadiccajafcop);
-                        $objcierres->efecadiccajafdolar = floatval($req->efecadiccajafdolar);
-                        $objcierres->efecadiccajafeuro = floatval($req->efecadiccajafeuro);
+                    $objcierres->numreportez = $req->numreportez;
+                    $objcierres->ventaexcento = floatval($req->ventaexcento);
+                    $objcierres->ventagravadas = floatval($req->ventagravadas);
+                    $objcierres->ivaventa = floatval($req->ivaventa);
+                    $objcierres->totalventa = floatval($req->totalventa);
+                    $objcierres->ultimafactura = $req->ultimafactura;
+                    
+                    $objcierres->efecadiccajafbs = floatval($req->efecadiccajafbs);
+                    $objcierres->efecadiccajafcop = floatval($req->efecadiccajafcop);
+                    $objcierres->efecadiccajafdolar = floatval($req->efecadiccajafdolar);
+                    $objcierres->efecadiccajafeuro = floatval($req->efecadiccajafeuro);
 
-                        
-                        $objcierres->inventariobase = floatval($req->inventariobase);
-                        $objcierres->inventarioventa = floatval($req->inventarioventa);
+                    
+                    $objcierres->inventariobase = floatval($req->inventariobase);
+                    $objcierres->inventarioventa = floatval($req->inventarioventa);
 
-                        $objcierres->credito = floatval($req->credito);
-                        $objcierres->creditoporcobrartotal = floatval($req->creditoporcobrartotal);
-                        $objcierres->vueltostotales = floatval($req->vueltostotales);
-                        $objcierres->abonosdeldia = floatval($req->abonosdeldia);
-                        
-                        $objcierres->save();
+                    $objcierres->credito = floatval($req->credito);
+                    $objcierres->creditoporcobrartotal = floatval($req->creditoporcobrartotal);
+                    $objcierres->vueltostotales = floatval($req->vueltostotales);
+                    $objcierres->abonosdeldia = floatval($req->abonosdeldia);
+                    
+                    $objcierres->save();
 
-                    }else if($req->tipo_accionCierre=="editar"){
-                        
-                        cierres::updateOrCreate(
-                            ["fecha"=>$today, "id_usuario" => $id_usuario],
-                            [
-                                "caja_biopago" => floatval($req->total_biopago),
-                                "debito" => floatval($req->total_punto),
-                                "efectivo" => floatval($req->efectivo),
-                                "transferencia" => floatval($req->transferencia),
-                                "dejar_dolar" => floatval($req->dejar_usd),
-                                "dejar_peso" => floatval($req->dejar_cop),
-                                "dejar_bss" => floatval($req->dejar_bs),
-            
-                                "efectivo_guardado" => floatval($req->guardar_usd),
-                                "efectivo_guardado_cop" => floatval($req->guardar_cop),
-                                "efectivo_guardado_bs" => floatval($req->guardar_bs),
-                                "tasa" => $bs,
-                                "nota" => $req->notaCierre,
-                                "id_usuario" => $id_usuario,
-            
-                                "precio" => floatval($req->precio),
-                                "precio_base" => floatval($req->precio_base),
-                                "ganancia" => floatval($req->ganancia),
-                                "porcentaje" => floatval($req->porcentaje),
-                                "numventas" => intval($req->numventas),
-                                "desc_total" => floatval($req->desc_total),
+                }else if($req->tipo_accionCierre=="editar"){
+                    
+                    cierres::updateOrCreate(
+                        ["fecha"=>$today, "id_usuario" => $id_usuario],
+                        [
+                            "caja_biopago" => floatval($req->total_biopago),
+                            "debito" => floatval($req->total_punto),
+                            "efectivo" => floatval($req->efectivo),
+                            "transferencia" => floatval($req->transferencia),
+                            "dejar_dolar" => floatval($req->dejar_usd),
+                            "dejar_peso" => floatval($req->dejar_cop),
+                            "dejar_bss" => floatval($req->dejar_bs),
+        
+                            "efectivo_guardado" => floatval($req->guardar_usd),
+                            "efectivo_guardado_cop" => floatval($req->guardar_cop),
+                            "efectivo_guardado_bs" => floatval($req->guardar_bs),
+                            "tasa" => $bs,
+                            "nota" => $req->notaCierre,
+                            "id_usuario" => $id_usuario,
+        
+                            "precio" => floatval($req->precio),
+                            "precio_base" => floatval($req->precio_base),
+                            "ganancia" => floatval($req->ganancia),
+                            "porcentaje" => floatval($req->porcentaje),
+                            "numventas" => intval($req->numventas),
+                            "desc_total" => floatval($req->desc_total),
 
-                                "efectivo_actual" => floatval($req->caja_usd),
-                                "efectivo_actual_cop" => floatval($req->caja_cop),
-                                "efectivo_actual_bs" => floatval($req->caja_bs),
-                                "puntodeventa_actual_bs" => floatval($req->caja_punto),
+                            "efectivo_actual" => floatval($req->caja_usd),
+                            "efectivo_actual_cop" => floatval($req->caja_cop),
+                            "efectivo_actual_bs" => floatval($req->caja_bs),
+                            "puntodeventa_actual_bs" => floatval($req->caja_punto),
 
-                                "tasacop" => $cop,
-                                "inventariobase" => floatval($req->inventariobase),
-                                "inventarioventa" => floatval($req->inventarioventa),
-                                "numreportez" => $req->numreportez,
-                                "ventaexcento" => floatval($req->ventaexcento),
-                                "ventagravadas" => floatval($req->ventagravadas),
-                                "ivaventa" => floatval($req->ivaventa),
-                                "totalventa" => floatval($req->totalventa),
-                                "ultimafactura" => $req->ultimafactura,
-                                "credito" => floatval($req->credito),
-                                "creditoporcobrartotal" => floatval($req->creditoporcobrartotal),
-                                "vueltostotales" => floatval($req->vueltostotales),
-                                "abonosdeldia" => floatval($req->abonosdeldia),
-                                "efecadiccajafbs" => floatval($req->efecadiccajafbs),
-                                "efecadiccajafcop" => floatval($req->efecadiccajafcop),
-                                "efecadiccajafdolar" => floatval($req->efecadiccajafdolar),
-                                "efecadiccajafeuro" => floatval($req->efecadiccajafeuro),
-                                
-                                
-                            ]
-            
-                        );
-                    }
-
-
-                }else{
-                    throw new \Exception("Cierre sin montos.", 1);
+                            "tasacop" => $cop,
+                            "inventariobase" => floatval($req->inventariobase),
+                            "inventarioventa" => floatval($req->inventarioventa),
+                            "numreportez" => $req->numreportez,
+                            "ventaexcento" => floatval($req->ventaexcento),
+                            "ventagravadas" => floatval($req->ventagravadas),
+                            "ivaventa" => floatval($req->ivaventa),
+                            "totalventa" => floatval($req->totalventa),
+                            "ultimafactura" => $req->ultimafactura,
+                            "credito" => floatval($req->credito),
+                            "creditoporcobrartotal" => floatval($req->creditoporcobrartotal),
+                            "vueltostotales" => floatval($req->vueltostotales),
+                            "abonosdeldia" => floatval($req->abonosdeldia),
+                            "efecadiccajafbs" => floatval($req->efecadiccajafbs),
+                            "efecadiccajafcop" => floatval($req->efecadiccajafcop),
+                            "efecadiccajafdolar" => floatval($req->efecadiccajafdolar),
+                            "efecadiccajafeuro" => floatval($req->efecadiccajafeuro),
+                            
+                            
+                        ]
+        
+                    );
                 }
             }else {
                 throw new \Exception("Cierre de la fecha: ".$fecha_ultimo_cierre." procesado. No se pueden hacer cambios.", 1);
@@ -1588,14 +1610,35 @@ class PedidosController extends Controller
             $from1 = $sucursal->correo;
             $from = $sucursal->sucursal;
             $subject = $sucursal->sucursal." | CIERRE DIARIO | ".$fechareq;
+            $mensajes = "";
             try {
                 \Artisan::call('database:backup'); //Hacer respaldo Local
-                \Artisan::call('backup:run'); //Enviar Respaldo
-                $gastosCentral = (new sendCentral)->setGastos();
-                $sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
-                Mail::to($this->sends())->send(new enviarCierre($arr_send,$from1,$from,$subject));    
+                \Artisan::call('backup:run'); //Enviar Respaldo al correo
                 
-                return Response::json(["msj"=>"Cierre enviado con Éxito al correo. Envío a Central: ".$sendCierreCentral." ".$gastosCentral,"estado"=>true]);
+                $sendGastos = (new sendCentral)->sendGastos();
+                $mensajes  = "[ Envio de Gastos: $sendGastos ], ";
+                
+                $sendGarantias = (new sendCentral)->sendGarantias();
+                $mensajes .= "[ Envio de Garantias: $sendGarantias ], ";
+                
+                $sendFallas = (new sendCentral)->sendFallas(); 
+                $mensajes .= "[ Envio de Fallas: $sendFallas ], "; 
+                
+                $sendInventario = (new sendCentral)->sendInventario();
+                $mensajes .= "[ Envio de Inventario: $sendInventario ], ";
+                
+                $sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
+                $mensajes .= "[ Cierre a Central: $sendCierreCentral ], ";
+                
+                $enviarcierrecorreo = Mail::to($this->sends())->send(new enviarCierre($arr_send,$from1,$from,$subject));    
+                $mensajes .= "[ Cierre al correo: $enviarcierrecorreo ], "; 
+               
+                
+
+
+
+
+                return Response::json(["msj" => $mensajes ,"estado" => true]);
             
             } catch (\Exception $e) {
 

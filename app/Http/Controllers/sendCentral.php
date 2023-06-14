@@ -3,20 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\fallas;
 use App\Models\movimientos_caja;
 use App\Models\sucursal;
 use App\Models\moneda;
 use App\Models\factura;
 
-use App\Models\inventario;
 use App\Models\categorias;
 use App\Models\proveedores;
 use App\Models\pedidos;
-use App\Models\tareas;
-use App\Models\cierres;
-use App\Models\gastos;
 use App\Models\items_pedidos;
+use App\Models\tareas;
+
+use App\Models\cierres;
+use App\Models\inventario;
+
+use App\Models\gastos;
+use App\Models\fallas;
+use App\Models\garantia;
+
 
 
 
@@ -32,7 +36,7 @@ class sendCentral extends Controller
 
     public function path()
     {
-       // return "http://127.0.0.1:8001";
+        //return "http://127.0.0.1:8001";
         return "https://titanio.lat";
     }
 
@@ -42,7 +46,7 @@ class sendCentral extends Controller
             "omarelhenaoui@hotmail.com",           
             "yeisersalah2@gmail.com",           
             "amerelhenaoui@outlook.com",           
-            "yesers982@hotmail.com",   
+            "yesers982@hotmail.com",    
             "alvaroospino79@gmail.com"        
         ];
     }
@@ -431,43 +435,7 @@ class sendCentral extends Controller
     }
 
     
-    public function sendCierres($id)
-    {   
-        $cierre = cierres::find($id);
-
-        if ($cierre) {
-            $codigo_origen = $this->getOrigen();
     
-            try{
-                $response = Http::post($this->path() . "/setCierreFromSucursalToCentral", [
-                    "codigo_origen" => $codigo_origen,
-                    "cierre" => $cierre,
-                ]);
-    
-                if ($response->ok()) {
-                    //Retorna respuesta solo si es Array
-                    if ($response->json()) {
-                        return Response::json([
-                            "msj"=>$response->json(),
-                            "estado"=>true,
-                        ]);
-                    } else {
-                        return Response::json([
-                            "msj"=> $response->body(),
-                            "estado"=> true,
-                        ]);
-                    }
-                } else {
-                    return Response::json([
-                        "msj"=> $response->body(),
-                        "estado"=>false,
-                    ]);
-                }
-            } catch (\Exception $e) {
-                return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
-            } 
-        }
-    }
 
     public function setPedidoInCentralFromMaster($id, $type = "add")
     {
@@ -548,14 +516,52 @@ class sendCentral extends Controller
             return Response::json(["estado" => false, "msj" => "Error de sucursal: " . $e->getMessage()]);
         }
     }
-    public function setGastos()
+
+    public function sendCierres($id)
+    {   
+        $cierre = cierres::find($id);
+
+        if ($cierre) {
+            $codigo_origen = $this->getOrigen();
+    
+            try{
+                $response = Http::post($this->path() . "/setCierreFromSucursalToCentral", [
+                    "codigo_origen" => $codigo_origen,
+                    "cierre" => $cierre,
+                ]);
+    
+                if ($response->ok()) {
+                    //Retorna respuesta solo si es Array
+                    if ($response->json()) {
+                        return Response::json([
+                            "msj"=>$response->json(),
+                            "estado"=>true,
+                        ]);
+                    } else {
+                        return Response::json([
+                            "msj"=> $response->body(),
+                            "estado"=> true,
+                        ]);
+                    }
+                } else {
+                    return Response::json([
+                        "msj"=> $response->body(),
+                        "estado"=>false,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+            } 
+        }
+    }
+    public function sendGastos()
     {
         try {
             $codigo_origen = $this->getOrigen();
-            $gastos = gastos::where("created_at","LIKE",(new PedidosController)->today()."%")->get();
+            $gastos = gastos::where("push",0)->get();
 
             if ($gastos->count()) {
-                $response = Http::post($this->path() . '/setGastos', [
+                $response = Http::post($this->path() . '/sendGastos', [
                     "codigo_origen" => $codigo_origen,
                     "gastos" => $gastos
                 ]);
@@ -578,6 +584,107 @@ class sendCentral extends Controller
                         "msj"=> $response->body(),
                         "estado"=>false,
                     ]);
+                }
+            }
+
+
+        } catch (\Exception $e) {
+            return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+        } 
+    }
+
+    function sendGarantias() {
+        try {
+            $codigo_origen = $this->getOrigen();
+            $garantias = garantia::with(["producto"=>function($q){
+                $q->select(["id","id_vinculacion","cantidad"]);
+            }])->get();
+            
+            if ($garantias->count()) {
+                $response = Http::post($this->path() . '/sendGarantias', [
+                    "codigo_origen" => $codigo_origen,
+                    "garantias" => $garantias
+                ]);
+    
+                if ($response->ok()) {
+                    //Retorna respuesta solo si es Array
+                    if ($response->json()) {
+                        return $response->json();
+                    } else {
+                        return $response->body();
+                    }
+                } else {
+                    return $response->body();
+                }
+            }
+
+
+        } catch (\Exception $e) {
+            return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+        } 
+    }
+    function sendFallas() {
+       try {
+            $codigo_origen = $this->getOrigen();
+            $fallas = fallas::with(["producto"=>function($q) {
+
+                $q->select(["id","stockmin","id_vinculacion","cantidad"]);
+
+            }])->whereIn("id",function($q) {
+                $q->from("inventarios")->whereNotNull("id_vinculacion")->select("id");
+            })
+            ->get();
+
+            if ($fallas->count()) {
+                $response = Http::post($this->path() . '/sendFallas', [
+                    "codigo_origen" => $codigo_origen,
+                    "fallas" => $fallas
+                ]);
+    
+                if ($response->ok()) {
+                    //Retorna respuesta solo si es Array
+                    if ($response->json()) {
+                        return $response->json();
+                    } else {
+                        return $response->body();
+                    }
+                } else {
+                    return $response->body();
+                }
+            }
+
+
+        } catch (\Exception $e) {
+            return Response::json(["msj"=>"Error: ".$e->getMessage(),"estado"=>false]);
+        }  
+    }
+    function sendInventario($all=false) {
+        try {
+            $today = (new PedidosController)->today();
+
+            $idsdehoy = items_pedidos::where("created_at", "LIKE", $today."%")->select("id_producto");
+            
+            $codigo_origen = $this->getOrigen();
+            
+            $inventario = inventario::whereNotNull("id_vinculacion")
+            ->when(!$all, function ($q) use ($idsdehoy){
+                $q->whereIn("id", $idsdehoy);
+            })
+            ->get(["id_vinculacion","cantidad"]);
+            if ($inventario->count()) {
+                $response = Http::post($this->path() . '/sendInventarioCt', [
+                    "codigo_origen" => $codigo_origen,
+                    "inventario" => $inventario
+                ]);
+                if ($response->ok()) {
+                    //Retorna respuesta solo si es Array
+                    if ($response->json()) {
+                        return $response->json();
+                    } else {
+                        return $response->body();
+                    }
+                } else {
+                    return  $response->body();
                 }
             }
 
@@ -1017,7 +1124,7 @@ class sendCentral extends Controller
 
 
 
-    public function sendInventario()
+    /* public function sendInventario()
     {
         try {
             $inventario = InventarioController::all();
@@ -1043,7 +1150,7 @@ class sendCentral extends Controller
             return Response::json(["estado" => false, "msj" => "Error de sucursal: " . $e->getMessage()]);
 
         }
-    }
+    } */
     public function updatetasasfromCentral()
     {
         try {

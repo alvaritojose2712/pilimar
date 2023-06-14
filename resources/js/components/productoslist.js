@@ -93,14 +93,14 @@ function ProductosList({
                       <div className="col-5 m-0 p-0">
                         <div className='btn-group w-100 h-100'>
                             <button type="button" className='m-0 btn-sm btn btn-success text-light fs-4 fw-bold'>
-                            {e.precio}
+                            {moneda(e.precio)}
                             </button>
                         </div>
                       </div>
                       <div className="col m-0 p-0">
                         <div className='btn-group-vertical w-100 h-100'>
-                            <button type="button" className='m-0 btn-sm btn btn-secondary text-light fw-bold fs-6'>Bs. {e.bs} </button>
-                            <button type="button" className='m-0 btn-sm btn btn-secondary text-light fw-bold'>Cop. {e.cop}</button>
+                            <button type="button" className='m-0 btn-sm btn btn-secondary text-light fw-bold fs-6'>Bs. {moneda(e.bs)} </button>
+                            <button type="button" className='m-0 btn-sm btn btn-secondary text-light fw-bold'>Cop. {moneda(e.cop)}</button>
                         </div>
                       </div>
                       
@@ -139,11 +139,11 @@ function ProductosList({
                   </div>
                   <div className="w-50 text-right">
 
-                    <span className="h6 text-muted font-italic">Bs. {e.bs}</span>
+                    <span className="h6 text-muted font-italic">Bs. {moneda(e.bs)}</span>
                     <br/>
-                    <span className="h6 text-muted font-italic">COP. {e.cop}</span>
+                    <span className="h6 text-muted font-italic">COP. {moneda(e.cop)}</span>
                     <br/>
-                    <span className="h3 text-success">{e.precio}</span>
+                    <span className="h3 text-success">{moneda(e.precio)}</span>
                   </div>
                 </div>
               </div>

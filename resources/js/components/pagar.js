@@ -1,9 +1,8 @@
 import {useEffect,useState} from 'react';
 
-import Modaladdproductocarrito from '../components/Modaladdproductocarrito';
-import ModaladdPersona from '../components/ModaladdPersona';
-import Modalconfigcredito from '../components/Modalconfigcredito';
-
+import Modaladdproductocarrito from './Modaladdproductocarrito';
+import ModaladdPersona from './ModaladdPersona';
+import Modalconfigcredito from './Modalconfigcredito';
 
 
 
@@ -456,6 +455,8 @@ const syncPago = (val,type)=>{
                 clickSetOrderColumn={clickSetOrderColumn}
                 orderColumn={orderColumn}
                 orderBy={orderBy}
+                moneda={moneda}
+
 
 
               />}
