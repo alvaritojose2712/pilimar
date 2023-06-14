@@ -1174,7 +1174,7 @@ class InventarioController extends Controller
     {   
         if ($id) {
             $stockmin = 0;
-            $stockminquery = inventario::find($id)->get(["id","stockmin"]);
+            $stockminquery = inventario::find($id)->first(["id","stockmin"]);
             if ($stockminquery) {
                 $stockmin = $stockminquery->stockmin?$stockminquery->stockmin:0; 
             }
