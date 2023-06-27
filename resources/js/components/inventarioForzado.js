@@ -55,6 +55,11 @@ export default function InventarioForzado({
     setdatamodalhistoricoproducto,
     getmovientoinventariounitario,
     user,
+
+    selectRepleceProducto,
+    replaceProducto,
+    setreplaceProducto,
+    saveReplaceProducto,
     
 }){
     const getPorGanacia = (precio,base) => {
@@ -130,6 +135,26 @@ export default function InventarioForzado({
                 <div className="overlay"></div>
             </>}
 
+                {replaceProducto?
+                    <div className="m-2">
+                        {replaceProducto.este?
+                            <>
+                                <button className="btn btn-outline-danger" onClick={()=>setreplaceProducto({poreste: null, este: null})}>{replaceProducto.este}</button>
+                                <span className="fw-bold ms-1 me-1">></span>
+                            </> 
+                        :null}
+
+                        {replaceProducto.poreste?
+                            <>
+                                <button className="btn btn-outline-success" onClick={()=>setreplaceProducto({...replaceProducto, poreste: null})}> {replaceProducto.poreste}</button>
+                                <button className="btn btn-outline-success btn-sm ms-2" onClick={saveReplaceProducto}><i className="fa fa-paper-plane"></i></button>
+
+                            </> 
+                        :null}
+                        
+                    </div>
+                
+                :null}
             <div className="d-flex">
                 <div className="d-flex flex-fill">
                     <div className="flex-fill">                    
@@ -206,6 +231,7 @@ export default function InventarioForzado({
                         }
                     </div>
                     <div className="flex-fill">
+                        
                         <div className="input-group">
                             <select value={Invnum} onChange={e => setInvnum(e.target.value)} className="form-control">
                                 <option value="25">Num.25</option>
@@ -291,7 +317,7 @@ export default function InventarioForzado({
                         {productosInventario.length?productosInventario.map((e,i)=>
                             <tr key={i} className="pointer" onDoubleClick={() => changeInventario(null, i, e.id, "update")}>
                                 <td className="cell05">
-                                    <b>{e.id_vinculacion}</b> / {e.id}
+                                <span className="pointer" onClick={()=>selectRepleceProducto(e.id)}> <b>{e.id_vinculacion}</b> / {e.id}</span>
                                 </td>
                                 {type(e.type)?
                                 <>

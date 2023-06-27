@@ -21,6 +21,8 @@ const db = {
   closeAllSession: ()=>axios.get(host+"closeAllSession"),
   
   
+  saveReplaceProducto: data=>axios.post(host+"saveReplaceProducto",data),
+  
   guardarCierre: data=>axios.post(host+"guardarCierre",data),
 
   setMoneda: data=>axios.post(host+"setMoneda",data),

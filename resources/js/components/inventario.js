@@ -261,6 +261,12 @@ function Inventario({
   setdatamodalhistoricoproducto,
   getmovientoinventariounitario,
 
+  selectRepleceProducto,
+  replaceProducto,
+  setreplaceProducto,
+  saveReplaceProducto,
+  
+
   
 }) {
   useEffect(()=>{
@@ -559,6 +565,10 @@ function Inventario({
 
             {modViewInventario=="list"?
               <InventarioForzado
+                selectRepleceProducto={selectRepleceProducto}
+                replaceProducto={replaceProducto}
+                setreplaceProducto={setreplaceProducto}
+                saveReplaceProducto={saveReplaceProducto}
                 user={user}
                 setStockMin={setStockMin}
                 getmovientoinventariounitario={getmovientoinventariounitario}

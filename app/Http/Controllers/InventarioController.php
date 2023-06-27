@@ -961,7 +961,34 @@ class InventarioController extends Controller
 
          
     }
+    function saveReplaceProducto(Request $req) {
+        try {
+            $replaceProducto = $req->replaceProducto;
+            $este = $replaceProducto["este"];
+            $poreste = $replaceProducto["poreste"];
+    
+            $productoeste = inventario::find($este);
+            $ct = $productoeste->cantidad;
+            $id_vinculacion = $productoeste->id_vinculacion;
+    
+            $productoporeste = inventario::find($poreste);
+            $productoporeste->cantidad = $productoporeste->cantidad + ($ct);
+            $productoeste->cantidad = 0;
+            if ($id_vinculacion) {
+                $productoeste->id_vinculacion = NULL;
+                $productoporeste->id_vinculacion = $id_vinculacion;
+            }
+            
+            $productoeste->save();
+            $productoporeste->save();
+    
+            items_pedidos::where("id_producto",$este)->update(["id_producto" => $poreste]);
 
+            return Response::json(["estado" => true, "msj" => "Éxito"]);
+        } catch (\Exception $e) {
+            return Response::json(["estado" => false, "msj" => "Error: ".$e->getMessage()]);
+        }
+    }
     public function guardarProducto($arrproducto){
         try {
 

@@ -165,8 +165,8 @@ Route::group(['middleware' => ['login']], function () {
 	
 	Route::group(['middleware' => ['admin']], function () {
 		Route::get('delpedidoforce', [PedidosController::class,"delpedidoForce"]);
-
-
+		
+		
 		Route::get('getTareasLocal', [TareaslocalController::class,"getTareasLocal"]);
 		Route::get('resolverTareaLocal', [TareaslocalController::class,"resolverTareaLocal"]);
 		
@@ -174,7 +174,9 @@ Route::group(['middleware' => ['login']], function () {
 		Route::get('getmovientoinventariounitario', [MovimientosInventariounitarioController::class,"getmovientoinventariounitario"]);
 		Route::post('getSyncProductosCentralSucursal', [InventarioController::class,"getSyncProductosCentralSucursal"]);
 		
+		Route::post('saveReplaceProducto', [InventarioController::class,"saveReplaceProducto"]);
 		Route::post('guardarDeSucursalEnCentral', [InventarioController::class,"guardarDeSucursalEnCentral"]);
+		
 		
 		
 		

@@ -50,8 +50,8 @@ export default function Facturar({ user, notificar, setLoading }) {
     const [itemCero, setItemCero] = useState(true);
     const [qProductosMain, setQProductosMain] = useState("");
 
-    const [orderColumn, setOrderColumn] = useState("descripcion");
-    const [orderBy, setOrderBy] = useState("asc");
+    const [orderColumn, setOrderColumn] = useState("cantidad");
+    const [orderBy, setOrderBy] = useState("desc");
 
     const [inputaddCarritoFast, setinputaddCarritoFast] = useState("");
 
@@ -414,6 +414,27 @@ export default function Facturar({ user, notificar, setLoading }) {
         precio: "",
         cantidad: "",
     });
+
+    const [replaceProducto, setreplaceProducto] = useState({este:null, poreste:null})
+    
+    const selectRepleceProducto = (id) => {
+        if (replaceProducto.este) {
+            setreplaceProducto({...replaceProducto, poreste: id})
+        }else{
+            setreplaceProducto({...replaceProducto, este: id})
+        }
+    }
+    const saveReplaceProducto = () => {
+        db.saveReplaceProducto({
+            replaceProducto
+        }).then(({data})=>{
+            if (data.estado) {
+                buscarInventario()
+                setreplaceProducto({este:null, poreste:null})
+            }
+            notificar(data.msj)
+        })
+    }
 
 
 
@@ -4747,6 +4768,8 @@ export default function Facturar({ user, notificar, setLoading }) {
         }
     }
 
+   
+
     return (
         <>
             <Header
@@ -5342,6 +5365,10 @@ export default function Facturar({ user, notificar, setLoading }) {
 
             {view == "inventario" ? (
                 <Inventario
+                    saveReplaceProducto={saveReplaceProducto}
+                    selectRepleceProducto={selectRepleceProducto}
+                    replaceProducto={replaceProducto}
+                    setreplaceProducto={setreplaceProducto}
                     user={user}
                     setStockMin={setStockMin}
                     datamodalhistoricoproducto={datamodalhistoricoproducto}
