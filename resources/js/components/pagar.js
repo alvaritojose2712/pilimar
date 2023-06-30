@@ -735,6 +735,22 @@ const syncPago = (val,type)=>{
                         </div>
                         <div className="col p-0">
                         </div>
+                        {
+                          !editable?<div className="col p-0">
+                            <div className="card-body">
+                              <div onClick={entregarVuelto}>
+                                <div className="card-text pago-numero">                
+                                {vuelto}
+                                </div>
+                                <small className="text-success fst-italic pointer">Entregar</small><br/>
+                                {vuelto_entregado?vuelto_entregado.map(e=><div title={e.created_at} key={e.id}>
+                                Entregado = <b>{e.monto}</b>
+                                
+                                </div>):null}
+                              </div>
+                            </div>
+                          </div>:null
+                        }
                         {/* <div className="col p-0">
                             
                             <div className={(vuelto!=""?"card-danger-pago":"t-5")+(" card pointer w125px")}>
