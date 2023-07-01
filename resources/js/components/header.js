@@ -122,7 +122,7 @@ function Header({
             {auth(1)?<span className={(view=="inventario"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("inventario")}>Administración</span>:null}
             
             {
-              (auth(1) && !user.iscentral) || user.nombre ==="Alvaro Ospino" ?
+              (auth(1)) ?
                 view == "seleccionar" ?
                   <>
                     <span className={(view == "pedidosCentral" ? "btn btn-dark" : null) + (" p-3 pointer")} onClick={() => setView("pedidosCentral")}>Central</span>
