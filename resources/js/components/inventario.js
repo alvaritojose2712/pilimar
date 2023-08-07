@@ -14,6 +14,8 @@ import React, { useEffect } from 'react';
 
 
 function Inventario({
+  children,
+
   user,
   printTickedPrecio,
   setdropprintprice,
@@ -284,6 +286,10 @@ function Inventario({
         <div className="col mb-2 d-flex justify-content-between">
           <div className="btn-group">              
               <button className={("btn ")+(subViewInventario=="inventario"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewInventario("inventario")}>Inventario</button>
+              
+              {user.iscentral?
+                <button className={("btn ")+(subViewInventario=="precarga"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewInventario("precarga")}>PreCarga</button>
+              :null}
               {user.iscentral?
                 <button className={("btn ")+(subViewInventario=="proveedores"?"btn-success":"btn-outline-success")} onClick={()=>setsubViewInventario("proveedores")}>Proveedores</button>
               :null}
@@ -302,6 +308,7 @@ function Inventario({
         </div>
       </div>
       <hr/>
+      {children}
       {
         subViewInventario=="facturas"?
           <Facturas

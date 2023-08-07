@@ -1247,7 +1247,9 @@ class InventarioController extends Controller
             if($proveedor){$q->where("id_proveedor",$proveedor);}
             if($categoria){$q->where("id_categoria",$categoria);}
             if($marca){$q->where("id_marca",$marca);}
-        })->get()
+        })
+        ->orderBy("descripcion","asc")
+        ->get()
         ->map(function($q) use (&$costo,&$venta)
         {
             if (count($q->lotes)) {

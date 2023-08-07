@@ -56,8 +56,36 @@ class PedidosController extends Controller
     }
     public function changepedidouser(Request $req)
     {
+        
         $id_pedido = $req->id_pedido; 
         $id_usuario = $req->id_usuario;
+
+
+        $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+            "id_pedido" => $id_pedido,
+            "tipo" => "transferirPedido",
+        ]);
+        
+        if ((new UsuariosController)->isAdmin()) {
+
+            
+        }elseif($isPermiso["permiso"]){
+            
+        }else{
+
+            $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                "id_pedido" =>  $id_pedido,
+                "valoraprobado" => 0,
+                "tipo" => "transferirPedido",
+                "descripcion" => "Solicitud de Transferencia de pedido: #".$id_pedido,
+            ]);
+            if ($nuevatarea) {
+                return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>false]);
+            }
+
+        }
+
+        
 
         $pedido = pedidos::find($id_pedido);
         $pedido->id_vendedor = $id_usuario;

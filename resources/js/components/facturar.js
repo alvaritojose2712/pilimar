@@ -3561,6 +3561,7 @@ export default function Facturar({ user, notificar, setLoading }) {
                 setmodalchangepedido(false)
                 getPedidos()
                 getPedidosList()
+                notificar(res)
             })
         }
     }
