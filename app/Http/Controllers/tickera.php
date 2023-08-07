@@ -321,9 +321,7 @@ class tickera extends Controller
     
                     $printer->text("Desc: ".$pedido->total_des);
                     $printer->text("\n");
-                    $printer->text("Sub-Total: ". number_format($pedido->clean_total/1.16,2) );
-                    $printer->text("\n");
-                    $printer->text("Monto IVA 16%: ".number_format($pedido->clean_total*.16,2));
+                    $printer->text("Sub-Total: ". number_format($pedido->clean_total,2) );
                     $printer->text("\n");
                     $printer->text("Total: ".$pedido->total);
                     $printer->text("\n");
