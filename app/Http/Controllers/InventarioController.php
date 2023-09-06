@@ -883,6 +883,7 @@ class InventarioController extends Controller
                             "precio" => $ee["precio"],
                             "precio_base" => $ee["precio_base"],
                             "unidad" => $ee["unidad"],
+                            "push" => $ee["push"],
                             "id_deposito" => "",
                             "porcentaje_ganancia" => 0,
                             
@@ -1011,6 +1012,7 @@ class InventarioController extends Controller
             $req_inpInvid_deposito = $arrproducto["id_deposito"];
             $req_inpInvporcentaje_ganancia = $arrproducto["porcentaje_ganancia"];
             
+            $push = isset($arrproducto["push"])?$arrproducto["push"]:null; 
             $precio1 = isset($arrproducto["precio1"])?$arrproducto["precio1"]:null; 
             $precio2 = isset($arrproducto["precio2"])?$arrproducto["precio2"]:null; 
             $precio3 = isset($arrproducto["precio3"])?$arrproducto["precio3"]:null; 
@@ -1065,6 +1067,7 @@ class InventarioController extends Controller
                 "stockmin" => $stockmin,
                 "stockmax" => $stockmax,
                 "id_vinculacion" => $id_vinculacion,
+                "push" => $push,
             ]);
 
             $this->checkFalla($insertOrUpdateInv->id,$ctInsert);

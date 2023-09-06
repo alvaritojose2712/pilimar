@@ -369,7 +369,7 @@ class PagoPedidosController extends Controller
                 $pago_pedidos->cuenta = 0;
                 $pago_pedidos->save();
 
-                return Response::json(["msj"=>"Pago registrado con éxito","estado"=>true]);
+                return Response::json(["msj"=>"Pago registrado con éxito","estado"=>true,"id_pedido"=>$pedido->id]);
                 
 
             }

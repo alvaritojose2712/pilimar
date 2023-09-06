@@ -500,6 +500,17 @@ body{
   background-color: #ffd3d3 !important;
   text-shadow: 0 0 black;
 }
+
+.bg-success-super-light{
+  background-color: #eaf7ea !important;
+  text-shadow: 0 0 black;
+}
+.bg-danger-super-light {
+  background-color: #f8e2e2 !important;
+  text-shadow: 0 0 black;
+}
+
+
 .bg-secondary-light {
   background-color: #dae2ea !important;
   text-shadow: 0 0 black;
@@ -909,3 +920,4 @@ body{
   background-color: #eaeaea !important;
 
 }
+

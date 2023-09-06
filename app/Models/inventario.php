@@ -54,6 +54,7 @@ class inventario extends Model
         "stockmin",
         "stockmax",
         "id_vinculacion",
+        "push",
     ];
     
 

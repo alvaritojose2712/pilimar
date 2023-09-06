@@ -273,7 +273,7 @@ export default function InventarioForzado({
                             <th className="cell1 pointer"><span onClick={() => setInvorderColumn("codigo_barras")}>C. Barras</span></th>
                             <th className="cell05 pointer"><span onClick={() => setInvorderColumn("unidad")}>Unidad</span></th>
                             <th className="cell2 pointer"><span onClick={() => setInvorderColumn("descripcion")}>Descripción</span></th>
-                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("cantidad")}>Ct.</span></th>
+                            <th className="cell05 pointer"><span onClick={() => setInvorderColumn("cantidad")}>Ct.</span>/ <span onClick={() => setInvorderColumn("push")}>Inventario</span></th>
                             <th className="cell1 pointer"><span onClick={() => setInvorderColumn("precio_base")}>Base</span></th>
                             <th className="cell15 pointer">
                                 <span onClick={() => setInvorderColumn("precio")}>Venta </span>
@@ -315,7 +315,7 @@ export default function InventarioForzado({
                     </thead>
                     <tbody>
                         {productosInventario.length?productosInventario.map((e,i)=>
-                            <tr key={i} className="pointer" onDoubleClick={() => changeInventario(null, i, e.id, "update")}>
+                            <tr key={i} className={("pointer ")+(e.push?"bg-success-super-light":"bg-danger-super-light")} onDoubleClick={() => changeInventario(null, i, e.id, "update")}>
                                 <td className="cell05">
                                 <span className="pointer" onClick={()=>selectRepleceProducto(e.id)}> <b>{e.id_vinculacion}</b> / {e.id}</span>
                                 </td>
@@ -416,6 +416,12 @@ export default function InventarioForzado({
                                             value={!e.cantidad?"":e.cantidad}
                                             onChange={e => changeInventario(number(e.target.value), i, e.id, "changeInput", "cantidad")}
                                             placeholder="cantidad..." />
+
+                                            {e.push==1?
+                                                <button className="btn btn-success" onClick={e => changeInventario(0, i, e.id, "changeInput", "push")}>Inventariado</button>
+                                                :
+                                                <button className="btn btn-secondary" onClick={e => changeInventario(1, i, e.id, "changeInput", "push")}>No inventariado</button>
+                                            }
 
                                     </td>
                                     <td className="cell1">

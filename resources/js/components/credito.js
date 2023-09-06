@@ -36,6 +36,7 @@ function Credito({
 
   return (
     <div className="container"> 
+    
       <div className="row">
         <div className="col">
           <h3>Cuentas por cobrar</h3> 
@@ -147,6 +148,7 @@ function Credito({
                             <option value="3">Efectivo</option>            
                             <option value="1">Transferencia</option>            
                             <option value="2">Débito</option>            
+                            <option value="5">Biopago</option>            
                           </select>
                         </div>
                       </form>
@@ -187,6 +189,7 @@ function Credito({
                             {ee.tipo==1&&ee.monto!=0?<span className="w-50 btn-sm btn-info btn">Trans. {ee.monto}</span>:null}
                             {ee.tipo==2&&ee.monto!=0?<span className="w-50 btn-sm btn-secondary btn">Deb. {ee.monto}</span>:null}
                             {ee.tipo==3&&ee.monto!=0?<span className="w-50 btn-sm btn-success btn">Efec. {ee.monto}</span>:null}
+                            {ee.tipo==5&&ee.monto!=0?<span className="w-50 btn-sm btn-info btn">Biopago {ee.monto}</span>:null}
                             {ee.tipo==6&&ee.monto!=0?<span className="w-50 btn-sm btn-danger btn" data-id={e.id} onClick={onClickEditPedido}>Vuel. {ee.monto}</span>:null}
                             {ee.tipo==4&&ee.monto!=0?<span className="w-50 btn-sm btn-warning btn">Cred. {ee.monto}</span>:null}
                           </div>)}

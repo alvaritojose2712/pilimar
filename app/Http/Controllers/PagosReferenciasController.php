@@ -35,7 +35,13 @@ class PagosReferenciasController extends Controller
          try {
             $id = $req->id;
             $pagos_referencias = pagos_referencias::find($id);
+
+            (new PedidosController)->checkPedidoAuth($pagos_referencias->id_pedido);
+            (new PedidosController)->checkPedidoPago($pagos_referencias->id_pedido);
+
+
             if ($pagos_referencias) {
+                
                 $pagos_referencias->delete();
                 return Response::json(["msj"=>"Éxito al eliminar","estado"=>true]);
             }
