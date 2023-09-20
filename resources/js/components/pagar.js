@@ -518,7 +518,7 @@ const syncPago = (val,type)=>{
                   {items?items.map((e,i)=>
                     e.abono&&!e.producto?
                     <tr key={e.id}>
-                      <td>PAGO</td>
+                      <td>MOV</td>
                       <td>{e.abono}</td>
                       <td>{e.cantidad} </td>
                       <td>{e.monto}</td>

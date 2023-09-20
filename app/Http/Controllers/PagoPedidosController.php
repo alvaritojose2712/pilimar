@@ -143,10 +143,9 @@ class PagoPedidosController extends Controller
                // 5 Biopago
                // 6 vuelto
             try {
-
                 (new PedidosController)->checkPedidoAuth($req->id);
-                
-                
+                (new PedidosController)->checkPedidoPago($req->id);
+
 
                 $cuenta = 1;
                 $checkIfAbono = items_pedidos::where("id_producto",NULL)->where("id_pedido",$req->id)->get()->count();
@@ -339,40 +338,73 @@ class PagoPedidosController extends Controller
 
     public function setPagoCredito(Request $req)
     {
-        if (session()->has("id_usuario")) {
-            $id_cliente = $req->id_cliente;
-            $pedido = new pedidos;
-
-            $pedido->estado = 1;
-            $pedido->id_cliente = $id_cliente;
-            $pedido->id_vendedor = session("id_usuario");
-
-            if ($pedido->save()) {
-                $cliente = clientes::find($id_cliente);
-
-                $producto_pago_desc = "PAGO ".$cliente->nombre;
-                
-
-                $items_pedidos = new items_pedidos;
-                $items_pedidos->id_producto = null;
-                $items_pedidos->abono = $producto_pago_desc;
-                $items_pedidos->id_pedido = $pedido->id;
-                $items_pedidos->cantidad = 1;
-                $items_pedidos->descuento = 0;
-                $items_pedidos->monto = $req->monto_pago_deudor;
-                $items_pedidos->save();
-                
-                $pago_pedidos = new pago_pedidos;
-                $pago_pedidos->tipo = $req->tipo_pago_deudor;
-                $pago_pedidos->monto = $req->monto_pago_deudor;
-                $pago_pedidos->id_pedido = $pedido->id;
-                $pago_pedidos->cuenta = 0;
-                $pago_pedidos->save();
-
-                return Response::json(["msj"=>"Pago registrado con éxito","estado"=>true,"id_pedido"=>$pedido->id]);
-                
-
+        try {
+            $monto_pago_deudor = $req->monto_pago_deudor;
+    
+            if (session()->has("id_usuario")) {
+    
+                if ($monto_pago_deudor<0) {
+                    $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                        "id_pedido" => null,
+                        "tipo" => "devolucionPago",
+                    ]);
+                    
+                    if ((new UsuariosController)->isAdmin()) {
+                    }elseif($isPermiso["permiso"]){
+                    }else{
+                        $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                            "id_pedido" => null,
+                            "tipo" => "devolucionPago",
+                            "valoraprobado" => $monto_pago_deudor,
+                            "descripcion" => "Devolver dinero $ ".$monto_pago_deudor,
+                        ]);
+                        if ($nuevatarea) {
+                            throw new \Exception("Debe esperar aprobación del Administrador", 1);
+                        }
+                    }
+                }
+                $id_cliente = $req->id_cliente;
+                $pedido = new pedidos;
+    
+                $pedido->estado = 1;
+                $pedido->id_cliente = $id_cliente;
+                $pedido->id_vendedor = session("id_usuario");
+    
+                if ($pedido->save()) {
+                    $tipo_pago_deudor = $req->tipo_pago_deudor;
+                    $monto_pago_deudor = $req->monto_pago_deudor;
+    
+                    $tipo = $monto_pago_deudor<0?"DEVOLUCION":"PAGO";
+    
+                    $cliente = clientes::find($id_cliente);
+    
+                    $producto_pago_desc = $tipo." ".$cliente->nombre;
+                    
+    
+                    $items_pedidos = new items_pedidos;
+                    $items_pedidos->id_producto = null;
+                    $items_pedidos->abono = $producto_pago_desc;
+                    $items_pedidos->id_pedido = $pedido->id;
+                    $items_pedidos->cantidad = 1;
+                    $items_pedidos->descuento = 0;
+                    $items_pedidos->monto = $monto_pago_deudor;
+                    $items_pedidos->save();
+                    
+                    $pago_pedidos = new pago_pedidos;
+                    $pago_pedidos->tipo = $tipo_pago_deudor;
+                    $pago_pedidos->monto = $monto_pago_deudor;
+                    $pago_pedidos->id_pedido = $pedido->id;
+                    $pago_pedidos->cuenta = 0;
+                    $pago_pedidos->save();
+    
+                    return Response::json(["msj"=>"Pago registrado con éxito","estado"=>true,"id_pedido"=>$pedido->id]);
+                    
+    
+                }
             }
+        } catch (\Exception $e) {
+            return Response::json(["msj"=>$e->getMessage(),"estado"=>false]);
+
         }
     }
 }

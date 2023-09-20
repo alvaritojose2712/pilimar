@@ -522,6 +522,24 @@ class PedidosController extends Controller
     {
         $pedidomodify = $tipo=="pedido"? pedidos::find($id): pedidos::find(items_pedidos::find($id)->id_pedido);
         if ($pedidomodify->estado) {
+            $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                "id_pedido" => $pedidomodify->id,
+                "tipo" => "modped",
+            ]);
+            
+            if ((new UsuariosController)->isAdmin()) {
+            }elseif($isPermiso["permiso"]){
+            }else{
+                $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                    "id_pedido" => $pedidomodify->id,
+                    "tipo" => "modped",
+                    "valoraprobado" => 0,
+                    "descripcion" => "Modificar pedido",
+                ]);
+                if ($nuevatarea) {
+                    throw new \Exception("Debe esperar aprobación del Administrador", 1);
+                }
+            }
             $pedidomodify->estado = 0;
             if ($pedidomodify->save()) {
                 pago_pedidos::where("id_pedido",$pedidomodify->id)->delete();
@@ -693,7 +711,6 @@ class PedidosController extends Controller
                 }else{
                     $des_unitario = 0;
                     if ($item->descuento<0) {
-                        # code...
                         $item->des_unitario = (($item->descuento/100)*$item->producto["precio"]);
                     }
 
@@ -879,7 +896,7 @@ class PedidosController extends Controller
         } 
     }
     
-    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$total_biopago,$dejar=[],$grafica=false,$totalizarcierre=false,$check_pendiente=true)
+    public function cerrarFun($fecha,$total_caja_neto,$total_punto,$total_biopago,$dejar=[],$grafica=false,$totalizarcierre=false,$check_pendiente=true,$usuario=null)
     {   
         if (!$fecha) {return Response::json(["msj"=>"Error: Fecha inválida","estado"=>false]);}
 
@@ -896,7 +913,7 @@ class PedidosController extends Controller
         }
 
 
-        $id_vendedor = $this->selectUsersTotalizar($totalizarcierre); 
+        $id_vendedor = $usuario?[$usuario]:$this->selectUsersTotalizar($totalizarcierre); 
 
         $usuariosget = usuarios::whereIn("id",$id_vendedor)->get(["id","usuario","tipo_usuario","nombre"]);
         $entregado_fun = $this->entregadoPendi($fecha,$id_vendedor);
@@ -957,42 +974,6 @@ class PedidosController extends Controller
                     $q->monto_abono = $q->monto;
                 }
                 return $q;
-                /* if (isset($q->producto)) {
-                    $q->base_tot = $q->producto->precio_base*$q->cantidad;
-                }else{
-
-                    $avgporcentajeganancia = items_pedidos::with("producto")
-                    ->whereIn(
-                        "id_pedido", 
-                        pago_pedidos::where("tipo",4)
-                        ->whereIn(
-                            "id_pedido", 
-                            pedidos::where("id_cliente", $q->pedido->id_cliente)->select("id") 
-                        )->select("id_pedido")
-                    )
-                    ->get()
-                    ->map(function($qq){
-                        $porcentaje = 0;
-                        if (isset($qq->producto)) {
-                            $base_tot = $qq->producto->precio_base * $qq->cantidad;
-                            $venta_tot = $qq->producto->precio * $qq->cantidad;
-                            
-                            $ganancia = ($venta_tot-$base_tot);
-                            if ($base_tot==0) {
-                                $porcentaje = 100; 
-                            }else{
-                                $porcentaje = round( (($ganancia*100) / $base_tot),2 ); 
-                            }
-                            
-                        }
-                        $qq->porcentaje = $porcentaje;
-                        return $qq;
-                    })->avg("porcentaje");
-
-                    $divisor = ($avgporcentajeganancia/100) + 1;
-                    $q->base_tot = round($q->monto/$divisor,2);
-                }
-                return $q; */
             });
 
             $total_credito = pago_pedidos::whereIn("id_pedido",pedidos::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor)->where("tipo",4)->select("id"))
@@ -1031,24 +1012,13 @@ class PedidosController extends Controller
             $desc_total = ($venta_total + $venta_abono) - $venta_credito;
 
             $ganancia = $desc_total - $precio_base;
-            /*
-            $desc_total = items_pedidos::whereIn("id_pedido", pedidos::where("created_at","LIKE",$fecha."%")->whereIn("id_vendedor",$id_vendedor)->where("estado",1)->select("id") )
-            ->get()
-            ->map(function($q){
-                $q->monto_sin = ($q->monto)-(($q->descuento/100)*$q->monto);
-                return $q;
-            })->sum("monto_sin"); */
-
-            /* 
-
-            $desc_total -= $credi_total;
-            $precio -= $credi_total; */
+            
             
 
 
             
         /////End Montos de ganancias
-        $tipo_accion = cierres::where("fecha",$fecha)->where("id_usuario",session("id_usuario"))->first();
+        $tipo_accion = cierres::where("fecha",$fecha)->whereIn("id_usuario",$id_vendedor)->first();
         if ($tipo_accion) {
             $tipo_accion = "editar"; 
         }else{
@@ -1232,10 +1202,21 @@ class PedidosController extends Controller
 
         $fechaGetCierre = $req->fechaGetCierre;
         $fechaGetCierre2 = $req->fechaGetCierre2;
+        $tipoUsuarioCierre = $req->tipoUsuarioCierre;
+        
         if (!$fechaGetCierre&&!$fechaGetCierre2) {
-            $cierres = cierres::with("usuario")->orderBy("fecha","desc");
+            $cierres = cierres::with("usuario")
+            ->when($tipoUsuarioCierre!="",function($q) use ($tipoUsuarioCierre){
+                $q->where("tipo_cierre",$tipoUsuarioCierre);
+            })
+            ->orderBy("fecha","desc");
         }else{
-            $cierres = cierres::with("usuario")->where("tipo_cierre",0)->whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2])->orderBy("id_usuario","asc");
+            $cierres = cierres::with("usuario")
+            ->whereBetween("fecha",[$fechaGetCierre,$fechaGetCierre2])
+            ->when($tipoUsuarioCierre!="",function($q) use ($tipoUsuarioCierre){
+                $q->where("tipo_cierre",$tipoUsuarioCierre);
+            })
+            ->orderBy("fecha","desc");
         }
         
         
@@ -1468,6 +1449,10 @@ class PedidosController extends Controller
     {   
         $fechareq = $req->fecha;
         $type = $req->type;
+        $usuario = isset($req->usuario)? $req->usuario: null;
+        
+        $usuarioLogin = $usuario? $usuario: session("id_usuario");
+
         $sucursal = sucursal::all()->first();
 
         $totalizarcierre = filter_var($req->totalizarcierre, FILTER_VALIDATE_BOOLEAN);
@@ -1477,10 +1462,9 @@ class PedidosController extends Controller
             });
             
         }else{
-            $id_vendedor = [session("id_usuario")];
+            $id_vendedor = [$usuarioLogin];
         } 
-
-        $cierre = cierres::with("usuario")->where("fecha",$fechareq)->where('id_usuario',session("id_usuario"))->first();
+        $cierre = cierres::with("usuario")->where("fecha",$fechareq)->where('id_usuario',$usuarioLogin)->first();
         if (!$cierre) {
             return "No hay cierre guardado para esta fecha";
         }
@@ -1511,14 +1495,19 @@ class PedidosController extends Controller
             return $q;
         });
 
-        $facturado = $this->cerrarFun($fechareq,0,0,0,[],false,$totalizarcierre);
+        $facturado = $this->cerrarFun($fechareq,0,0,0,[],false,$totalizarcierre, true, $usuario? $usuario: null);
 
-        $total_inventario = $facturado["total_inventario"];
-        $total_inventario_base = $facturado["total_inventario_base"];
-        $cred_total = $facturado["cred_total"];
-        $vueltos_totales = $facturado["vueltos_totales"];
-        $pedidos_abonos = $facturado["pedidos_abonos"];
-        $abonosdeldia = $facturado["abonosdeldia"];
+        if (is_array($facturado)) {
+            $total_inventario = $facturado["total_inventario"];
+            $total_inventario_base = $facturado["total_inventario_base"];
+            $cred_total = $facturado["cred_total"];
+            $vueltos_totales = $facturado["vueltos_totales"];
+            $pedidos_abonos = $facturado["pedidos_abonos"];
+            $abonosdeldia = $facturado["abonosdeldia"];
+        }else{
+            return $facturado;
+        }
+
         
         if (is_object($facturado)) {
             return $facturado;
@@ -1526,57 +1515,57 @@ class PedidosController extends Controller
         $arr_send = [
             "referencias"=>$pagos_referencias,
             "cierre" => $cierre,
-            "cierre_tot" => number_format($cierre->debito+$cierre->efectivo+$cierre->transferencia+$cierre->caja_biopago,2,",","."),
+            "cierre_tot" => moneda($cierre->debito+$cierre->efectivo+$cierre->transferencia+$cierre->caja_biopago),
            
             "total_inventario" =>($total_inventario),
-            "total_inventario_format" =>number_format($total_inventario,2,",","."),
+            "total_inventario_format" =>moneda($total_inventario),
             "total_inventario_base" =>($total_inventario_base),
-            "total_inventario_base_format" =>number_format($total_inventario_base,2,",","."),
+            "total_inventario_base_format" =>moneda($total_inventario_base),
            
-            "vueltos_totales" =>number_format($vueltos_totales,2,",","."),
+            "vueltos_totales" =>moneda($vueltos_totales),
             "vueltos_des" => $facturado["vueltos_des"],
 
-            "precio"=> number_format($facturado["precio"],2,",","."),
-            "precio_base"=> number_format($facturado["precio_base"],2,",","."),
-            "ganancia"=> number_format(round($facturado["ganancia"],2),2,",","."),
-            "porcentaje"=> number_format($facturado["porcentaje"],2,",","."),
-            "desc_total"=> number_format(round($facturado["desc_total"],2),2,",","."),
+            "precio"=> moneda($facturado["precio"]),
+            "precio_base"=> moneda($facturado["precio_base"]),
+            "ganancia"=> moneda(round($facturado["ganancia"],2)),
+            "porcentaje"=> moneda($facturado["porcentaje"]),
+            "desc_total"=> moneda(round($facturado["desc_total"],2)),
             "facturado" => $facturado,
-            "facturado_tot" => number_format($facturado[2]+$facturado[3]+$facturado[1]+$facturado[5],2,",","."),
+            "facturado_tot" => moneda($facturado[2]+$facturado[3]+$facturado[1]+$facturado[5]),
             "sucursal"=>$sucursal,
             "movimientos"=>$movimientos,
             "movimientosInventario"=>$movimientosInventario,
         ];
 
         
-        $arr_send["cierre"]["debito"] = number_format($arr_send["cierre"]["debito"],2,",",".");
-        $arr_send["cierre"]["efectivo"] = number_format($arr_send["cierre"]["efectivo"],2,",",".");
-        $arr_send["cierre"]["transferencia"] = number_format($arr_send["cierre"]["transferencia"],2,",",".");
-        $arr_send["cierre"]["caja_biopago"] = number_format($arr_send["cierre"]["caja_biopago"],2,",",".");
+        $arr_send["cierre"]["debito"] = moneda($arr_send["cierre"]["debito"]);
+        $arr_send["cierre"]["efectivo"] = moneda($arr_send["cierre"]["efectivo"]);
+        $arr_send["cierre"]["transferencia"] = moneda($arr_send["cierre"]["transferencia"]);
+        $arr_send["cierre"]["caja_biopago"] = moneda($arr_send["cierre"]["caja_biopago"]);
 
-        $arr_send["cierre"]["dejar_dolar"] = number_format($arr_send["cierre"]["dejar_dolar"],2,",",".");
-        $arr_send["cierre"]["dejar_peso"] = number_format($arr_send["cierre"]["dejar_peso"],2,",",".");
-        $arr_send["cierre"]["dejar_bss"] = number_format($arr_send["cierre"]["dejar_bss"],2,",",".");
-        $arr_send["cierre"]["tasa"] = number_format($arr_send["cierre"]["tasa"],2,",",".");
-        $arr_send["cierre"]["efectivo_guardado"] = number_format($arr_send["cierre"]["efectivo_guardado"],2,",",".");
-        $arr_send["cierre"]["efectivo_guardado_cop"] = number_format($arr_send["cierre"]["efectivo_guardado_cop"],2,",",".");
-        $arr_send["cierre"]["efectivo_guardado_bs"] = number_format($arr_send["cierre"]["efectivo_guardado_bs"],2,",",".");
-        $arr_send["facturado"]["total"] = number_format($arr_send["facturado"]["total"],2,",",".");
-        $arr_send["facturado"]["caja_inicial"] = number_format($arr_send["facturado"]["caja_inicial"],2,",",".");
+        $arr_send["cierre"]["dejar_dolar"] = moneda($arr_send["cierre"]["dejar_dolar"]);
+        $arr_send["cierre"]["dejar_peso"] = moneda($arr_send["cierre"]["dejar_peso"]);
+        $arr_send["cierre"]["dejar_bss"] = moneda($arr_send["cierre"]["dejar_bss"]);
+        $arr_send["cierre"]["tasa"] = moneda($arr_send["cierre"]["tasa"]);
+        $arr_send["cierre"]["efectivo_guardado"] = moneda($arr_send["cierre"]["efectivo_guardado"]);
+        $arr_send["cierre"]["efectivo_guardado_cop"] = moneda($arr_send["cierre"]["efectivo_guardado_cop"]);
+        $arr_send["cierre"]["efectivo_guardado_bs"] = moneda($arr_send["cierre"]["efectivo_guardado_bs"]);
+        $arr_send["facturado"]["total"] = moneda($arr_send["facturado"]["total"]);
+        $arr_send["facturado"]["caja_inicial"] = moneda($arr_send["facturado"]["caja_inicial"]);
         
-        $arr_send["facturado"]["entregadomenospend"] = number_format($arr_send["facturado"]["entregadomenospend"],2,",",".");
-        $arr_send["facturado"]["entregado"] = number_format($arr_send["facturado"]["entregado"],2,",",".");
-        $arr_send["facturado"]["pendiente"] = number_format($arr_send["facturado"]["pendiente"],2,",",".");
-        $arr_send["facturado"]["total_caja"] = number_format($arr_send["facturado"]["total_caja"],2,",",".");
-        $arr_send["facturado"]["total_punto"] = number_format($arr_send["facturado"]["total_punto"],2,",",".");
-        $arr_send["facturado"]["total_biopago"] = number_format($arr_send["facturado"]["total_biopago"],2,",",".");
+        $arr_send["facturado"]["entregadomenospend"] = moneda($arr_send["facturado"]["entregadomenospend"]);
+        $arr_send["facturado"]["entregado"] = moneda($arr_send["facturado"]["entregado"]);
+        $arr_send["facturado"]["pendiente"] = moneda($arr_send["facturado"]["pendiente"]);
+        $arr_send["facturado"]["total_caja"] = moneda($arr_send["facturado"]["total_caja"]);
+        $arr_send["facturado"]["total_punto"] = moneda($arr_send["facturado"]["total_punto"]);
+        $arr_send["facturado"]["total_biopago"] = moneda($arr_send["facturado"]["total_biopago"]);
 
-        $arr_send["facturado"]["1"] = number_format($arr_send["facturado"]["1"],2,",",".");
-        $arr_send["facturado"]["2"] = number_format($arr_send["facturado"]["2"],2,",",".");
-        $arr_send["facturado"]["3"] = number_format($arr_send["facturado"]["3"],2,",",".");
-        $arr_send["facturado"]["4"] = number_format($arr_send["facturado"]["4"],2,",",".");
-        $arr_send["facturado"]["5"] = number_format($arr_send["facturado"]["5"],2,",",".");
-        $arr_send["facturado"]["6"] = number_format($arr_send["facturado"]["6"],2,",",".");
+        $arr_send["facturado"]["1"] = moneda($arr_send["facturado"]["1"]);
+        $arr_send["facturado"]["2"] = moneda($arr_send["facturado"]["2"]);
+        $arr_send["facturado"]["3"] = moneda($arr_send["facturado"]["3"]);
+        $arr_send["facturado"]["4"] = moneda($arr_send["facturado"]["4"]);
+        $arr_send["facturado"]["5"] = moneda($arr_send["facturado"]["5"]);
+        $arr_send["facturado"]["6"] = moneda($arr_send["facturado"]["6"]);
         
         $arr_send["total_inventario_format"] = toLetras($arr_send["total_inventario_format"]); 
         $arr_send["total_inventario_base_format"] = toLetras($arr_send["total_inventario_base_format"]); 

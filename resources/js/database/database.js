@@ -212,7 +212,7 @@ const db = {
   
   
   openPrintCreditos: (param) => window.open(host + "verCreditos?"+param,"targed=blank"),
-  openVerCierre: ({ type,fechaCierre,totalizarcierre }) => window.open(host + "verCierre?type=" + type + "&fecha=" + fechaCierre+ "&totalizarcierre=" + totalizarcierre,"targed=blank"),
+  openVerCierre: ({ type,fechaCierre,totalizarcierre,usuario }) => window.open(host + "verCierre?type=" + type + "&fecha=" + fechaCierre+ "&totalizarcierre=" + totalizarcierre + "&usuario=" + usuario,"targed=blank"),
   openNotaentregapedido: ({ id }) => window.open(host + "/notaentregapedido?id=" + id, "targed=blank"),
   openVerFactura: ({ id }) => window.open(host + "verFactura?id=" + id, "targed=blank"),
   openReporteInventario: () => window.open(host + "reporteInventario", "targed=blank"),

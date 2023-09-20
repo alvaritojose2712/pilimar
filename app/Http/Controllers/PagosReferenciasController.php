@@ -11,9 +11,18 @@ class PagosReferenciasController extends Controller
     public function addRefPago(Request $req)
     {
          try {
-            
+            $check = true;
             (new PedidosController)->checkPedidoAuth($req->id_pedido);
-            (new PedidosController)->checkPedidoPago($req->id_pedido);
+            
+            
+            if (isset($req->check)) {
+                if ($req->check==false) {
+                    $check = false;
+                }
+            }
+            if ($check) {
+                (new PedidosController)->checkPedidoPago($req->id_pedido);
+            }
             
 
             $item = new pagos_referencias;

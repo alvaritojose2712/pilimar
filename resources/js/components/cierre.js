@@ -1,6 +1,8 @@
 import Historicocierre from '../components/historicocierre';
 
 function Cierre({
+	tipoUsuarioCierre,
+	settipoUsuarioCierre,
 	moneda,
 	caja_usd,
 	caja_cop,
@@ -522,6 +524,9 @@ function Cierre({
 
 							getCierres={getCierres}
 							verCierreReq={verCierreReq}
+
+							tipoUsuarioCierre={tipoUsuarioCierre}
+							settipoUsuarioCierre={settipoUsuarioCierre}
 							/>
 						:null}
 					</div>

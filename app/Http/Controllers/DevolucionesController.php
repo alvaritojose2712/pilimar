@@ -35,6 +35,25 @@ class DevolucionesController extends Controller
     {
         try {
             
+            $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                "id_pedido" => null,
+                "tipo" => "devolucion",
+            ]);
+            
+            if ((new UsuariosController)->isAdmin()) {
+            }elseif($isPermiso["permiso"]){
+            }else{
+                $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                    "id_pedido" => null,
+                    "tipo" => "devolucion",
+                    "valoraprobado" => 0,
+                    "descripcion" => "Devolucion",
+                ]);
+                if ($nuevatarea) {
+                    throw new \Exception("Debe esperar aprobación del Administrador", 1);
+                }
+            }
+
             $id_vendedor = session("id_usuario");
             $new_mov = new devoluciones;
             $new_mov->id_vendedor = $id_vendedor;
@@ -45,6 +64,7 @@ class DevolucionesController extends Controller
                     $cantidad = $e["cantidad"];
                     $tipoMovMovimientos = $e["tipo"];
                     $tipoCatMovimientos = $e["categoria"];
+                    $motivoMov = $e["motivo"];
         
                     $date = new \DateTime($req->fechaMovimientos);
                     $fechaMovimientos = $date->getTimestamp();
@@ -92,7 +112,7 @@ class DevolucionesController extends Controller
                     $new_item_mov->cantidad = $cantidad;
                     $new_item_mov->tipo = $tipoMovMovimientos;
                     $new_item_mov->categoria = $tipoCatMovimientos;
-                    $new_item_mov->motivo = "Motivo";
+                    $new_item_mov->motivo = $motivoMov;
                     $new_item_mov->id_devolucion = $new_mov->id;
                     $new_item_mov->save();
 

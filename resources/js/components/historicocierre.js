@@ -6,12 +6,19 @@ export default function Historicocierre({
 	verCierreReq,
 	fechaGetCierre2,
 	setfechaGetCierre2,
+	tipoUsuarioCierre,
+	settipoUsuarioCierre,
 }) {
 	return (
 		<div className="container-fluid p-0">
 			<div className="input-group mb-3">
 				<input type="date" className="form-control" value={fechaGetCierre} onChange={e => setfechaGetCierre(e.target.value)} />
 				<input type="date" className="form-control" value={fechaGetCierre2} onChange={e=>setfechaGetCierre2(e.target.value)}/>
+				<select className="form-control" value={tipoUsuarioCierre} onChange={e=>settipoUsuarioCierre(e.target.value)}>
+					<option value="">Todos</option>
+					<option value="1">Administrador</option>
+					<option value="0">Cajero</option>
+				</select>
 				<div className="inputr-group-append">
 					<button className="btn" onClick={getCierres}><i className="fa fa-search"></i></button>
 				</div>
@@ -68,12 +75,12 @@ export default function Historicocierre({
 							<td>{e.tasa}</td>
 							<th>{e.fecha}</th>
 							<td>
-								<button className="btn btn-outline-success" onClick={()=>verCierreReq(e.fecha,"ver")} type="button">Ver</button>
-								<button className="btn btn-outline-success" onClick={()=>verCierreReq(e.fecha,"enviar")} type="button"><i className="fa fa-send"></i></button>
+								<button className="btn btn-outline-success" onClick={()=>verCierreReq(e.fecha,"ver",e.id_usuario)} type="button">Ver</button>
+								<button className="btn btn-outline-success" onClick={()=>verCierreReq(e.fecha,"enviar",e.id_usuario)} type="button"><i className="fa fa-send"></i></button>
 							</td>
 						</tr>
 
-):null:null:null}
+						):null:null:null}
 					<tr>
 						<td></td>
 						<th>{cierres.numventas}</th>
