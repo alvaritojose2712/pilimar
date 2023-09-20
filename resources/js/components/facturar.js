@@ -4974,7 +4974,6 @@ export default function Facturar({ user, notificar, setLoading }) {
                                         </span>
                                         <span
                                             className="input-group-text pointer"
-                                            onClick={() => setItemCero(!itemCero)}
                                         >
                                             En cero: {itemCero ? "Sí" : "No"}
                                         </span>

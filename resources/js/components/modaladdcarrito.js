@@ -50,6 +50,12 @@ export default function ModalAddCarrito({
 
                 </span>
               </div>
+              <div className="input-group-append text-right">
+
+                <span className="input-group-text h-100 fs-3 text-right">
+                Ct. {producto.cantidad}
+                </span>
+              </div>
             </div>
             <div className="input-group mb-3">
               <div className="input-group-prepend">

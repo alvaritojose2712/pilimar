@@ -229,7 +229,7 @@ class InventarioController extends Controller
 
 
     }
-    public function hacer_pedido($id,$id_pedido,$cantidad,$type,$lote=null)
+    public function hacer_pedido($id,$id_pedido,$cantidad,$type,$typeafter=null,$usuario=null)
     {   
         try {
             if ($cantidad<0) {
@@ -237,10 +237,26 @@ class InventarioController extends Controller
             }
             $cantidad = $cantidad==""?1:$cantidad;
             $old_ct = 0;
-
-            // $old_cant_query = items_pedidos::where("id_producto",$id)->where("id_pedido",$id_pedido)->first();
-            // $old_cant = $old_cant_query["cantidad"];
             if ($type=="ins") {
+                if ($id_pedido=="nuevo") {
+                    //Crea Pedido
+
+                    $pro = inventario::find($id);
+                    $loquehabra = $pro->cantidad - $cantidad;
+
+                    if ($loquehabra<0) {
+                        throw new \Exception("No hay disponible la cantidad solicitada", 1);
+                        
+                    }
+
+                    $new_pedido = new pedidos;
+                    $new_pedido->estado = 0;
+                    $new_pedido->id_cliente = 1;
+                    $new_pedido->id_vendedor = $usuario;
+                    $new_pedido->save();
+                    $id_pedido = $new_pedido->id;
+                }
+
 
                 $producto = inventario::select(["cantidad","precio"])->find($id);
                 $precio = $producto->precio;
@@ -255,7 +271,6 @@ class InventarioController extends Controller
 
                 (new PedidosController)->checkPedidoAuth($id_pedido);
                 (new PedidosController)->checkPedidoPago($id_pedido);
-                
 
                 if ($checkIfExits) {
                     $old_ct = $checkIfExits["cantidad"];
@@ -275,30 +290,28 @@ class InventarioController extends Controller
                     $setprecio = $setcantidad*$precio;
                 }
 
-
+                $ctquehabia = $producto->cantidad + $old_ct;
+                
+                $ctSeter = ($ctquehabia - $setcantidad);
+                
+                $this->descontarInventario($id,$ctSeter, $ctquehabia, $id_pedido, "inItPd");
+                
+                $this->checkFalla($id,$ctSeter);
                 items_pedidos::updateOrCreate([
                     "id_producto"=>$id,
                     "id_pedido"=>$id_pedido,
-                    "lote"=>$lote,
                 ],[
                     "id_producto" => $id,
                     "id_pedido" => $id_pedido,
                     "cantidad" => $setcantidad,
                     "monto" => $setprecio,
-                    "lote" => $lote,
                 ]);
 
-                // DB::insert('INSERT INTO items_pedidos (id_producto,id_pedido,cantidad,monto,lote) VALUES "$id","$id_pedido","$setcantidad","$setprecio","$lote"');
-                $ctquehabia = $producto->cantidad + $old_ct;
+                return ["msj"=>"Agregado al pedido #".$id_pedido." || Cant. ".$cantidad,"estado"=>"ok","num_pedido"=>$id_pedido,"type"=>$typeafter];
 
-                $ctSeter = ($ctquehabia - $setcantidad);
-                
-                $this->descontarInventario($id,$ctSeter, $ctquehabia, $id_pedido, "inItPd");
-
-                $this->checkFalla($id,$ctSeter);
 
             }else if($type=="upd"){
-                $checkIfExits = items_pedidos::select(["lote","id_producto","cantidad"])->find($id);
+                $checkIfExits = items_pedidos::select(["id_producto","cantidad"])->find($id);
                 (new PedidosController)->checkPedidoAuth($id,"item");
                 (new PedidosController)->checkPedidoPago($id,"item");
                 
@@ -307,20 +320,22 @@ class InventarioController extends Controller
                 $precio = $producto->precio;
 
                 $old_ct = $checkIfExits->cantidad;
-                $lote = $checkIfExits->lote;
 
                 $setprecio = $cantidad*$precio;
 
+                $ctSeter = (($producto->cantidad + $old_ct) - $cantidad);
+                
+                
+                $this->descontarInventario($checkIfExits->id_producto,$ctSeter, ($producto->cantidad), $id_pedido, "updItemPedido");
+                $this->checkFalla($checkIfExits->id_producto,$ctSeter);
+                
                 items_pedidos::updateOrCreate(["id"=>$id],[
                     "cantidad" => $cantidad,
                     "monto" => $setprecio
                 ]);
-                $ctSeter = (($producto->cantidad + $old_ct) - $cantidad);
+                return ["msj"=>"Actualizado Prod #".$checkIfExits->id_producto." || Cant. ".$cantidad,"estado"=>"ok"];
 
-                
-                $this->descontarInventario($checkIfExits->id_producto,$ctSeter, ($producto->cantidad), $id_pedido, "updItemPedido");
 
-                $this->checkFalla($checkIfExits->id_producto,$ctSeter);
             }else if($type=="del"){
                 (new PedidosController)->checkPedidoAuth($id,"item");
                 (new PedidosController)->checkPedidoPago($id,"item");
@@ -330,7 +345,6 @@ class InventarioController extends Controller
                     $old_ct = $item->cantidad;
                     $id_producto = $item->id_producto;
                     $pedido_id = $item->id_pedido;
-                    $lote = $item->lote;
 
                 
                     $producto = inventario::select(["cantidad"])->find($id_producto);
@@ -343,7 +357,7 @@ class InventarioController extends Controller
                     $this->descontarInventario($id_producto,$ctSeter, $producto->cantidad, $pedido_id, "delItemPedido");
 
                     $this->checkFalla($id_producto,$ctSeter);
-                    // return Response::json(["msj"=>"Item Eliminado","estado"=>true]);
+                    return ["msj"=>"Item Eliminado","estado"=>true];
 
                 }
             }
@@ -358,6 +372,10 @@ class InventarioController extends Controller
     public function descontarInventario($id_producto,$cantidad, $ct1,$id_pedido,$origen)
     {
         $inv = inventario::find($id_producto);
+
+        if ($cantidad<0) {
+            throw new \Exception("No hay disponible la cantidad solicitada", 1);
+        }
         $inv->cantidad = $cantidad;
         if($inv->save()){
             (new MovimientosInventariounitarioController)->setNewCtMov([
@@ -741,7 +759,6 @@ class InventarioController extends Controller
         $type = $req->type;
         $cantidad = $req->cantidad;
         $numero_factura = $req->numero_factura;
-        $loteIdCarrito = $req->loteIdCarrito;
         
         if (isset($numero_factura)) {
             $id = $numero_factura;
@@ -763,52 +780,10 @@ class InventarioController extends Controller
                     return Response::json(["msj"=>"¡Imposible hacer pedidos! Cierre procesado", "estado"=>false,"num_pedido"=>0,"type"=>""]);
                 }
             }
-            // $producto = inventario::select(["descripcion"])->find($id_producto);
-
             
-            if ($id=="nuevo") {
-
-              //Crea Pedido
-                // $check_cli = clientes::find(1);
-
-                // if (!$check_cli) {
-                //     $cli = new clientes;
-                //     $cli->identificacion = "CF";
-                //     $cli->nombre = "CF";
-                //     $cli->direccion = "CF";
-                //     $cli->save();
-                // }
-                $new_pedido = new pedidos;
-
-                $new_pedido->estado = 0;
-                $new_pedido->id_cliente = 1;
-                $new_pedido->id_vendedor = $usuario;
-                $new_pedido->save();
-
-              //Next pedido num
-                $nuevo_pedido_num = $new_pedido->id;
-
-                // 1 Transferencia
-               // 2 Debito 
-               // 3 Efectivo 
-               // 4 Credito  
-               // 5 Biopago
-               // 6 vuelto
-
-
-                $this->hacer_pedido($id_producto,$nuevo_pedido_num,$cantidad,"ins",$loteIdCarrito);
-              return Response::json(["msj"=>"Agregado nuevo pedido #".$nuevo_pedido_num." || Cant. ".$cantidad,"estado"=>"ok","num_pedido"=>$nuevo_pedido_num,"type"=>$type]);
-                
-
-            }else{
-
-                
-                $this->hacer_pedido($id_producto,$id,$cantidad,"ins",$loteIdCarrito);
-
-                return Response::json(["msj"=>"Agregado al pedido #".$id." || Cant. ".$cantidad,"estado"=>"ok","num_pedido"=>$id,"type"=>$type]);
-
-
-            }
+            $id_return = $id=="nuevo"?"nuevo":$id;
+            
+            return  $this->hacer_pedido($id_producto,$id_return,$cantidad,"ins",$type,$usuario);
         }
         
     }
