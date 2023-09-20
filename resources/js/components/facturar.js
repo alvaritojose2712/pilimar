@@ -3433,7 +3433,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             let time = window.setTimeout(() => {
                 db.getinventario({
                     num: Invnum,
-                    itemCero,
+                    itemCero:true,
                     qProductosMain: qBuscarInventario,
                     orderColumn: InvorderColumn,
                     orderBy: InvorderBy,
