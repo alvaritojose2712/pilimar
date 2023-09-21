@@ -914,7 +914,7 @@ class PedidosController extends Controller
 
 
         $id_vendedor = $usuario?[$usuario]:$this->selectUsersTotalizar($totalizarcierre); 
-
+        
         $usuariosget = usuarios::whereIn("id",$id_vendedor)->get(["id","usuario","tipo_usuario","nombre"]);
         $entregado_fun = $this->entregadoPendi($fecha,$id_vendedor);
         $ultimo_cierre = $this->ultimoCierre($fecha,$id_vendedor);
@@ -1018,7 +1018,7 @@ class PedidosController extends Controller
 
             
         /////End Montos de ganancias
-        $tipo_accion = cierres::where("fecha",$fecha)->whereIn("id_usuario",$id_vendedor)->first();
+        $tipo_accion = cierres::where("fecha",$fecha)->where("id_usuario",session("id_usuario"))->first();
         if ($tipo_accion) {
             $tipo_accion = "editar"; 
         }else{
@@ -1464,6 +1464,7 @@ class PedidosController extends Controller
         }else{
             $id_vendedor = [$usuarioLogin];
         } 
+
         $cierre = cierres::with("usuario")->where("fecha",$fechareq)->where('id_usuario',$usuarioLogin)->first();
         if (!$cierre) {
             return "No hay cierre guardado para esta fecha";
@@ -1496,7 +1497,6 @@ class PedidosController extends Controller
         });
 
         $facturado = $this->cerrarFun($fechareq,0,0,0,[],false,$totalizarcierre, true, $usuario? $usuario: null);
-
         if (is_array($facturado)) {
             $total_inventario = $facturado["total_inventario"];
             $total_inventario_base = $facturado["total_inventario_base"];

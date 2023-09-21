@@ -3261,7 +3261,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             });
         }
     };
-    const verCierreReq = (fechaCierre, type = "ver", usuario = null) => {
+    const verCierreReq = (fechaCierre, type = "ver", usuario = "") => {
         // console.log(fecha)
         // if (window.confirm("Confirme envio")) {
         db.openVerCierre({ fechaCierre, type, totalizarcierre, usuario});
