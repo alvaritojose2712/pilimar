@@ -112,7 +112,7 @@ class DevolucionesController extends Controller
                     $new_item_mov->cantidad = $cantidad;
                     $new_item_mov->tipo = $tipoMovMovimientos;
                     $new_item_mov->categoria = $tipoCatMovimientos;
-                    $new_item_mov->motivo = $motivoMov;
+                    $new_item_mov->motivo = $motivoMov?$motivoMov:"SALIDA";
                     $new_item_mov->id_devolucion = $new_mov->id;
                     $new_item_mov->save();
 
