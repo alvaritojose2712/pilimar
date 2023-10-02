@@ -1969,7 +1969,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             db.getBuscarDevolucion({
                 qProductosMain: buscarDevolucion,
                 num: 10,
-                itemCero:true,
+                itemCero:true, 
                 orderColumn: "descripcion",
                 orderBy: "asc",
             }).then((res) => {
