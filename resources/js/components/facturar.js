@@ -1892,6 +1892,35 @@ export default function Facturar({ user, notificar, setLoading }) {
             }
         });
     };
+    const fun_setguardar = (type,val,cierreForce) =>{
+		let total = number(cierreForce["efectivo_guardado"])
+		if (type=="setguardar_cop") {
+			
+				setguardar_cop(val)
+
+				let p = number((val/peso).toFixed(1))
+				let u = total-p
+
+				setguardar_bs("")
+				setguardar_usd(u)
+		}
+
+		if (type=="setguardar_bs") {
+			setguardar_bs(val)
+
+			if (!val) {
+				let p = number((guardar_cop/peso).toFixed(1))
+				let u = total-p
+
+				setguardar_usd(u)
+			}else{
+				let u = ((total-number((guardar_cop/peso).toFixed(1)))-number((val/dolar).toFixed(1))).toFixed(1)
+				setguardar_usd(u)
+
+			}
+		}
+
+	}
     const cerrar_dia = (e = null) => {
         if (e) {
             e.preventDefault();
@@ -1909,8 +1938,10 @@ export default function Facturar({ user, notificar, setLoading }) {
             let cierreData = res.data;
             if (res.data) {
                 setguardar_usd(cierreData["efectivo_guardado"]);
-                setguardar_cop("");
-                setguardar_bs("");
+
+                fun_setguardar("setguardar_cop",guardar_cop,cierreData)
+                fun_setguardar("setguardar_bs",guardar_bs,cierreData)
+
                 settipo_accionCierre(cierreData["tipo_accion"]);
                 setFechaCierre(cierreData["fecha"]);
             }
@@ -1938,7 +1969,7 @@ export default function Facturar({ user, notificar, setLoading }) {
             db.getBuscarDevolucion({
                 qProductosMain: buscarDevolucion,
                 num: 10,
-                itemCero,
+                itemCero:true,
                 orderColumn: "descripcion",
                 orderBy: "asc",
             }).then((res) => {
@@ -2101,10 +2132,12 @@ export default function Facturar({ user, notificar, setLoading }) {
 
             case "caja_cop":
                 setCaja_cop(val);
+                setguardar_cop(val)
                 break;
-
+                
             case "caja_bs":
                 setCaja_bs(val);
+                setguardar_bs(val)
                 break;
 
             case "dejar_usd":
@@ -2113,10 +2146,14 @@ export default function Facturar({ user, notificar, setLoading }) {
 
             case "dejar_cop":
                 setDejar_cop(val);
+                setguardar_cop(caja_cop-val)
                 break;
-
+                
             case "dejar_bs":
+                    
                 setDejar_bs(val);
+                setguardar_bs(caja_bs-val)
+
                 break;
 
             case "caja_punto":
@@ -5379,6 +5416,7 @@ export default function Facturar({ user, notificar, setLoading }) {
                     setDejar_bs={setDejar_bs}
                     cierre={cierre}
                     cerrar_dia={cerrar_dia}
+                    fun_setguardar={fun_setguardar}
                     total_caja_neto={total_caja_neto}
                     total_punto={total_punto}
                     total_biopago={total_biopago}

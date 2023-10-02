@@ -104,37 +104,10 @@ function Cierre({
 	setcierreefecadiccajafdolar,
 	cierreefecadiccajafeuro,
 	setcierreefecadiccajafeuro,
+	fun_setguardar,
 }) {
 
-	const fun_setguardar = (type,val) =>{
-		let total = number(cierre["efectivo_guardado"])
-		if (type=="setguardar_cop") {
-			
-				setguardar_cop(val)
-
-				let p = number((val/peso).toFixed(1))
-				let u = total-p
-
-				setguardar_bs("")
-				setguardar_usd(u)
-		}
-
-		if (type=="setguardar_bs") {
-			setguardar_bs(val)
-
-			if (!val) {
-				let p = number((guardar_cop/peso).toFixed(1))
-				let u = total-p
-
-				setguardar_usd(u)
-			}else{
-				let u = ((total-number((guardar_cop/peso).toFixed(1)))-number((val/dolar).toFixed(1))).toFixed(1)
-				setguardar_usd(u)
-
-			}
-		}
-
-	}
+	
 	
 	return (
 		<div className="container-fluid">
@@ -288,13 +261,13 @@ function Cierre({
 												<div className="row p-2">
 													<div className="col-2"></div>
 													<div className="col">
-														$ <input type="text" placeholder="$" name="dejar_usd" value={dejar_usd} onChange={e=>setDejar_usd(number(e.target.value))}/>
+														$ <input type="text" placeholder="$" name="dejar_usd" value={dejar_usd} onChange={onchangecaja}/>
 													</div>
 													<div className="col">
-														P <input type="text" placeholder="COP" name="dejar_cop" value={dejar_cop} onChange={e=>setDejar_cop(number(e.target.value))}/>
+														P <input type="text" placeholder="COP" name="dejar_cop" value={dejar_cop} onChange={onchangecaja}/>
 													</div>
 													<div className="col">
-														Bs. <input type="text" placeholder="Bs." name="dejar_bs" value={dejar_bs} onChange={e=>setDejar_bs(number(e.target.value))}/>
+														Bs. <input type="text" placeholder="Bs." name="dejar_bs" value={dejar_bs} onChange={onchangecaja}/>
 														
 													</div>
 												</div>
@@ -413,7 +386,7 @@ function Cierre({
 													</div>
 													<div className="col">
 														<div className="input-group mb-3">
-															<input type="text" className="form-control" placeholder="COP" name="guardar_cop" value={guardar_cop} onChange={e=>fun_setguardar("setguardar_cop",number(e.target.value))}/>
+															<input type="text" className="form-control" placeholder="COP" name="guardar_cop" value={guardar_cop} disabled={true} onChange={e=>fun_setguardar("setguardar_cop",number(e.target.value), cierre)}/>
 															<div className="input-group-prepend w-50">
 																<span className="input-group-text">COP.</span>
 															</div>
@@ -422,7 +395,7 @@ function Cierre({
 													</div>
 													<div className="col">
 														<div className="input-group mb-3">
-															<input type="text" className="form-control" placeholder="Bs." name="guardar_bs" value={guardar_bs} onChange={e=>fun_setguardar("setguardar_bs",number(e.target.value))}/>
+															<input type="text" className="form-control" placeholder="Bs." name="guardar_bs" value={guardar_bs} disabled={true} onChange={e=>fun_setguardar("setguardar_bs",number(e.target.value), cierre)}/>
 															<div className="input-group-prepend w-50">
 																<span className="input-group-text">Bs.</span>
 															</div>
