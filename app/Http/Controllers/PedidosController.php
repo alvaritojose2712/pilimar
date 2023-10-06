@@ -39,16 +39,16 @@ class PedidosController extends Controller
     
     
     protected  $letras = [
-                1=>"L",
-                2=>"R",
-                3=>"E",
-                4=>"A",
-                5=>"S",
-                6=>"G",
-                7=>"F",
-                8=>"B",
-                9=>"P",
-                0=>"X",
+                1=>"1",
+                2=>"2",
+                3=>"3",
+                4=>"4",
+                5=>"5",
+                6=>"6",
+                7=>"7",
+                8=>"8",
+                9=>"9",
+                0=>"0",
             ];
     public function sends()
     {
@@ -1635,16 +1635,16 @@ class PedidosController extends Controller
                 $sendGastos = (new sendCentral)->sendGastos();
                 $mensajes  = "[ Envio de Gastos: $sendGastos ], ";
                 
-                $sendGarantias = (new sendCentral)->sendGarantias();
+                //$sendGarantias = (new sendCentral)->sendGarantias();
                 $mensajes .= "[ Envio de Garantias: $sendGarantias ], ";
                 
-                $sendFallas = (new sendCentral)->sendFallas(); 
+                //$sendFallas = (new sendCentral)->sendFallas(); 
                 $mensajes .= "[ Envio de Fallas: $sendFallas ], "; 
                 
-                $sendInventario = (new sendCentral)->sendInventario();
+                //$sendInventario = (new sendCentral)->sendInventario();
                 $mensajes .= "[ Envio de Inventario: $sendInventario ], ";
                 
-                $sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
+                //$sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
                 $mensajes .= "[ Cierre a Central: $sendCierreCentral ], ";
                 
                 $enviarcierrecorreo = Mail::to($this->sends())->send(new enviarCierre($arr_send,$from1,$from,$subject));    
