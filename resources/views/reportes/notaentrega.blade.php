@@ -76,13 +76,13 @@
 							Cantidad
 						</th>
 						<th>
-							P/U BASE / VENTA
+							P/U VENTA
 						</th>
 						<th>
 							Descuento
 						</th>
 						<th class="text-right">
-							SubTotal BASE / VENTA  
+							SubTotal VENTA  
 						</th>
 					</tr>
 					@foreach ($pedido->items as $val)
@@ -98,11 +98,10 @@
 							</td>
 							<td>
 								@if ($bs)
-									{{moneda($val->producto->precio_base*$bs)}} / 
 									{{moneda($val->producto->precio*$bs)}}
 								@endif
 								<br>
-								REF: {{moneda($val->producto->precio_base)}} / 
+								REF:
 								{{moneda($val->producto->precio)}}
 							</td>
 							<td>
@@ -110,10 +109,10 @@
 							</td>
 							<td class="text-right">
 								@if ($bs)
-									{{moneda($val->cantidad*$val->producto->precio_base*$bs)}} / {{moneda($val->cantidad*$val->producto->precio*$bs)}} 
+									 {{moneda($val->cantidad*$val->producto->precio*$bs)}} 
 								@endif
 								<br>
-								REF: {{moneda($val->cantidad*$val->producto->precio_base)}} / {{moneda($val->cantidad*$val->producto->precio)}}
+								REF: {{moneda($val->cantidad*$val->producto->precio)}}
 							</td>
 						</tr>
 
@@ -157,13 +156,13 @@
 					  </td>
                     </tr>
                     <tr class="hover h4">
-                      <th colspan="5" class="text-right">Total BASE / VENTA</th>
+                      <th colspan="5" class="text-right">Total VENTA</th>
                       <td class="text-right">
 						@if ($bs)
-							Bs. {{moneda($t_base*$bs)}} / {{moneda(removemoneda($pedido->total)*$bs)}}
+							Bs. {{moneda(removemoneda($pedido->total)*$bs)}}
 						@endif
 						<br>
-						REF: {{moneda($t_base)}} / {{$pedido->total}}
+						REF:  {{$pedido->total}}
 					  </td>
                     </tr>
 				</tbody>

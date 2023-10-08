@@ -157,6 +157,7 @@ Route::group(['middleware' => ['login']], function () {
 		
 		Route::post('delpedido', [PedidosController::class,"delpedido"]);
 
+		Route::get('getCierres', [PedidosController::class,"getCierres"]);
 		
 		
 	});
@@ -184,7 +185,6 @@ Route::group(['middleware' => ['login']], function () {
 		
 		/* GastosController */
 		
-		Route::get('getCierres', [PedidosController::class,"getCierres"]);
 		Route::post('setProveedor', [ProveedoresController::class,"setProveedor"]);
 		Route::post('guardarNuevoProducto', [InventarioController::class,"guardarNuevoProducto"]);
 		Route::post('guardarNuevoProductoLote', [InventarioController::class,"guardarNuevoProductoLote"]);

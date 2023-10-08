@@ -85,25 +85,16 @@ function Header({
               </ul>
             </div>:null}
 
-
-            {auth(1)
-              ?<span className={(view=="cierres"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("cierres")}>Cierre</span>
-              :<span className={(view=="cierres"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>getPermisoCierre()}>Cierre</span>
-            }
+            <span className={(view=="cierres"?"btn btn-dark":null)+(" p-3 pointer")} onClick={()=>setView("cierres")}>Cierre</span>
             
-            {auth(1)?
+            
             <>
               <small className="p-3 monto-header" onClick={setMoneda} data-type="1">USD {dolar} </small>
               <small className="p-3 monto-header" onClick={setMoneda} data-type="2">COP {peso} </small>
-              <small className="p-3 monto-header"><i className="fa fa-refresh" onClick={updatetasasfromCentral}></i> </small>
               
             </>
-            :
-            <>
-              <small className="p-3 monto-header" data-type="1">USD {dolar} </small>
-              <small className="p-3 monto-header" data-type="2">COP {peso} </small>
-            </>
-            }
+            
+            
             
           </div>
           <div className="col-4 d-flex header-justify-content-end">
