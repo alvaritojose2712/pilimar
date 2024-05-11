@@ -858,7 +858,7 @@ class InventarioController extends Controller
                             "precio" => $ee["precio"],
                             "precio_base" => $ee["precio_base"],
                             "unidad" => $ee["unidad"],
-                            "push" => $ee["push"],
+                            "push" => isset($ee["push"])?$ee["push"]:1,
                             "id_deposito" => "",
                             "porcentaje_ganancia" => 0,
                             
