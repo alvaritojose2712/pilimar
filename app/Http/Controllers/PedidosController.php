@@ -170,7 +170,7 @@ class PedidosController extends Controller
     
             if ($fechafixedsql) {
                 $Date1 = $fechafixedsql->fecha;
-                $fechafixedsqlmas5 = date('Y-m-d', strtotime($Date1 . " + 15 day"));
+                $fechafixedsqlmas5 = date('Y-m-d', strtotime($Date1 . " + 3 day"));
     
                 if (($today < $fechafixedsql->fecha) OR ($today > $fechafixedsqlmas5) ) {
                     throw new \Exception("Fecha incorrecta", 1);
@@ -522,7 +522,24 @@ class PedidosController extends Controller
     {
         $pedidomodify = $tipo=="pedido"? pedidos::find($id): pedidos::find(items_pedidos::find($id)->id_pedido);
         if ($pedidomodify->estado) {
+            $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                "id_pedido" => $pedidomodify->id,
+                "tipo" => "modped",
+            ]);
             
+            if ((new UsuariosController)->isAdmin()) {
+            }elseif($isPermiso["permiso"]){
+            }else{
+                $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                    "id_pedido" => $pedidomodify->id,
+                    "tipo" => "modped",
+                    "valoraprobado" => 0,
+                    "descripcion" => "Modificar pedido",
+                ]);
+                if ($nuevatarea) {
+                    throw new \Exception("Debe esperar aprobación del Administrador", 1);
+                }
+            }
             $pedidomodify->estado = 0;
             if ($pedidomodify->save()) {
                 pago_pedidos::where("id_pedido",$pedidomodify->id)->delete();
@@ -553,29 +570,29 @@ class PedidosController extends Controller
             $id = $req->id;
             $motivo = $req->motivo;
 
-            // $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
-            //     "id_pedido" => $id,
-            //     "tipo" => "eliminarPedido",
-            // ]);
+            $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                "id_pedido" => $id,
+                "tipo" => "eliminarPedido",
+            ]);
             
-            // if ((new UsuariosController)->isAdmin()) {
+            if ((new UsuariosController)->isAdmin()) {
 
                 
-            // }elseif($isPermiso["permiso"]){
+            }elseif($isPermiso["permiso"]){
                 
-            // }else{
+            }else{
 
-            //     $nuevatarea = (new TareaslocalController)->createTareaLocal([
-            //         "id_pedido" =>  $id,
-            //         "valoraprobado" => 0,
-            //         "tipo" => "eliminarPedido",
-            //         "descripcion" => "Solicitud de eliminación de pedido: #".$id,
-            //     ]);
-            //     if ($nuevatarea) {
-            //         return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>false]);
-            //     }
+                $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                    "id_pedido" =>  $id,
+                    "valoraprobado" => 0,
+                    "tipo" => "eliminarPedido",
+                    "descripcion" => "Solicitud de eliminación de pedido: #".$id,
+                ]);
+                if ($nuevatarea) {
+                    return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>false]);
+                }
 
-            // }
+            }
 
             $this->checkPedidoAuth($id);
             if ($id) {
@@ -1616,22 +1633,22 @@ class PedidosController extends Controller
                 \Artisan::call('backup:run'); //Enviar Respaldo al correo
                 
                 $sendGastos = (new sendCentral)->sendGastos();
-                //$mensajes  = "[ Envio de Gastos: $sendGastos ], ";
+                $mensajes  = "[ Envio de Gastos: $sendGastos ], ";
                 
                 //$sendGarantias = (new sendCentral)->sendGarantias();
-                // $mensajes .= "[ Envio de Garantias: $sendGarantias ], ";
+                $mensajes .= "[ Envio de Garantias: $sendGarantias ], ";
                 
-                // //$sendFallas = (new sendCentral)->sendFallas(); 
-                // $mensajes .= "[ Envio de Fallas: $sendFallas ], "; 
+                //$sendFallas = (new sendCentral)->sendFallas(); 
+                $mensajes .= "[ Envio de Fallas: $sendFallas ], "; 
                 
-                // //$sendInventario = (new sendCentral)->sendInventario();
-                // $mensajes .= "[ Envio de Inventario: $sendInventario ], ";
+                //$sendInventario = (new sendCentral)->sendInventario();
+                $mensajes .= "[ Envio de Inventario: $sendInventario ], ";
                 
-                // //$sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
-                // $mensajes .= "[ Cierre a Central: $sendCierreCentral ], ";
+                //$sendCierreCentral = (new sendCentral)->sendCierres($cierre->id);
+                $mensajes .= "[ Cierre a Central: $sendCierreCentral ], ";
                 
                 $enviarcierrecorreo = Mail::to($this->sends())->send(new enviarCierre($arr_send,$from1,$from,$subject));    
-                $mensajes .= "Cierre al correo: $enviarcierrecorreo "; 
+                $mensajes .= "[ Cierre al correo: $enviarcierrecorreo ], "; 
                
                 
 

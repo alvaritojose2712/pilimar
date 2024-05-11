@@ -119,9 +119,9 @@ function Cierre({
 							<div className="col">
 								<div className="btn-group mb-1">
 									<button className={(viewCierre=="cuadre"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("cuadre")}>Cuadre</button>
-									
-									<button className={(viewCierre=="historico"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("historico")}>Histórico</button>
-									
+									{auth(1)?
+										<button className={(viewCierre=="historico"?"btn-":"btn-outline-")+("sinapsis btn")} onClick={()=>setViewCierre("historico")}>Histórico</button>
+									:null}
 								</div>
 								<br />
 							</div>
@@ -160,8 +160,8 @@ function Cierre({
 											:null}
 
 
-											<button className="btn btn-warning" onClick={veryenviarcierrefun} type="button" data-type="enviar">Enviar Cierre</button>
-											<button className="btn btn-warning" onClick={sendCuentasporCobrar} type="button" data-type="enviar">Enviar Cuentas por Cobrar</button>
+											{totalizarcierre?<button className="btn btn-warning" onClick={veryenviarcierrefun} type="button" data-type="enviar">Enviar Cierre</button>:null}
+											{/*<button className="btn btn-warning" onClick={sendCuentasporCobrar} type="button" data-type="enviar">Enviar Cuentas por Cobrar</button>*/}
 										</div>
 										<span>
 											{totalizarcierre?"Totalizando ":"Cajero "} {cierre["fecha"]?cierre["usuariosget"].map(e=>
@@ -404,7 +404,77 @@ function Cierre({
 												</div>
 											</div>
 
-											
+											<div className="p-3 card shadow-card mb-2">
+												<table className="table">
+													<tbody>
+														<tr>
+															<th># de Reporte Z</th>
+															<td>
+																<input type="text" className='form-control' value={cierrenumreportez} onChange={e=>setcierrenumreportez(e.target.value)} />
+															</td>
+														</tr>
+														<tr>
+															<th>Venta Exento</th>
+															<td>
+																<input type="text" className='form-control' value={cierreventaexcento} onChange={e=>setcierreventaexcento(number(e.target.value))} />
+															</td>
+														</tr>
+														<tr>
+															<th>Ventas Gravadas (16%)</th>
+															<td>
+																<input type="text" className='form-control' value={cierreventagravadas} onChange={e=>setcierreventagravadas(number(e.target.value))} />
+															</td>
+														</tr>
+														<tr>
+															<th>IVA Ventas</th>
+															<td>
+																<input type="text" className='form-control' value={cierreivaventa} onChange={e=>setcierreivaventa(number(e.target.value))} />
+															</td>
+														</tr>
+														<tr>
+															<th>Total Ventas</th>
+															<td>
+																<input type="text" className='form-control' value={cierretotalventa} onChange={e=>setcierretotalventa(number(e.target.value))} />
+															</td>
+														</tr>
+														<tr>
+															<th>Última Factura</th>
+															<td>
+																<input type="text" className='form-control' value={cierreultimafactura} onChange={e=>setcierreultimafactura(e.target.value)} />
+															</td>
+														</tr>
+														<tr>
+															<td colSpan={2}>
+
+															</td>
+														</tr>
+														<tr>
+															<th>Efectivo adicional Ingresado en Caja Fuerte BS</th>
+															<td>
+																<input type="text" className='form-control' value={cierreefecadiccajafbs} onChange={e=>setcierreefecadiccajafbs(number(e.target.value))} />
+															</td>
+														</tr>
+														<tr>
+															<th>Efectivo adicional Ingresado en Caja Fuerte COP</th>
+															<td>
+																<input type="text" className='form-control' value={cierreefecadiccajafcop} onChange={e=>setcierreefecadiccajafcop(number(e.target.value))} />
+															</td>
+														</tr>
+														<tr>
+															<th>Efectivo adicional Ingresado en Caja Fuerte DOLAR</th>
+															<td>
+																<input type="text" className='form-control' value={cierreefecadiccajafdolar} onChange={e=>setcierreefecadiccajafdolar(number(e.target.value))} />
+															</td>
+														</tr>
+														<tr>
+															<th>Efectivo adicional Ingresado en Caja Fuerte EURO</th>
+															<td>
+																<input type="text" className='form-control' value={cierreefecadiccajafeuro} onChange={e=>setcierreefecadiccajafeuro(number(e.target.value))} />
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
 
 
 									</div>

@@ -35,6 +35,25 @@ class DevolucionesController extends Controller
     {
         try {
             
+            $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                "id_pedido" => null,
+                "tipo" => "devolucion",
+            ]);
+            
+            if ((new UsuariosController)->isAdmin()) {
+            }elseif($isPermiso["permiso"]){
+            }else{
+                $nuevatarea = (new TareaslocalController)->createTareaLocal([
+                    "id_pedido" => null,
+                    "tipo" => "devolucion",
+                    "valoraprobado" => 0,
+                    "descripcion" => "Devolucion",
+                ]);
+                if ($nuevatarea) {
+                    throw new \Exception("Debe esperar aprobación del Administrador", 1);
+                }
+            }
+
             $id_vendedor = session("id_usuario");
             $new_mov = new devoluciones;
             $new_mov->id_vendedor = $id_vendedor;
