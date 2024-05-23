@@ -4864,7 +4864,7 @@ export default function Facturar({ user, notificar, setLoading }) {
 
     const [isCierre, setisCierre] = useState(false)
     const getPermisoCierre = () => {
-        if (!isCierre) {
+        /* if (!isCierre) {
             
             db.getPermisoCierre({}).then(res=>{
                 if (res.data) {
@@ -4875,9 +4875,9 @@ export default function Facturar({ user, notificar, setLoading }) {
                 }
             })
         }else{
-            setView("cierres")
-
-        }
+            
+        } */
+        setView("cierres")
     }
 
    
