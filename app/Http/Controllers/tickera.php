@@ -311,7 +311,7 @@ class tickera extends Controller
                     foreach ($items as $item) {
     
                         //Current item ROW 1
-                       $printer->text($item['descripcion']);
+                       /* $printer->text($item['descripcion']);
                        $printer->text("\n");
                        $printer->text($item['codigo_barras']);
                        $printer->text("\n");
@@ -326,7 +326,25 @@ class tickera extends Controller
                        $printer->text("\n");
     
                        $printer->text(addSpaces("Tot. ",6).$item['totalprecio']);
-                       $printer->text("\n");
+                       $printer->text("\n"); */
+
+                        $printer->setEmphasis(true);
+                        $printer->text($item['descripcion']);
+                        $printer->setEmphasis(false);
+                        $printer->text("\n");
+
+                        $printer->text($item['codigo_barras']);
+                        $printer->text("\n");
+    
+
+                        $printer->text(addSpaces("CT. ".$item['cantidad'],12)." | ");
+                        //$printer->text("\n");
+                        
+                        $printer->text(addSpaces("P/U. ".$item['pu'],13)." | ");
+                        //$printer->text("\n");
+
+                        $printer->text(addSpaces("SUB. ".$item['totalprecio'],15));
+                        $printer->text("\n");
     
     
     
