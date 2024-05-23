@@ -99,7 +99,7 @@ class tickera extends Controller
                     $printer->text($e['id']);
                     $printer->text("\n");
 
-                    $printer->text(addSpaces("P/U. ",6).moneda($e['precio']*$dolar));
+                    /* $printer->text(addSpaces("P/U. ",6).moneda($e['precio']*$dolar));
                     $printer->text("\n");
                     
                     $printer->setEmphasis(true);
@@ -108,7 +108,22 @@ class tickera extends Controller
                     $printer->text("\n");
 
                     $printer->text(addSpaces("SubTotal. ",6).moneda($e['subtotal']*$dolar));
+                    $printer->text("\n"); */
+
+
+
+                    $printer->text(addSpaces("CT. ".$e['cantidad'],12)." | ");
+                    //$printer->text("\n");
+                    
+                    $printer->text(addSpaces("P/U. ".moneda($e['precio']*$dolar),13)." | ");
+                    //$printer->text("\n");
+
+                    $printer->text(addSpaces("SUB. ".moneda($e['subtotal']*$dolar),15));
                     $printer->text("\n");
+
+
+
+
                     $printer->feed();
 
                     $totalpresupuesto += $e['subtotal'];
