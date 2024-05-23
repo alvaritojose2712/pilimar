@@ -2231,7 +2231,7 @@ export default function Facturar({ user, notificar, setLoading }) {
 
             let promptInfoCliente = window.prompt("(Moneda: $ | bs | cop),(Identificación),(Nombre y Apellido) Separado por coma (,)",
                     pedidoData.cliente
-                        ? "bs," +
+                        ? "$," +
                               pedidoData.cliente.identificacion +
                               "," +
                               pedidoData.cliente.nombre
