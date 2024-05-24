@@ -144,8 +144,8 @@ class PagoPedidosController extends Controller
                // 5 Biopago
                // 6 vuelto
             try {
-                /* (new PedidosController)->checkPedidoAuth($req->id);
-                (new PedidosController)->checkPedidoPago($req->id); */
+                (new PedidosController)->checkPedidoAuth($req->id);
+                (new PedidosController)->checkPedidoPago($req->id);
 
 
                 $cuenta = 1;

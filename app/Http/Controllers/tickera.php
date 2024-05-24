@@ -145,7 +145,7 @@ class tickera extends Controller
                 $today = (new PedidosController)->today();
 
                 if ($fecha_creada != $today || ($fecha_creada == $today && $pedido->ticked)) {
-                    $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
+                    /* $isPermiso = (new TareaslocalController)->checkIsResolveTarea([
                         "id_pedido" => $req->id,
                         "tipo" => "tickera",
                     ]);
@@ -167,7 +167,7 @@ class tickera extends Controller
                         if ($nuevatarea) {
                             return Response::json(["msj"=>"Debe esperar aprobación del Administrador","estado"=>false]);
                         }
-                    }
+                    } */
                 }
                 
 

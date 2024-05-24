@@ -746,7 +746,8 @@ const syncPago = (val,type)=>{
                                 <div className="card-text pago-numero">
                                     <input type="text" value={vuelto} onChange={(e)=>setVuelto(number(e.target.value))} placeholder="V"/>
                                 </div>
-                                :
+                                :null
+                                }
                                 <div onClick={entregarVuelto}>
                                     <div className="card-text pago-numero">                
                                     {vuelto}
@@ -757,7 +758,6 @@ const syncPago = (val,type)=>{
                                     
                                     </div>):null}
                                 </div>
-                                }
                             </div>
                             </div>
                         </div> 
